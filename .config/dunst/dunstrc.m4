@@ -1,6 +1,6 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')
-sinclude(`dunstrc.pre.m4')
 merge_env(`MONOCHROME')
+sinclude(`dunstrc.pre.m4')
 
 [global]
     ### Display ###

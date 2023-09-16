@@ -8,8 +8,8 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')
-sinclude(`config.pre.m4')
 merge_env(`HIDPI', `MONOCHROME')
+sinclude(`config.pre.m4')
 
 set $mod Mod4
 
