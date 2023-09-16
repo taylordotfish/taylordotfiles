@@ -3,7 +3,7 @@ set -eu
 xrdb ~/.Xresources -cpp m4
 xset s off
 xset s noblank
-xset dpms 65535 65536 65536
+xset dpms 65535 65535 65535
 xset -dpms
 xset b off
 xset fp default
