@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+name=Rxvt
+prev=
+for arg in "$@"; do
+    [ "$prev" == "-name" ] && name=$arg
+    prev=$arg
+done
+if ! xrdb -query | grep '^\s*'"$name"'\.font:\s*-misc-' > /dev/null; then
+    export HEAVY_BLOCKS=1
+fi
+exec urxvt "$@"

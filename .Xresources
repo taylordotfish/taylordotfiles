@@ -1,0 +1,53 @@
+include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')
+sinclude(`.Xresources.pre.m4')
+merge_env(`HIDPI', `MONOCHROME')
+
+Xft.dpi: ifdefn(`HIDPI', `192', `96')
+xterm*background: black
+xterm*foreground: white
+xterm*color4: rgb:0f/6b/b0
+xterm*color12: rgb:60/a4/ff
+xterm*metaSendsEscape: true
+xterm*locale: true
+
+define_default(`RXVT_COLORS', `
+    $1.foreground: white
+    $1.background: [75]#000000
+')
+
+define_default(`RXVT_COLORS_MONOCHROME', `
+    $1.foreground: black
+    $1.background: [90]#ffffff
+')
+
+RXVT_COLORS(Rxvt-color)
+ifdefn(`MONOCHROME', `pushdef(`RXVT_COLORS', `RXVT_COLORS_MONOCHROME($@)')')
+RXVT_COLORS(Rxvt)
+
+Rxvt.scrollBar: false
+Rxvt.color4: #0f6bb0
+Rxvt.color12: #60a4ff
+Rxvt.depth: 32
+
+define_default(`RXVT_FONTS', `
+    $1.font: -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1
+    $1.boldFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
+')
+
+define_default(`RXVT_FONTS_HIDPI', `
+    $1.font: -misc-2xfixed-medium-r-normal--30-280-75-75-c-180-iso10646-1
+    $1.boldFont: -misc-2xfixed-bold-r-normal--30-280-75-75-c-180-iso10646-1
+')
+
+define_default(`RXVT_FONTS_MONOCHROME', `
+    $1.font: xft:DejaVu Sans Mono:size=8.5
+')
+
+ifdefn(`HIDPI', `pushdef(`RXVT_FONTS', `RXVT_FONTS_HIDPI($@)')')
+RXVT_FONTS(Rxvt-color)
+ifdefn(`MONOCHROME', `pushdef(`RXVT_FONTS', `RXVT_FONTS_MONOCHROME($@)')')
+RXVT_FONTS(Rxvt)
+
+sinclude(`.Xresources.post.m4')
+! `vim:ft=xdefaults'
+dnl vim:ft=m4

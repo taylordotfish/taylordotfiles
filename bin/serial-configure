@@ -1,0 +1,92 @@
+#!/bin/bash
+# Copyright (C) 2023 taylor.fish <contact@taylor.fish>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+set -euo pipefail
+
+DEFAULT_DEVICE=/dev/ttyUSB0
+
+USAGE=$(cat << EOF
+Usage: $(basename "$0") [device [stty-option...]]
+
+Default device: $DEFAULT_DEVICE
+[stty-option...] configures [device].
+EOF
+)
+
+if [[ "${1:-}" =~ -h|--help ]]; then
+    echo "$USAGE"
+    exit
+fi
+
+device=${1:-$DEFAULT_DEVICE}
+
+stty -F "$device" \
+    115200 \
+    min 1 \
+    time 0 \
+    -parenb \
+    -parodd \
+    -cmspar \
+    cs8 \
+    -cstopb \
+    cread \
+    clocal \
+    -crtscts \
+    ignbrk \
+    -brkint \
+    ignpar \
+    -parmrk \
+    -inpck \
+    -istrip \
+    -inlcr \
+    -igncr \
+    -icrnl \
+    -ixon \
+    -ixoff \
+    -iuclc \
+    -ixany \
+    -imaxbel \
+    -iutf8 \
+    -opost \
+    -olcuc \
+    -ocrnl \
+    -onlcr \
+    -onocr \
+    -onlret \
+    -ofill \
+    -ofdel \
+    nl0 \
+    cr0 \
+    tab0 \
+    bs0 \
+    vt0 \
+    ff0 \
+    -isig \
+    -icanon \
+    iexten \
+    -echo \
+    -echoe \
+    -echok \
+    -echonl \
+    -noflsh \
+    -xcase \
+    -tostop \
+    -echoprt \
+    -echoctl \
+    echoke \
+    -flusho \
+    -extproc \
+    "${@:2}"

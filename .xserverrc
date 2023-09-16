@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ -n "$LOGVERBOSE" ]; then
+    set -- -logverbose "$LOGVERBOSE" "$@"
+fi
+exec /usr/bin/X -nolisten tcp "$@" vt$XDG_VTNR

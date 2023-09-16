@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+import sys
+import unicodedata
+
+
+def show(c: str):
+    try:
+        name = unicodedata.name(c)
+    except ValueError:
+        name = "[no name found]"
+    print("U+{:X} {}".format(ord(c), name))
+
+
+def main():
+    if len(sys.argv) > 1:
+        text = sys.argv[1]
+    else:
+        text = sys.stdin.read()
+    for c in text:
+        show(c)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+from commonmark import commonmark
+import sys
+
+
+def main():
+    if len(sys.argv) <= 1:
+        print(commonmark(sys.stdin.read()), end="")
+        return
+    for name in sys.argv[1:]:
+        with open(name) as f:
+            print(commonmark(f.read()), end="")
+
+
+if __name__ == "__main__":
+    main()

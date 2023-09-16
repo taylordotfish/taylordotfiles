@@ -1,0 +1,110 @@
+#!/usr/bin/env lua
+-- Copyright (C) 2023 taylor.fish <contact@taylor.fish>
+--
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+local ALPHANUMERIC = (function()
+	local str = (
+		"abcdefghijklmnopqrstuvwxyz" ..
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" ..
+		"0123456789"
+	)
+
+	local list = {}
+	for i = 1, #str do
+		list[i] = str:sub(i, i)
+	end
+	return list
+end)()
+
+local function version_gte(maj, min)
+	local vs = {_VERSION:match("(%d+)%.(%d+)$")}
+	for i = 1, #vs do
+		vs[i] = tonumber(vs[i]) or 0
+	end
+	rmaj, rmin = vs[1], vs[2]
+	return rmaj > maj or (rmaj == maj and rmin >= min)
+end
+
+local floor_div = (function()
+	if not version_gte(5, 3) then
+		return function(a, b)
+			return math.floor(a / b)
+		end
+	end
+	return load("return function(a, b) \
+		return a // b \
+	end")()
+end)()
+
+local random_num = (function()
+	local file = assert(io.open("/dev/urandom", "rb"))
+
+	return function(from, to)
+		local num_vals = to - from + 1
+		local max_rand = 256
+		local num_bytes = 1
+		while max_rand < num_vals do
+			max_rand = max_rand * 256
+			num_bytes = num_bytes + 1
+		end
+		local max_valid = floor_div(max_rand, num_vals) * num_vals
+
+		while true do
+			local num = 0
+			for i = 1, num_bytes do
+				num = num * 256 + file:read(1):byte()
+			end
+			if num < max_valid then
+				return from + num % num_vals
+			end
+		end
+	end
+end)()
+
+local function random_choice(list)
+	return list[random_num(1, #list)]
+end
+
+local function usage(file)
+	file = file or io.stdout
+	file:write("Usage: random-string <length>\n")
+end
+
+local function usage_error(code)
+	usage(io.stderr)
+	os.exit(code or 1)
+end
+
+(function()
+	if #arg ~= 1 then
+		usage_error()
+	end
+
+	if arg[1] == "-h" or arg[1] == "--help" then
+		usage()
+		return
+	end
+
+	local length = tonumber(arg[1])
+	if length == nil then
+		usage_error()
+	end
+
+	local result = {}
+	for i = 1, length do
+		result[i] = random_choice(ALPHANUMERIC)
+	end
+	print(table.concat(result))
+end)()

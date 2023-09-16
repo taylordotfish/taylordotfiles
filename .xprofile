@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+xrdb ~/.Xresources -cpp m4
+xset s off
+xset s noblank
+xset dpms 65535 65536 65536
+xset -dpms
+xset b off
+xset fp default
+for d in /usr/local/share/fonts/X11/*; do
+    [ -f "$d/fonts.dir" ] && xset fp+ "$d"
+done
+for script in ~/scripts/{displays,controls,xrdb}.sh; do
+    [ -f "$script" ] && "$script"
+done

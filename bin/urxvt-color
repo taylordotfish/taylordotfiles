@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+title="-title urxvt"
+for arg in "$@"; do
+    [ "$arg" = "-e" ] && title=
+done
+exec urxvt -name Rxvt-color $title

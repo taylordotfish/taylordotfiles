@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+unset GDK_DPI_SCALE
+unset QT_FONT_DPI
+old=$(xrdb -query | grep '^Xft.dpi:')
+printf 'Xft.dpi: %d\n' "${DPI:-96}" | xrdb -override -
+(sleep 2; printf '%s\n' "$old" | xrdb -override -) &
+exec "$@"

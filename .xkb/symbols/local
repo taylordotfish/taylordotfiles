@@ -1,0 +1,16 @@
+xkb_symbols {
+    # Right Control is Left Super
+    key <RCTL> { [ Super_L ] };
+    modifier_map Mod4 { <RCTL> };
+
+    # Compose keys
+    key <MENU> { [ Multi_key, Multi_key ] };
+    key <RWIN> { [ Multi_key, Multi_key ] };
+
+    # Caps Lock is Left Control
+    key <CAPS> { [ Control_L ] };
+    modifier_map control { <CAPS> };
+
+    # Unused Caps Lock key for xcape
+    key <I248> { [ Caps_Lock ] };
+};
