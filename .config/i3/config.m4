@@ -185,15 +185,17 @@ define_default(`DMENU_FONT', ifelse(
     `0', `Misc Fixed:pixelsize=13', `DejaVu Sans Mono:size=10'))
 define_default(`I3_FONT_HIDPI', `pango:DejaVu Sans Mono 10')
 define_default(`DMENU_FONT_HIDPI', `DejaVu Sans Mono:size=10')
+
 define_default(`DMENU_COLORS')
 define_default(`DMENU_COLORS_MONOCHROME',
     `-nf white -sb white -sf black')
 dnl `-nf black -sb black -sf white')
 
-ifdefn(`HIDPI', `concat(
-    pushdef(`I3_FONT', `I3_FONT_HIDPI'),
-    pushdef(`DMENU_FONT', `DMENU_FONT_HIDPI'))')
 ifdefn(`MONOCHROME', `pushdef(`DMENU_COLORS', `DMENU_COLORS_MONOCHROME')')
+ifdefn(`HIDPI', `ifelse(
+    pushdef(`I3_FONT', `I3_FONT_HIDPI')
+    pushdef(`DMENU_FONT', `DMENU_FONT_HIDPI')
+)')
 font I3_FONT
 bindsym $mod+d exec --no-startup-id dmenu_run -fn "DMENU_FONT" DMENU_COLORS
 
