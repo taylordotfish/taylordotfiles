@@ -4,4 +4,4 @@ cmd=vim
 if [ -n "${MONOCHROME:-}" ]; then
     cmd="monoterm -b $cmd"
 fi
-urxvt -e $cmd "$@"
+exec urxvt -e $cmd "$@"
