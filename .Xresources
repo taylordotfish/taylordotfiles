@@ -32,11 +32,16 @@ Rxvt.depth: 32
 define_default(`RXVT_FONTS', `
     $1.font: -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1
     $1.boldFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
+    $1.italicFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
+    $1.boldItalicFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
 ')
 
 define_default(`RXVT_FONTS_HIDPI', `
     $1.font: -misc-2xfixed-medium-r-normal--30-280-75-75-c-180-iso10646-1
     $1.boldFont: -misc-2xfixed-bold-r-normal--30-280-75-75-c-180-iso10646-1
+    $1.italicFont: -misc-2xfixed-bold-r-normal--30-280-75-75-c-180-iso10646-1
+    $1.boldItalicFont: dnl
+        -misc-2xfixed-bold-r-normal--30-280-75-75-c-180-iso10646-1
 ')
 
 define_default(`RXVT_FONTS_MONOCHROME', `
