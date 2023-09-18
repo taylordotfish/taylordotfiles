@@ -37,7 +37,7 @@ syntax on
 colorscheme bluegreen
 
 au FileType * set cindent indentexpr=GetCIndent()
-au FileType markdown,text set nocindent indentexpr=
+au FileType markdown,text,gitcommit set nocindent indentexpr=
 au FileType make,lua TabMode
 au FileType vim set comments+=:\"
 au FileType m4 set matchpairs+=`:' |
