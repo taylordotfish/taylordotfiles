@@ -132,5 +132,5 @@ function GetCIndent()
 endfunction
 
 let g:python_indent = {}
-let g:python_indent.open_paren = 4
-let g:python_indent.continue = 4
+let g:python_indent.open_paren = g:indent
+let g:python_indent.continue = g:indent
