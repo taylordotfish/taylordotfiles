@@ -3,9 +3,7 @@
 
 let g:indent = 4
 set autoindent
-set cindent
 set cinoptions=(1s
-set indentexpr=GetCIndent()
 set expandtab
 execute "set shiftwidth=" . g:indent
 execute "set softtabstop=" . g:indent
@@ -36,19 +34,29 @@ filetype indent on
 syntax on
 colorscheme bluegreen
 
-au FileType * set cindent indentexpr=GetCIndent()
-au FileType markdown,text,gitcommit set nocindent indentexpr=
+au FileType * call SetDefaultIndent()
+au FileType markdown,text,gitcommit set indentexpr=
 au FileType make,lua TabMode
 au FileType vim set comments+=:\"
-au FileType m4 set matchpairs+=`:' |
-    \ set cpoptions+=%M |
-    \ syn clear m4String |
-    \ syn region m4Str start="`" end="'" contains=m4Constants,m4Special,
-    \     m4Variable,m4Paren,m4Command,m4Statement,m4Function |
-    \ syn cluster m4Top add=m4Str |
-    \ hi def link m4Str String
+au FileType m4 call SetM4Options()
 au BufRead,BufNewFile *.html set filetype=htmldjango
 au BufRead,BufNewFile *.h++ set filetype=cpp
+
+function SetDefaultIndent()
+    if &l:indentexpr == ""
+        set indentexpr=GetCIndent()
+    endif
+endfunction
+
+function SetM4Options()
+    set matchpairs+=`:'
+    set cpoptions+=%M
+    syn clear m4String
+    syn region m4Str start="`" end="'" contains=m4Constants,m4Special,
+        \ m4Variable,m4Paren,m4Command,m4Statement,m4Function
+    syn cluster m4Top add=m4Str |
+    hi def link m4Str String
+endfunction
 
 nnoremap <Space> :noh<CR>
 inoremap # <Space><Backspace>#
