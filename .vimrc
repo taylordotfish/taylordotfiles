@@ -39,7 +39,6 @@ au FileType markdown,text,gitcommit set indentexpr=
 au FileType make,lua TabMode
 au FileType vim set comments+=:\"
 au FileType m4 call SetM4Options()
-au BufRead,BufNewFile *.html set filetype=htmldjango
 au BufRead,BufNewFile *.h++ set filetype=cpp
 
 function SetDefaultIndent()
