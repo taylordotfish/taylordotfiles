@@ -168,8 +168,12 @@ bindsym $mod+r mode "resize"
 for_window [class=".*"] border normal 0
 
 # floating
-for_window [title="ImageMagick"] floating enable
-for_window [title="ImageMagick"] move position 800 200
+for_window [class="^display(-|$)"] floating enable
+for_window [class="^display(-|$)"] move position ifdefn(
+    `HIDPI', `800 450', `400 225')
+for_window [class="^kmag$"] floating enable
+for_window [class="^kmag$"] resize set ifdefn(
+    `HIDPI', `1600 1200', `800 600')
 
 # dunst
 bindsym Control+space exec --no-startup-id dunstctl close
@@ -215,9 +219,9 @@ bindsym $mod+Return exec --no-startup-id \
 bindsym $mod+Shift+Return exec --no-startup-id \
     urxvt -title urxvt -e TERM_COMMAND bash
 
-client.focused          #232323 #101010 #ffffff #202020 #000000
-client.unfocused        #131313 #000000 #777777 #202020 #000000
-client.focused_inactive #131313 #101010 #777777 #202020 #000000
+client.focused          #444444 #202020 #ffffff #000000 #000000
+client.unfocused        #444444 #000000 #909090 #000000 #000000
+client.focused_inactive #444444 #202020 #909090 #000000 #000000
 
 #client.focused          #000000 #ffffff #000000 #ffffff #000000
 #client.unfocused        #ffffff #ffffff #dddddd #ffffff #000000
@@ -231,8 +235,8 @@ bar {
         statusline #ffffff
         ifdefn(`MONOCHROME', `separator #bbbbbb')
         focused_workspace #303030 #303030 #ffffff
-        active_workspace #202020 #202020 #9a9a9a
-        inactive_workspace #101010 #101010 #777777
+        active_workspace #202020 #202020 #c0c0c0
+        inactive_workspace #101010 #101010 #909090
 
         #background #ffffff
         #statusline #000000
