@@ -17,7 +17,7 @@ define_default(`RXVT_COLORS', `
 
 define_default(`RXVT_COLORS_MONOCHROME', `
     $1.foreground: black
-    $1.background: [90]#ffffff
+    $1.background: #ffffff
 ')
 
 RXVT_COLORS(Rxvt-color)
