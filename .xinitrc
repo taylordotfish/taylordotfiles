@@ -33,7 +33,7 @@ fi
 
 start-lock() {
     NOXCAPE=1 NOSRVRKEYS=1 ~/.xkb/setmap.sh
-    if [ -n "${MONOCHROME:-}" ]; then
+    if [ -n "${MONOCHROME-}" ]; then
         local color=ffffff
     else
         local color=000000

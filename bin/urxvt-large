@@ -1,4 +1,4 @@
 #!/bin/sh
-size=${1:-20}
+size=${1-20}
 shift
 exec urxvt -fn "xft:DejaVu Sans Mono:size=$size" +fb +fi +fbi "$@"

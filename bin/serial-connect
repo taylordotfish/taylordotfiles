@@ -27,12 +27,12 @@ Press ^X to quit.
 EOF
 )
 
-if [[ "${1:-}" =~ -h|--help ]]; then
+if [[ "${1-}" =~ ^(-h|--help)$ ]]; then
     echo "$USAGE"
     exit
 fi
 
-device=${1:-$DEFAULT_DEVICE}
+device=${1-$DEFAULT_DEVICE}
 
 if ! ([ -r "$device" ] && [ -w "$device" ]); then
     echo >&2 "error: no read/write access for $device"

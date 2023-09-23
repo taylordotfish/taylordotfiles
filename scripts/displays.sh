@@ -8,7 +8,7 @@ fi
 
 if [ -f ~/.fehbg ]; then
     ~/.fehbg
-elif [ -n "$MONOCHROME" ]; then
+elif [ -n "${MONOCHROME-}" ]; then
     "$setroot" -solid '#ffffff'
 else
     "$setroot" -solid '#000000'

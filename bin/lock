@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-if [ -n "${MONOCHROME:-}" ]; then
+if [ -n "${MONOCHROME-}" ]; then
     i3lock -c ffffff
 else
     i3lock -c 000000

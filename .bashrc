@@ -28,7 +28,7 @@ alias cal="ncal -C"
 alias mail="MBOX=$HOME/Documents/mbox mail"
 
 get-alias() {
-    printf '%s' "${BASH_ALIASES[$1]:-$1}"
+    printf '%s' "${BASH_ALIASES[$1]-$1}"
 }
 
 # Adds the option "--si" to a command if "-h" is present.

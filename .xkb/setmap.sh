@@ -6,7 +6,7 @@ layout=$(cat layout.conf | grep -o '^\w\+' | head -1)
 
 xkb_args=()
 xcape_map=
-if [ -n "${NOSRVRKEYS:-}" ]; then
+if [ -n "${NOSRVRKEYS-}" ]; then
     xkb_args+=(-option srvrkeys:none)
 fi
 
@@ -20,17 +20,17 @@ setxkbmap "-I$HOME/.xkb" \
 
 run-verbose() {
     xkbcomp "-I$HOME/.xkb" .keymap.xkb "$DISPLAY"
-    if [ -z "${NOXCAPE:-}" ]; then
+    if [ -z "${NOXCAPE-}" ]; then
         killall xcape || true
     fi
 }
 
-if [ -n "${DEBUG:-}" ]; then
+if [ -n "${DEBUG-}" ]; then
     run-verbose
 else
     run-verbose >& /dev/null
 fi
 
-if [ -z "${NOXCAPE:-}" ]; then
+if [ -z "${NOXCAPE-}" ]; then
     xcape -e "#66=Escape;#37=Caps_Lock$xcape_map"
 fi
