@@ -1,5 +1,6 @@
 include "%L"
 <Multi_key> <minus> <period> : "−"
+<Multi_key> <minus> <equals> : "−"
 <Multi_key> <s> <h> : "ʃ"
 <Multi_key> <z> <h> : "ʒ"
 <Multi_key> <n> <g> : "ŋ"
