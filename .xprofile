@@ -8,8 +8,8 @@ xset -dpms
 xset b off
 xset fp default
 for d in /usr/local/share/fonts/X11/*; do
-    [ -f "$d/fonts.dir" ] && xset fp+ "$d"
+    [ -f "$d/fonts.dir" ] && xset fp+ "$d" || true
 done
-for script in ~/scripts/{displays,controls,xrdb}.sh; do
-    [ -f "$script" ] && "$script"
+for script in ~/scripts/{displays,controls}.sh; do
+    [ -f "$script" ] && "$script" || true
 done
