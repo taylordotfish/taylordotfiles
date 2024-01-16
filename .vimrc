@@ -86,7 +86,7 @@ function TabMode()
     call ClearWsMode()
     set noexpandtab softtabstop=0
     let g:lc_normal = "trail:·"
-    execute "set listchars=tab:\\ \\ ,lead:·," . g:lc_normal
+    execute "set listchars+=tab:\\ \\ ,lead:·," . g:lc_normal
     call add(g:ws_ids, matchadd("Ws", "\\(^\\s*\\)\\@<= ", -2))
     call add(g:ws_ids, matchadd("Ws", " \\ze\\s*$", -2))
     call add(g:ws_ids, matchadd("TrailingWs", "\\(\\S.*\\)\\@<=\\t", -1))
@@ -99,9 +99,9 @@ function SpaceMode()
     execute "set expandtab softtabstop=" . g:indent
     let g:lc_normal = ""
     if $HEAVY_BLOCKS != ""
-        set listchars=tab:┣━┫
+        set listchars+=tab:┣━┫
     else
-        set listchars=tab:├─┤
+        set listchars+=tab:├─┤
     endif
     call add(g:ws_ids, matchadd("Ws", "\\t", -2))
 endfunction
@@ -109,6 +109,7 @@ command SpaceMode call SpaceMode()
 
 let g:ws_ids = []
 function ClearWsMode()
+    set listchars=extends:$,precedes:$
     for id in g:ws_ids
         call matchdelete(id)
     endfor
