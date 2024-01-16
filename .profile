@@ -9,10 +9,12 @@ PATH=~/.cargo/bin:$PATH
 PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-        SOURCED_FROM_PROFILE=1 . "$HOME/.bashrc"
+source_bashrc() {
+    # if running bash
+    if [ -n "$BASH_VERSION" ]; then
+        # include .bashrc if it exists
+        if [ -f "$HOME/.bashrc" ]; then
+            SOURCED_FROM_PROFILE=1 . "$HOME/.bashrc" || true
+        fi
     fi
-fi
+}

@@ -168,11 +168,11 @@ bindsym $mod+r mode "resize"
 for_window [class=".*"] border normal 0
 
 # floating
-for_window [class="^display(-|$)"] floating enable
-for_window [class="^display(-|$)"] move position ifdefn(
+for_window [instance="^display(-|$)"] floating enable
+for_window [instance="^display(-|$)"] move position ifdefn(
     `HIDPI', `800 450', `400 225')
-for_window [class="^kmag$"] floating enable
-for_window [class="^kmag$"] resize set ifdefn(
+for_window [instance="^kmag$"] floating enable
+for_window [instance="^kmag$"] resize set ifdefn(
     `HIDPI', `1600 1200', `800 600')
 
 # dunst

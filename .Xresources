@@ -45,7 +45,7 @@ define_default(`RXVT_FONTS_HIDPI', `
 ')
 
 define_default(`RXVT_FONTS_MONOCHROME', `
-    $1.font: xft:DejaVu Sans Mono:size=8.5
+    $1.font: xft:DejaVu Sans Mono:pixelsize=22
 ')
 
 ifdefn(`HIDPI', `pushdef(`RXVT_FONTS', `RXVT_FONTS_HIDPI($@)')')

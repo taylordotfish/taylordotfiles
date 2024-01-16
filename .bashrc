@@ -1,7 +1,7 @@
 [ -n "$SOURCED_FROM_BASHRC" ] && return 1
 unalias -a
 
-SOURCED_FROM_BASHRC=1 source ~/.profile
+SOURCED_FROM_BASHRC=1 source ~/.profile || true
 # Source default .bashrc
 source /etc/skel/.bashrc
 

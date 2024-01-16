@@ -13,6 +13,7 @@ fi
 setxkbmap "-I$HOME/.xkb" \
     -rules local \
     -option compose:menu \
+    -option compose:rwin \
     -option local \
     "${xkb_args[@]}" \
     -layout "$layout" \
