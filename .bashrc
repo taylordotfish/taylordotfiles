@@ -14,7 +14,7 @@ PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
 export MIRIFLAGS="-Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
-export NODE_PATH=/usr/lib/nodejs:~/.local/lib/node_modules
+export NODE_PATH=~/.local/lib/node_modules
 
 alias grep="grep --color"
 alias rm="rm -I"
@@ -105,10 +105,6 @@ controls() {
     ~/scripts/controls.sh
 }
 
-refresh-xrdb() {
-    ~/scripts/xrdb.sh
-}
-
 git-gc-all() {
     if [ "$1" != "--confirm" ]; then
         echo >&2 "error: pass --confirm to confirm"
@@ -141,7 +137,8 @@ cargo() {
 
     local rustflags=" -Z macro-backtrace -Z proc-macro-backtrace"
     local docflags=" -Z unstable-options"
-    [ $1 == "test" ] || docflags+=" --extern-html-root-takes-precedence"
+    # Necessary to use local std docs
+    [ "$1" = "test" ] || docflags+=" --extern-html-root-takes-precedence"
 
     local args=()
     [ "$1" = "doc" ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
