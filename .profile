@@ -18,3 +18,8 @@ source_bashrc() {
         fi
     fi
 }
+
+# If this file is used as a shared script that other .profile files source, it
+# may be desired to defer the sourcing of .bashrc so those other files can run
+# their own commands first.
+[ -n "$DEFER_BASHRC" ] || source_bashrc
