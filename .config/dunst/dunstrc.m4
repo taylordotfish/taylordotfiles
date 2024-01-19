@@ -1,7 +1,7 @@
-include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')
-merge_env(`MONOCHROME')
-sinclude(`dunstrc.pre.m4')
-
+include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
+merge_env(`MONOCHROME')dnl
+sinclude(`dunstrc.pre.m4')dnl
+dnl
 [global]
     ### Display ###
 
@@ -68,13 +68,13 @@ sinclude(`dunstrc.pre.m4')
     frame_width = 3
 
     # Defines color of the notification window.
-    ifdefn(`MONOCHROME', `
-        background = "#ffffff"
-        foreground = "#000000"
-    ', `
-        background = "#285577"
-        foreground = "#ffffff"
-    ')
+ifdefn(`MONOCHROME', `dnl
+    background = "#ffffff"
+    foreground = "#000000"
+', `dnl
+    background = "#285577"
+    foreground = "#ffffff"
+')dnl
 
     # Defines color of the frame around the notification window.
     frame_color = ifdefn(`MONOCHROME', `"#000000"', `"#aaaaaa"')
@@ -266,10 +266,10 @@ sinclude(`dunstrc.pre.m4')
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
-    ifdefn(`MONOCHROME',, `
-        background = "#222222"
-        foreground = "#888888"
-    ')
+ifdefn(`MONOCHROME',, `dnl
+    background = "#222222"
+    foreground = "#888888"
+')dnl
     timeout = 0
     # Icon for notifications with low urgency, uncomment to enable
     #icon = /path/to/icon
@@ -280,11 +280,11 @@ sinclude(`dunstrc.pre.m4')
     #icon = /path/to/icon
 
 [urgency_critical]
-    ifdefn(`MONOCHROME',, `
-        background = "#900000"
-        foreground = "#ffffff"
-        frame_color = "#ff0000"
-    ')
+ifdefn(`MONOCHROME',, `dnl
+    background = "#900000"
+    foreground = "#ffffff"
+    frame_color = "#ff0000"
+')dnl
     timeout = 0
     # Icon for notifications with critical urgency, uncomment to enable
     #icon = /path/to/icon
@@ -404,5 +404,5 @@ sinclude(`dunstrc.pre.m4')
 #    appname = "some_volume_notifiers"
 #    set_stack_tag = "volume"
 
-sinclude(`dunstrc.post.m4')
+sinclude(`dunstrc.post.m4')dnl
 `#' `vim:ft=conf'

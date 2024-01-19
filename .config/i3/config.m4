@@ -7,10 +7,10 @@
 # i3 config file (v4)
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
-include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')
-merge_env(`HIDPI', `MONOCHROME')
-sinclude(`config.pre.m4')
-
+include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
+merge_env(`HIDPI', `MONOCHROME')dnl
+sinclude(`config.pre.m4')dnl
+dnl
 set $mod Mod4
 
 # use Mouse+$mod to drag floating windows to their wanted position
@@ -183,36 +183,36 @@ bindsym Control+Shift+period exec --no-startup-id dunstctl context
 
 # fonts
 define_default(`I3_FONT',
-    `-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso10646-1')
+    `-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso10646-1')dnl
 define_default(`DMENU_FONT', ifelse(
     vsyscmd(`[ "$(fc-match "Misc Fixed" family)" = "Misc Fixed" ]'),
-    `0', `Misc Fixed:pixelsize=13', `DejaVu Sans Mono:size=10'))
-define_default(`I3_FONT_HIDPI', `pango:DejaVu Sans Mono 10')
-define_default(`DMENU_FONT_HIDPI', `DejaVu Sans Mono:size=10')
-
-define_default(`DMENU_COLORS')
+    `0', `Misc Fixed:pixelsize=13', `DejaVu Sans Mono:size=10'))dnl
+define_default(`I3_FONT_HIDPI', `pango:DejaVu Sans Mono 10')dnl
+define_default(`DMENU_FONT_HIDPI', `DejaVu Sans Mono:size=10')dnl
+dnl
+define_default(`DMENU_COLORS')dnl
 define_default(`DMENU_COLORS_MONOCHROME',
-    `-nf white -sb white -sf black')
-dnl `-nf black -sb black -sf white')
-
-ifdefn(`MONOCHROME', `pushdef(`DMENU_COLORS', `DMENU_COLORS_MONOCHROME')')
+    `-nf white -sb white -sf black')dnl
+dnl `-nf black -sb black -sf white')dnl
+dnl
+ifdefn(`MONOCHROME', `pushdef(`DMENU_COLORS', `DMENU_COLORS_MONOCHROME')')dnl
 ifdefn(`HIDPI', `ifelse(
     pushdef(`I3_FONT', `I3_FONT_HIDPI')
     pushdef(`DMENU_FONT', `DMENU_FONT_HIDPI')
-)')
+)')dnl
 font I3_FONT
 bindsym $mod+d exec --no-startup-id dmenu_run -fn "DMENU_FONT" DMENU_COLORS
 
 # terminal shortcuts
-define_default(`TERM_COMMAND', `with-urxvt-transparency')
-define_default(`TERM_COMMAND_MONOCHROME', `monoterm -b')
-define(`COLOR_TERM', ifdefn(`MONOCHROME', `urxvt-color', `urxvt'))
-
+define_default(`TERM_COMMAND', `with-urxvt-transparency')dnl
+define_default(`TERM_COMMAND_MONOCHROME', `monoterm -b')dnl
+define(`COLOR_TERM', ifdefn(`MONOCHROME', `urxvt-color', `urxvt'))dnl
+dnl
 bindsym $mod+Mod1+Return exec --no-startup-id \
     COLOR_TERM -title urxvt -e TERM_COMMAND tmux -2
 bindsym $mod+Mod1+Shift+Return exec --no-startup-id \
     COLOR_TERM -title urxvt -e TERM_COMMAND bash
-ifdefn(`MONOCHROME', `pushdef(`TERM_COMMAND', `TERM_COMMAND_MONOCHROME')')
+ifdefn(`MONOCHROME', `pushdef(`TERM_COMMAND', `TERM_COMMAND_MONOCHROME')')dnl
 
 bindsym $mod+Return exec --no-startup-id \
     urxvt -title urxvt -e TERM_COMMAND tmux -2
@@ -247,5 +247,5 @@ bar {
     }
 }
 
-sinclude(`config.post.m4')
+sinclude(`config.post.m4')dnl
 `#' `vim:ft=conf'
