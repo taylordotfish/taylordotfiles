@@ -45,6 +45,7 @@ si() {
 alias ls="si $(get-alias ls)"
 alias du="si $(get-alias du)"
 alias df="si $(get-alias df)"
+alias free="si $(get-alias free)"
 
 gccs() {
     gcc -std=c11 -Wall -Wextra -Werror -pedantic -Og "$@"
