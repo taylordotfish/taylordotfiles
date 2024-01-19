@@ -6,6 +6,9 @@
 # ß
 # If the above line is not correctly displayed, fix your editor first!
 
+include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
+sinclude(`.i3status.conf.pre.m4')dnl
+dnl
 general {
     output_format="i3bar"
     colors = true
@@ -22,7 +25,11 @@ order += "disk /"
 #order += "run_watch VPN"
 order += "wireless _first_"
 order += "ethernet _first_"
-#order += "battery 0"
+ifelse(
+    vsyscmd(`ls /sys/class/power_supply/BAT* 2> /dev/null'),
+    `0',
+    `order += "battery 0"'
+)dnl
 order += "load"
 order += "tztime local"
 
@@ -71,3 +78,5 @@ volume master {
     device = "pulse"
     mixer = "Master"
 }
+dnl
+sinclude(`.i3status.conf.post.m4')dnl
