@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 unset GDK_DPI_SCALE
 unset QT_FONT_DPI
 old=$(xrdb -query | grep '^Xft.dpi:')

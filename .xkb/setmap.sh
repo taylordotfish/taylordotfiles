@@ -1,13 +1,13 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 cd "$(dirname "$0")"
 [ -f layout.conf ] || echo us > layout.conf
 layout=$(cat layout.conf | grep -o '^\w\+' | head -1)
 
-xkb_args=()
+xkb_args=
 xcape_map=
 if [ -n "${NOSRVRKEYS-}" ]; then
-    xkb_args+=(-option srvrkeys:none)
+    xkb_args="$xkb_args -option srvrkeys:none"
 fi
 
 setxkbmap "-I$HOME/.xkb" \
@@ -15,7 +15,7 @@ setxkbmap "-I$HOME/.xkb" \
     -option compose:menu \
     -option compose:rwin \
     -option local \
-    "${xkb_args[@]}" \
+    $xkb_args \
     -layout "$layout" \
     -print > .keymap.xkb
 

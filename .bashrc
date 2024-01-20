@@ -9,7 +9,7 @@ source /etc/skel/.bashrc
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
 # Some remote systems don't like URxvt
-[ "$TERM" == "rxvt-unicode-256color" ] && TERM=xterm
+[ "$TERM" = "rxvt-unicode-256color" ] && TERM=xterm
 
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
