@@ -19,7 +19,7 @@ setxkbmap "-I$HOME/.xkb" \
     -layout "$layout" \
     -print > .keymap.xkb
 
-run-verbose() {
+run_verbose() {
     xkbcomp "-I$HOME/.xkb" .keymap.xkb "$DISPLAY"
     if [ -z "${NOXCAPE-}" ]; then
         killall xcape || true
@@ -27,11 +27,11 @@ run-verbose() {
 }
 
 if [ -n "${DEBUG-}" ]; then
-    run-verbose
+    run_verbose
 else
-    run-verbose >& /dev/null
+    run_verbose > /dev/null 2>&1
 fi
 
 if [ -z "${NOXCAPE-}" ]; then
-    xcape -e "#66=Escape;#37=Caps_Lock$xcape_map"
+    xcape -e "#66=Escape;#37=Caps_Lock${xcape_map:+;$xcape_map}"
 fi
