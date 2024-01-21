@@ -2,22 +2,24 @@
 set -eu
 
 define_monitor_order() {
-    indices=
-    names=
+    local indices=
+    local names=
+    local tab=$(printf '\t')
+    local def
     for def in "$@"; do
-        if ! match=$(xrandr --listactivemonitors |
+        if ! local match=$(xrandr --listactivemonitors |
             sed -n 's/^\s*\([0-9]*:\).* \([^ ]*\)$/\1\2/p' |
             grep ":$def$"
         ); then
             echo >&2 "Could not find monitor: $def"
             return 1
         fi
-        indices="${indices:+$indices }$(printf '%s' "$match" | cut -d: -f1)"
-        names="${names:+$names }$(printf '%s' "$match" | cut -d: -f2)"
+        indices="${indices:+$indices$tab}$(printf '%s' "$match" | cut -d: -f1)"
+        names="${names:+$names$tab}$(printf '%s' "$match" | cut -d: -f2)"
     done
     (
-        printf "monitor_indices='%s'"'\n' "$indices"
-        printf "monitor_names='%s'"'\n' "$names"
+        printf "monitor_indices='%s'\\n" "$indices"
+        printf "monitor_names='%s'\\n" "$names"
     ) > ~/.config/monitor-order
 }
 

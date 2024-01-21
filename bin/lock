@@ -3,8 +3,7 @@ set -eu
 
 [ -f ~/.config/monitor-order ] && . ~/.config/monitor-order
 
-if [ -d ~/.cache/i3lock-screenshots ]; then
-    cd ~/.cache/i3lock-screenshots
+if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
     rm -f *.png
     for i in $(xrandr --listactivemonitors | grep -o '^\s*[0-9]*'); do
         scrot -M "$i" "screen$i.png"

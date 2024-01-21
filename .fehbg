@@ -1,21 +1,25 @@
 #!/bin/sh
 set -eu
-images=/usr/share/desktop-base/emerald-theme/wallpaper/contents/images/1920x1080.svg
+image_1=/usr/share/desktop-base/emerald-theme/wallpaper/contents/images/1920x1080.svg
 [ -f ~/.config/monitor-order ] && . ~/.config/monitor-order
 
 i=0
-max=0
-for image in $images; do
+while true; do
     i=$((i+1))
-    mindex=$(printf '%s' "${monitor_indices-}" | cut -d' ' -f"$i")
-    mindex=${mindex:-$i}
-    eval "image_$mindex=$image"
-    [ "$mindex" -gt "$max" ] && max=$mindex
+    eval "image=\${image_$i-}"
+    [ -z "$image" ] && break
+    mindex=$(printf '%s' "${monitor_indices-}" | cut -f"$i")
+    mindex=${mindex:-$((i-1))}
+    eval "mimage_$mindex=\$image"
 done
 
 args=
-default=$(printf '%s' "$images" | cut -d' ' -f1)
-for i in $(seq 0 "$max"); do
-    eval "args=\"$args \${image_$i-\$default}\""
+i=0
+while true; do
+    eval "mimage=\${mimage_$i-}"
+    [ -z "$mimage" ] && break
+    args="$args \"\$mimage_$i\""
+    i=$((i+1))
 done
-feh --no-fehbg --bg-fill $args
+
+eval "feh --no-fehbg --bg-fill $args"
