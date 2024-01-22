@@ -4,4 +4,5 @@ title="-title urxvt"
 for arg in "$@"; do
     [ "$arg" = "-e" ] && title=
 done
+unset MONOCHROME
 exec urxvt -name Rxvt-color $title "$@"

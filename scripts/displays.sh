@@ -17,10 +17,11 @@ define_monitor_order() {
         indices="${indices:+$indices$tab}$(printf '%s' "$match" | cut -d: -f1)"
         names="${names:+$names$tab}$(printf '%s' "$match" | cut -d: -f2)"
     done
-    (
-        printf "monitor_indices='%s'\\n" "$indices"
-        printf "monitor_names='%s'\\n" "$names"
-    ) > ~/.config/monitor-order
+    local escape='s/\\/\\\\/g;s/"/\\"/g'
+    printf > ~/.config/monitor-order \
+        'monitor_indices="%s"\nmonitor_names="%s"\n' \
+        "$(printf '%s' "$indices" | sed "$escape")" \
+        "$(printf '%s' "$names" | sed "$escape")"
 }
 
 if which hsetroot > /dev/null; then
