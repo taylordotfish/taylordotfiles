@@ -1,5 +1,5 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
-merge_env(`MONOCHROME')dnl
+merge_env(`HIDPI', `MONOCHROME')dnl
 sinclude(`dunstrc.pre.m4')dnl
 dnl
 [global]
