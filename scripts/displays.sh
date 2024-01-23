@@ -1,27 +1,18 @@
 #!/bin/sh
 set -eu
 
-define_monitor_order() {
-    local indices=
-    local names=
-    local tab=$(printf '\t')
-    local def
-    for def in "$@"; do
-        if ! local match=$(xrandr --listactivemonitors |
-            sed -n 's/^\s*\([0-9]*:\).* \([^ ]*\)$/\1\2/p' |
-            grep ":$def$"
-        ); then
-            echo >&2 "Could not find monitor: $def"
-            return 1
-        fi
-        indices="${indices:+$indices$tab}$(printf '%s' "$match" | cut -d: -f1)"
-        names="${names:+$names$tab}$(printf '%s' "$match" | cut -d: -f2)"
-    done
+printf > ~/.config/monitordef '%s=\n \' monitordef_names monitordef_properties
+
+define_monitor() {
+    local name=$1
+    local properties=${2:--}
     local escape='s/\\/\\\\/g;s/"/\\"/g'
-    printf > ~/.config/monitor-order \
-        'monitor_indices="%s"\nmonitor_names="%s"\n' \
-        "$(printf '%s' "$indices" | sed "$escape")" \
-        "$(printf '%s' "$names" | sed "$escape")"
+    local fmt='monitordef_names="${monitordef_names:+$monitordef_names\t}%s"\n'
+    fmt="$fmt"'monitordef_properties="${monitordef_properties:+'
+    fmt="$fmt"'$monitordef_properties\t}%s"\n'
+    printf >> ~/.config/monitordef "$fmt" \
+        "$(printf '%s' "$name" | sed "$escape")" \
+        "$(printf '%s' "$properties" | sed "$escape")"
 }
 
 if which hsetroot > /dev/null; then

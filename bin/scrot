@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 
+. ~/scripts/monitor-utils.sh
+
 for arg in "$@"; do
     case "$arg" in
         --overwrite)
@@ -25,23 +27,17 @@ parse() {
     posy=$5
 }
 
-get_monitor_geometry() {
-    script=$(printf '%s' 's/^\s*\([0-9]\+\):\s*\S*\s*' \
-        '\([0-9]\+\)[^x]*x\([0-9]\+\)[^+]*' \
-        '+\([0-9]\+\)+\([0-9]\+\).*' \
-        '/\1 \2 \3 \4 \5/p')
-    xrandr --listactivemonitors | sed -n "$script"
-}
-
 set -f
 OLDIFS=$IFS
-monitor_geometry=$(get_monitor_geometry)
 fullwidth=0
 fullheight=0
 IFS='
 '
-for line in $monitor_geometry; do
-    IFS=' '; parse $line
+for line in $(monitors); do
+    width=$(printf '%s' "$line" | cut -f2)
+    height=$(printf '%s' "$line" | cut -f3)
+    posx=$(printf '%s' "$line" | cut -f4)
+    posy=$(printf '%s' "$line" | cut -f5)
     right=$((posx+width))
     bottom=$((posy+height))
     [ "$right" -gt "$fullwidth" ] && fullwidth=$right
@@ -49,10 +45,11 @@ for line in $monitor_geometry; do
 done
 
 im_args=
-IFS='
-'
-for line in $monitor_geometry; do
-    IFS=' '; parse $line
+for line in $(monitors); do
+    width=$(printf '%s' "$line" | cut -f2)
+    height=$(printf '%s' "$line" | cut -f3)
+    posx=$(printf '%s' "$line" | cut -f4)
+    posy=$(printf '%s' "$line" | cut -f5)
     im_args="$im_args -draw 'rectangle $posx,0 $((posx+width)),$posy'"
     im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
     im_args="$im_args $((posx+width)),$fullheight'"
@@ -66,10 +63,14 @@ tmp=$(mktemp -d)
 trap 'rm -r "$tmp"' EXIT
 (cd "$tmp" && "$scrot" "$@")
 
+fullsize="$fullwidth"x"$fullheight"
 for img in "$tmp"/*.png; do
-    [ "$(identify -format '%wx%h' "$img")" = "$fullwidth"x"$fullheight" ] &&
+    if [ "$(identify -format '%wx%h' "$img")" = "$fullsize" ]; then
         eval 'mogrify -fill white '"$im_args"' -alpha off "$img"'
-    mv ${overwrite:--n} "$img" .
+    fi
+    mv_args=
+    [ -z "${overwrite-}" ] && mv_args="$mv_args -n"
+    mv $mv_args "$img" .
     i=0
     while [ -f "$img" ]; do
         name=$(basename "$img")
