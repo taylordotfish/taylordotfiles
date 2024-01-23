@@ -5,6 +5,7 @@ dnl
 [global]
     follow = mouse
     width = ifdefn(`HIDPI', `450', `300')
+    offset = 35x35
     frame_color = ifelse(defn(`MONOCHROME'), `2', `"#000000"', `"#9090907f"')
     font = DejaVu Sans Mono 10
     icon_position = off
