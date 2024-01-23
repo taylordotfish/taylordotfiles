@@ -36,24 +36,23 @@ get_monitor_geometry() {
 set -f
 OLDIFS=$IFS
 monitor_geometry=$(get_monitor_geometry)
+fullwidth=0
 fullheight=0
 IFS='
 '
 for line in $monitor_geometry; do
-    IFS=' '
-    parse $line
+    IFS=' '; parse $line
+    right=$((posx+width))
     bottom=$((posy+height))
-    if [ "$bottom" -gt "$fullheight" ]; then
-        fullheight=$bottom
-    fi
+    [ "$right" -gt "$fullwidth" ] && fullwidth=$right
+    [ "$bottom" -gt "$fullheight" ] && fullheight=$bottom
 done
 
 im_args=
 IFS='
 '
 for line in $monitor_geometry; do
-    IFS=' '
-    parse $line
+    IFS=' '; parse $line
     im_args="$im_args -draw 'rectangle $posx,0 $((posx+width)),$posy'"
     im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
     im_args="$im_args $((posx+width)),$fullheight'"
@@ -68,7 +67,8 @@ trap 'rm -r "$tmp"' EXIT
 (cd "$tmp" && "$scrot" "$@")
 
 for img in "$tmp"/*.png; do
-    eval 'convert "$img" -fill white '"$im_args"' -alpha off "$img"'
+    [ "$(identify -format '%wx%h' "$img")" = "$fullwidth"x"$fullheight" ] &&
+        eval 'mogrify -fill white '"$im_args"' -alpha off "$img"'
     mv ${overwrite:--n} "$img" .
     i=0
     while [ -f "$img" ]; do
