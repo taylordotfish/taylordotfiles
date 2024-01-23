@@ -18,7 +18,7 @@ if which xfce4-session > /dev/null; then
     }
 fi
 
-if which gnome > /dev/null; then
+if which gnome-session > /dev/null; then
     start_gnome() {
         prepare_desktop
         exec gnome-session
