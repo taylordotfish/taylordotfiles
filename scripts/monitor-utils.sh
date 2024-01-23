@@ -4,8 +4,8 @@ monitors() {
     local monitors=${monitordef_names-}
     local propertydefs=${monitordef_properties-}
     local tab=$(printf '\t')
-    local newline=$(printf '\nx')
-    local newline="${newline%x}"
+    local newline='
+'
     local num_defined=$(printf '%s'"${monitors:+\\t}" "$monitors" |
         grep -o "$tab" |
         wc -l
