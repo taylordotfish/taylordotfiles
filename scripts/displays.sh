@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-printf > ~/.config/monitordef '%s=\n \' monitordef_names monitordef_properties
+printf > ~/.config/monitordef '%s=\n' monitordef_names monitordef_properties
 
 define_monitor() {
     local name=$1
