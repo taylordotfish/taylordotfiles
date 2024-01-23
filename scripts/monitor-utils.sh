@@ -4,8 +4,6 @@ monitors() {
     local monitors=${monitordef_names-}
     local propertydefs=${monitordef_properties-}
     local tab=$(printf '\t')
-    local newline='
-'
     local num_defined=$(printf '%s'"${monitors:+\\t}" "$monitors" |
         grep -o "$tab" |
         wc -l
@@ -15,7 +13,8 @@ monitors() {
         '+\([0-9]\+\)+\([0-9]\+\)\s*\(\S\+\).*' \
         '/\1\t\2\t\3\t\4\t\5\t\6/p'
     )
-    local IFS="$newline"
+    local IFS='
+'
     set -f
     for line in $(xrandr --listactivemonitors | sed -n "$script"); do
         local name=$(printf '%s' "$line" | cut -f6)
