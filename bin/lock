@@ -5,7 +5,7 @@ set -eu
 
 if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
     rm -f *.png
-    for i in $(xrandr --listactivemonitors | grep -o '^\s*[0-9]*'); do
+    for i in $(xrandr --listactivemonitors | grep -o '^\s*[0-9]\+'); do
         scrot -M "$i" "screen$i.png"
     done
     convert $(ls -v screen*.png) -blur 10x10 +append full.png

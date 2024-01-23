@@ -1,13 +1,63 @@
 #!/bin/sh
 set -eu
-name=Rxvt
-prev=
+
+args=
+cmd=
+state=
+i=0
+
 for arg in "$@"; do
-    [ "$prev" = "-name" ] && name=$arg
-    prev=$arg
+    i=$((i+1))
+    case "$state" in
+        -name)
+            name="$arg"
+            state=
+            continue
+            ;;
+        -title)
+            title="$arg"
+            state=
+            continue
+            ;;
+        -e)
+            cmd="$cmd \"\$$i\""
+            continue
+            ;;
+    esac
+    case "${arg-}" in
+        -name|-title|-e)
+            state="$arg"
+            ;;
+        *)
+            args="$args \"\$$i\""
+            ;;
+    esac
 done
-if xrdb -query | grep '^\s*'"$name"'\.font:\s*-misc-2x' > /dev/null; then
-    export HEAVY_BLOCKS=1
+
+cmd=${cmd:-bash}
+if [ -n "${MONOCHROME-}" ]; then
+    which monoterm > /dev/null && cmd="monoterm -b $cmd"
+elif [ -x ~/scripts/set-urxvt-colors.sh ]; then
+    cmd="~/scripts/set-urxvt-colors.sh $cmd"
 fi
+
+if [ -n "${HIDPI-}" ] && [ -x ~/scripts/hidpi.sh ]; then
+    cmd="~/scripts/hidpi.sh $cmd"
+fi
+
+if [ -z "${name-}" ]; then
+    name=Rxvt
+    if [ -n "${MONOCHROME-}" ]; then
+        name="$name.mono"
+    fi
+    if [ -n "${HIDPI-}" ]; then
+        name="$name.2x"
+    fi
+    if [ -n "${HIDPI-}" ] && [ -z "${MONOCHROME}" ]; then
+        [ -z "${HEAVY_BLOCKS+x}" ] && export HEAVY_BLOCKS=1
+    fi
+fi
+
+title=${title-urxvt}
 urxvt=$(PATH=/usr/bin:/usr/local/bin which urxvt)
-exec "$urxvt" "$@"
+eval 'exec "$urxvt" -name "$name" -title "$title" '"$args -e $cmd"

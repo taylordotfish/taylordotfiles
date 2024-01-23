@@ -1,7 +1,3 @@
 #!/bin/sh
 set -eu
-cmd=vim
-if [ -n "${MONOCHROME-}" ]; then
-    cmd="monoterm -b $cmd"
-fi
-exec urxvt -e $cmd "$@"
+exec urxvt -e vim "$@"

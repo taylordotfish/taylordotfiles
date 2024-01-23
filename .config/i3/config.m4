@@ -184,18 +184,17 @@ bindsym Control+Shift+period exec --no-startup-id dunstctl context
 # fonts
 define_default(`I3_FONT',
     `-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso10646-1')dnl
+define_default(`I3_FONT_HIDPI', `pango:DejaVu Sans Mono 10')dnl
+dnl
 define_default(`DMENU_FONT', ifelse(
     vsyscmd(`[ "$(fc-match "Misc Fixed" family)" = "Misc Fixed" ]'),
     `0', `Misc Fixed:pixelsize=13', `DejaVu Sans Mono:size=10'))dnl
-define_default(`I3_FONT_HIDPI', `pango:DejaVu Sans Mono 10')dnl
 define_default(`DMENU_FONT_HIDPI', `DejaVu Sans Mono:size=10')dnl
 dnl
 define_default(`DMENU_COLORS')dnl
-define_default(`DMENU_COLORS_MONOCHROME',
-    `-nf white -sb white -sf black')dnl
-dnl `-nf black -sb black -sf white')dnl
-dnl
+define_default(`DMENU_COLORS_MONOCHROME', `-nf white -sb white -sf black')dnl
 ifdefn(`MONOCHROME', `pushdef(`DMENU_COLORS', `DMENU_COLORS_MONOCHROME')')dnl
+dnl
 ifdefn(`HIDPI', `ifelse(
     pushdef(`I3_FONT', `I3_FONT_HIDPI')
     pushdef(`DMENU_FONT', `DMENU_FONT_HIDPI')
@@ -204,20 +203,15 @@ font I3_FONT
 bindsym $mod+d exec --no-startup-id dmenu_run -fn "DMENU_FONT" DMENU_COLORS
 
 # terminal shortcuts
-define_default(`TERM_COMMAND', `with-urxvt-transparency')dnl
-define_default(`TERM_COMMAND_MONOCHROME', `monoterm -b')dnl
-define(`COLOR_TERM', ifdefn(`MONOCHROME', `urxvt-color', `urxvt'))dnl
-dnl
 bindsym $mod+Mod1+Return exec --no-startup-id \
-    COLOR_TERM -title urxvt -e TERM_COMMAND tmux -2
+    `MONOCHROME=1 HIDPI=1' urxvt -title urxvt -e tmux -2
 bindsym $mod+Mod1+Shift+Return exec --no-startup-id \
-    COLOR_TERM -title urxvt -e TERM_COMMAND bash
-ifdefn(`MONOCHROME', `pushdef(`TERM_COMMAND', `TERM_COMMAND_MONOCHROME')')dnl
+    `MONOCHROME=1 HIDPI=1' urxvt -title urxvt -e bash
 
 bindsym $mod+Return exec --no-startup-id \
-    urxvt -title urxvt -e TERM_COMMAND tmux -2
+    ifdefn(`MONOCHROME', ``MONOCHROME='') urxvt -title urxvt -e tmux -2
 bindsym $mod+Shift+Return exec --no-startup-id \
-    urxvt -title urxvt -e TERM_COMMAND bash
+    ifdefn(`MONOCHROME', ``MONOCHROME='') urxvt -title urxvt -e bash
 
 client.focused          #444444 #202020 #ffffff #000000 #000000
 client.unfocused        #444444 #000000 #909090 #000000 #000000
