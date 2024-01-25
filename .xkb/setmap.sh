@@ -1,5 +1,8 @@
 #!/bin/sh
+# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
+
 cd "$(dirname "$0")"
 [ -f layout.conf ] || echo us > layout.conf
 layout=$(cat layout.conf | grep -o '^\w\+' | head -1)

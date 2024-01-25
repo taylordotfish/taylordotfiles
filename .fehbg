@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
 
 . ~/scripts/monitor-utils.sh
@@ -8,11 +10,11 @@ image_1=/usr/share/desktop-base/emerald-theme/wallpaper/contents/images/1920x108
 IFS='
 '
 for line in $(monitors); do
-    index=$(printf '%s' "$line" | cut -f1)
-    priority=$(printf '%s' "$line" | cut -f7)
-    properties=$(printf '%s' "$line" | cut -f8)
+    index=$(printf '%s\n' "$line" | cut -f1)
+    priority=$(printf '%s\n' "$line" | cut -f7)
+    properties=$(printf '%s\n' "$line" | cut -f8)
     eval "image=\${image_$priority-\$image_1}"
-    if printf '%s' "$properties" | grep '\bmono\b' > /dev/null; then
+    if printf '%s\n' "$properties" | grep '\bmono\b' > /dev/null; then
         [ -n "$image_mono" ] && image=$image_mono
     fi
     eval "mimage_$index=\$image"

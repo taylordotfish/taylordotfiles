@@ -220,9 +220,9 @@ bindsym $mod+Shift+Return exec --no-startup-id \
     TERM_ENV`'urxvt -title urxvt -e bash
 
 ifelse(defn(`MONOCHROME'), `2', `dnl
-#client.focused          #000000 #ffffff #000000 #ffffff #000000
-#client.unfocused        #ffffff #ffffff #dddddd #ffffff #000000
-#client.focused_inactive #000000 #ffffff #dddddd #ffffff #000000
+client.focused          #000000 #ffffff #000000 #ffffff #000000
+client.unfocused        #ffffff #ffffff #dddddd #ffffff #000000
+client.focused_inactive #000000 #ffffff #dddddd #ffffff #000000
 ', `dnl
 client.focused          #444444 #202020 #ffffff #000000 #000000
 client.unfocused        #444444 #000000 #909090 #000000 #000000

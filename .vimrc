@@ -1,4 +1,4 @@
-" Copyright (C) 2023 taylor.fish <contact@taylor.fish>
+" Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
 let g:indent = 4
@@ -72,7 +72,7 @@ endif
 hi Ws ctermfg=243 cterm=none
 function HiTrailingWs()
     hi TrailingWs ctermfg=40 ctermbg=none cterm=reverse
-endfunction()
+endfunction
 au InsertEnter * hi clear TrailingWs
 au InsertLeave * call HiTrailingWs()
 call HiTrailingWs()

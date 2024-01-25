@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
 
 . ~/scripts/monitor-utils.sh
@@ -34,10 +36,10 @@ fullheight=0
 IFS='
 '
 for line in $(monitors); do
-    width=$(printf '%s' "$line" | cut -f2)
-    height=$(printf '%s' "$line" | cut -f3)
-    posx=$(printf '%s' "$line" | cut -f4)
-    posy=$(printf '%s' "$line" | cut -f5)
+    width=$(printf '%s\n' "$line" | cut -f2)
+    height=$(printf '%s\n' "$line" | cut -f3)
+    posx=$(printf '%s\n' "$line" | cut -f4)
+    posy=$(printf '%s\n' "$line" | cut -f5)
     right=$((posx+width))
     bottom=$((posy+height))
     [ "$right" -gt "$fullwidth" ] && fullwidth=$right
@@ -46,10 +48,10 @@ done
 
 im_args=
 for line in $(monitors); do
-    width=$(printf '%s' "$line" | cut -f2)
-    height=$(printf '%s' "$line" | cut -f3)
-    posx=$(printf '%s' "$line" | cut -f4)
-    posy=$(printf '%s' "$line" | cut -f5)
+    width=$(printf '%s\n' "$line" | cut -f2)
+    height=$(printf '%s\n' "$line" | cut -f3)
+    posx=$(printf '%s\n' "$line" | cut -f4)
+    posy=$(printf '%s\n' "$line" | cut -f5)
     im_args="$im_args -draw 'rectangle $posx,0 $((posx+width)),$posy'"
     im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
     im_args="$im_args $((posx+width)),$fullheight'"

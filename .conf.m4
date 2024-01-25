@@ -1,3 +1,5 @@
+dnl Copyright (C) 2023 taylor.fish <contact@taylor.fish>
+dnl License: GNU GPL version 3 or later
 define(`define_default', `ifdef(`$1',, `define(`$1', `$2')')')dnl
 define(`ifdefn', `ifelse(defn(`$1'),, `$3', `$2')')dnl
 define(`concat', ``$1'ifelse(`$#', `1',, `concat(shift($@))')')dnl

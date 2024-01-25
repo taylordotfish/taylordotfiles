@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
 
 . ~/scripts/monitor-utils.sh
@@ -13,26 +15,26 @@ if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
     maxy=0
     trap "rm -f screen_*.png" EXIT
     for line in $(monitors); do
-        index=$(printf '%s' "$line" | cut -f1)
-        width=$(printf '%s' "$line" | cut -f2)
-        height=$(printf '%s' "$line" | cut -f3)
-        posx=$(printf '%s' "$line" | cut -f4)
-        posy=$(printf '%s' "$line" | cut -f5)
-        properties=$(printf '%s' "$line" | cut -f8)
+        index=$(printf '%s\n' "$line" | cut -f1)
+        width=$(printf '%s\n' "$line" | cut -f2)
+        height=$(printf '%s\n' "$line" | cut -f3)
+        posx=$(printf '%s\n' "$line" | cut -f4)
+        posy=$(printf '%s\n' "$line" | cut -f5)
+        properties=$(printf '%s\n' "$line" | cut -f8)
         endx=$((posx+width))
         endy=$((posy+height))
         [ "$endx" -gt "$maxx" ] && maxx=$endx
         [ "$endy" -gt "$maxy" ] && maxy=$endy
-        if ! printf '%s' "$properties" | grep '\bmono\b' > /dev/null; then
+        if ! printf '%s\n' "$properties" | grep '\bmono\b' > /dev/null; then
             scrot -M "$index" screen_"$index".png
             mogrify -blur 10x10 screen_"$index".png
         fi
     done
     im_args=
     for line in $(monitors); do
-        index=$(printf '%s' "$line" | cut -f1)
-        posx=$(printf '%s' "$line" | cut -f4)
-        posy=$(printf '%s' "$line" | cut -f5)
+        index=$(printf '%s\n' "$line" | cut -f1)
+        posx=$(printf '%s\n' "$line" | cut -f4)
+        posy=$(printf '%s\n' "$line" | cut -f5)
         if [ -f "screen_$index.png" ]; then
             im_args="$im_args screen_$index.png -geometry +$posx+$posy"
             im_args="$im_args -composite"

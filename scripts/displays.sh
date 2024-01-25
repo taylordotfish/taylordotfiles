@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
 
 printf > ~/.config/monitordef '%s=\n' monitordef_names monitordef_properties
@@ -11,8 +13,8 @@ define_monitor() {
     fmt="$fmt"'monitordef_properties="${monitordef_properties:+'
     fmt="$fmt"'$monitordef_properties\t}%s"\n'
     printf >> ~/.config/monitordef "$fmt" \
-        "$(printf '%s' "$name" | sed "$escape")" \
-        "$(printf '%s' "$properties" | sed "$escape")"
+        "$(printf '%s\n' "$name" | sed "$escape")" \
+        "$(printf '%s\n' "$properties" | sed "$escape")"
 }
 
 if which hsetroot > /dev/null; then

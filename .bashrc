@@ -8,9 +8,6 @@ source /etc/skel/.bashrc
 # Non-color prompt
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
-# Some remote systems don't like URxvt
-[ "$TERM" = "rxvt-unicode-256color" ] && TERM=xterm
-
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
 export MIRIFLAGS="-Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
@@ -77,8 +74,8 @@ clear-history() {
 }
 
 clear-clipboard() {
-    for i in p s b; do
-        echo -n " " | xsel "-$i"
+    for c in p s b; do
+        printf '' | xsel "-$c"
     done
 }
 
@@ -94,16 +91,20 @@ ansireset() {
     echo -ne '\x1b[0m'
 }
 
-keyboard() {
-    ~/scripts/keyboard.sh
+[ -f ~/scripts/keyboard.sh ] && keyboard() {
+    ~/scripts/keyboard.sh "$@"
 }
 
-mouse() {
+[ -f ~/scripts/mouse.sh ] && mouse() {
     ~/scripts/mouse.sh
 }
 
-controls() {
+[ -f ~/scripts/controls.sh ] && controls() {
     ~/scripts/controls.sh
+}
+
+[ -f ~/scripts/displays.sh ] && displays() {
+    ~/scripts/displays.sh
 }
 
 git-gc-all() {
@@ -117,7 +118,7 @@ git-gc-all() {
         -c gc.pruneExpire=now gc "${@:2}"
 }
 
-rg() {
+which rg > /dev/null && rg() {
     env rg -p "$@" | less -FR
 }
 
@@ -130,7 +131,7 @@ find-unpushed() {
     done
 }
 
-cargo() {
+which cargo > /dev/null && cargo() {
     if ! env cargo --version | grep '\bnightly\b' > /dev/null; then
         env cargo "$@"
         return

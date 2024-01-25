@@ -1,4 +1,6 @@
 #!/bin/sh
+# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -eu
 
 DEFAULT_TARGET=i3

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
+
 from decimal import Decimal
 import json
 import os
