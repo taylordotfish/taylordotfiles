@@ -5,14 +5,6 @@ set -eu
 
 . ~/scripts/monitor-utils.sh
 
-parse() {
-    index=$1
-    width=$2
-    height=$3
-    posx=$4
-    posy=$5
-}
-
 set -f
 fullwidth=0
 fullheight=0
