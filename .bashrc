@@ -30,6 +30,7 @@ get-alias() {
 
 # Adds the option "--si" to a command if "-h" is present.
 si() {
+    local arg
     for arg in "${@:2}"; do
         if [[ "$arg" != --* ]] && [[ "$arg" == -*h* ]]; then
             "$@" --si
@@ -74,6 +75,7 @@ clear-history() {
 }
 
 clear-clipboard() {
+    local c
     for c in p s b; do
         printf '' | xsel "-$c"
     done
@@ -88,7 +90,7 @@ cd-parent() {
 }
 
 ansireset() {
-    echo -ne '\x1b[0m'
+    printf '\033[0m'
 }
 
 [ -f ~/scripts/keyboard.sh ] && keyboard() {
@@ -123,6 +125,7 @@ which rg > /dev/null && rg() {
 }
 
 find-unpushed() {
+    local d
     for d in $(find -maxdepth 1 -type d -path './*'); do
         cd $d
         git remote 2> /dev/null | grep origin > /dev/null && git status |

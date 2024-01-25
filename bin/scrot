@@ -5,22 +5,6 @@ set -eu
 
 . ~/scripts/monitor-utils.sh
 
-for arg in "$@"; do
-    case "$arg" in
-        --overwrite)
-            overwrite=1
-            ;;
-        --)
-            break
-            ;;
-        --*)
-            ;;
-        -*o*)
-            overwrite=1
-            ;;
-    esac
-done
-
 parse() {
     index=$1
     width=$2
@@ -30,7 +14,6 @@ parse() {
 }
 
 set -f
-OLDIFS=$IFS
 fullwidth=0
 fullheight=0
 IFS='
@@ -57,26 +40,8 @@ for line in $(monitors); do
     im_args="$im_args $((posx+width)),$fullheight'"
 done
 
-set +f
-IFS=$OLDIFS
-scrot=$(PATH=/usr/bin:/usr/local/bin which scrot)
-
-tmp=$(mktemp -d)
-trap 'rm -r "$tmp"' EXIT
-(cd "$tmp" && "$scrot" "$@")
-
 fullsize="$fullwidth"x"$fullheight"
-for img in "$tmp"/*.png; do
-    if [ "$(identify -format '%wx%h' "$img")" = "$fullsize" ]; then
-        eval 'mogrify -fill white '"$im_args"' -alpha off "$img"'
-    fi
-    mv_args=
-    [ -z "${overwrite-}" ] && mv_args="$mv_args -n"
-    mv $mv_args "$img" .
-    i=0
-    while [ -f "$img" ]; do
-        name=$(basename "$img")
-        mv -n "$img" "${name%.png}_$(printf '%03d' "$i").png"
-        i=$((i+1))
-    done
-done
+scrot=$(PATH=/usr/bin:/usr/local/bin which scrot)
+"$scrot" -e "\
+[ \"\\\$(identify -format '%%wx%%h' '\$f')\" = \"$fullsize\" ] && \
+mogrify -fill white $im_args -alpha off '\$f'" "$@"
