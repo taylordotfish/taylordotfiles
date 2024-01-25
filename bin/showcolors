@@ -73,7 +73,6 @@ print_cube_layer() {
             else
                 ansi_256_fg 231
             fi
-
             ansi_256_bg "$color"
             printf '   %3d   ' "$color"
         done
