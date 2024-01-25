@@ -1,0 +1,123 @@
+#!/bin/sh
+# Copyright (C) 2021, 2024 taylor.fish <contact@taylor.fish>
+#
+# showcolors: Displays all 256 terminal colors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+set -eu
+
+USAGE="\
+Usage: showcolors [order]
+
+[order] is some permutation of \"rgb\". The first color component will be
+represented on the X axis of each cube layer, the second component will be
+represented on the Y axis, and the third component will increase with each
+successive layer. Defaults to \"gbr\".
+"
+
+ansi_256_fg() {
+    printf '\033[38;5;%dm' "$1"
+}
+
+ansi_256_bg() {
+    printf '\033[48;5;%dm' "$1"
+}
+
+ansi_reset() {
+    printf '\033[0m'
+}
+
+show_extra() {
+    extra_i=${extra_i-0}
+    [ "$extra_i" -gt 255 ] && return
+    if [ "$extra_i" -eq 16 ]; then
+        extra_i=232
+        return
+    fi
+    printf '%4d ' "$extra_i"
+    ansi_256_bg "$extra_i"
+    printf '         '
+    ansi_reset
+    extra_i=$((extra_i + 1))
+}
+
+print_cube_layer() {
+    local c_3=$1
+    local c_2
+    local c_1
+    local r=0
+    local g=0
+    local b=0
+    for c_2 in $(seq 0 5); do
+        for c_1 in $(seq 0 5); do
+            eval "$component_map"
+            local color=$((16 + (36 * r) + (6 * g) + b))
+            local light=$((g == 5 ||
+                g == 4 && (r > 0 || b > 1) ||
+                g == 3 && r > 3 && (r > 4 || b > 3)
+            ))
+            if [ "$light" -ne 0 ]; then
+                ansi_256_fg 16
+            else
+                ansi_256_fg 231
+            fi
+
+            ansi_256_bg "$color"
+            printf '   %3d   ' "$color"
+        done
+        ansi_reset
+        show_extra
+        printf '\n'
+    done
+}
+
+case "${1-}" in
+    -h|--help)
+        printf '%s' "$USAGE"
+        exit
+        ;;
+esac
+
+bad_order() {
+    printf >&2 '%s\n' "$order: bad color component order"
+    exit 1
+}
+
+order=${1-gbr}
+case "${order-}" in
+    *r*r*|*g*g*|*b*b*)
+        bad_order
+        ;;
+    [rgb][rgb][rgb])
+        ;;
+    *)
+        bad_order
+        ;;
+esac
+
+component_map=
+for i in $(seq 3); do
+    component=$(printf '%s\n' "$order" | cut -c"$i")
+    component_map="$component_map$component=\$c_$i;"
+done
+
+for c_3 in $(seq 0 5); do
+    if [ "$c_3" -gt 0 ]; then
+        printf '%54s' ''
+        show_extra
+        printf '\n'
+    fi
+    print_cube_layer "$c_3"
+done
