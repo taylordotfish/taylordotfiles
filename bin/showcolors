@@ -24,7 +24,7 @@ Usage: showcolors [order]
 [order] is some permutation of \"rgb\". The first color component will be
 represented on the X axis of each cube layer, the second component will be
 represented on the Y axis, and the third component will increase with each
-successive layer. Defaults to \"gbr\".
+successive layer. Defaults to \"rgb\".
 "
 
 ansi_256_fg() {
@@ -95,7 +95,7 @@ bad_order() {
     exit 1
 }
 
-order=${1-gbr}
+order=${1-rgb}
 case "${order-}" in
     *r*r*|*g*g*|*b*b*)
         bad_order
