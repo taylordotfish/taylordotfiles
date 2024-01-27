@@ -7,15 +7,16 @@ xprofile_main() {
     xset -dpms
     xset b off
     xset fp default
-    for d in /usr/local/share/fonts/X11/*; do
-        [ -f "$d/fonts.dir" ] && xset fp+ "$d" || true
+    local d
+    local fd
+    for d in /usr/local/share/fonts/X11 ~/.local/share/fonts/X11; do
+        for fd in "$d"/*; do
+            [ -f "$fd/fonts.dir" ] && xset fp+ "$fd"
+        done
     done
+    local script
     for script in ~/scripts/{displays,controls}.sh; do
-        [ -f "$script" ] && "$script" || true
+        [ -f "$script" ] && "$script"
     done
 }
-
-(
-    set -eu
-    xprofile_main
-)
+(set -eu; xprofile_main)

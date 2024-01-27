@@ -11,6 +11,10 @@ xterm*color12: rgb:60/a4/ff
 xterm*metaSendsEscape: true
 xterm*locale: true
 
+xterm*font: -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1
+xterm*boldFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso10646-1
+xterm*colorITMode: true
+
 Rxvt*foreground: white
 Rxvt*background: [75]#000000
 

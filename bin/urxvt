@@ -39,7 +39,7 @@ done
 cmd=${cmd:-bash}
 if [ -n "${MONOCHROME-}" ]; then
     which monoterm > /dev/null && cmd="monoterm -b $cmd"
-elif [ -x ~/scripts/set-urxvt-colors.sh ]; then
+elif [ -z "${KEEPCOLORS-}" ] && [ -x ~/scripts/set-urxvt-colors.sh ]; then
     cmd="~/scripts/set-urxvt-colors.sh $cmd"
 fi
 

@@ -5,7 +5,7 @@ set -eu
 
 . ~/scripts/monitor-utils.sh
 
-image_1=/usr/share/desktop-base/emerald-theme/wallpaper/contents/images/1920x1080.svg
+image_1=/etc/alternatives/desktop-theme/wallpaper/contents/images/1920x1080.svg
 
 IFS='
 '

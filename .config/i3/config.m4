@@ -194,7 +194,8 @@ define_default(`DMENU_COLORS',
     ifdefn(`MONOCHROME', ``-nf white -sb white -sf black -nb black''))dnl
 dnl
 font I3_FONT
-bindsym $mod+d exec --no-startup-id dmenu_run -fn "DMENU_FONT"dnl
+bindsym $mod+d exec --no-startup-id dmenu_run \
+    -fn "DMENU_FONT"dnl
 ifdefn(`DMENU_COLORS', ` DMENU_COLORS')
 
 # terminal shortcuts
