@@ -126,11 +126,23 @@ which rg > /dev/null && rg() {
 
 find-unpushed() {
     local d
+    local IFS='
+'
     for d in $(find -maxdepth 1 -type d -path './*'); do
-        cd $d
-        git remote 2> /dev/null | grep origin > /dev/null && git status |
-            grep -i 'not staged\|untracked\|ahead of' > /dev/null && echo $d
-        cd ..
+        if ! (\
+            set -eu
+            cd "$d"
+            [ -d ".git" ] || exit 0
+            branch=$(git rev-parse --abbrev-ref 'HEAD@{upstream}')
+            set +e
+            git diff --name-only --exit-code "$branch" > /dev/null
+            status=$?
+            set -e
+            [ "$status" -ne 1 ] && exit "$status"
+            printf '%s\n' "$d"
+        ); then
+            printf 'error: %s\n' "$d"
+        fi
     done
 }
 
