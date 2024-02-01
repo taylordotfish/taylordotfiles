@@ -15,8 +15,9 @@ xprofile_main() {
         done
     done
     local script
-    for script in ~/scripts/{displays,controls}.sh; do
+    for script in ~/scripts/displays.sh ~/scripts/controls.sh; do
         [ -f "$script" ] && "$script"
     done
+    true
 }
 (set -eu; xprofile_main)
