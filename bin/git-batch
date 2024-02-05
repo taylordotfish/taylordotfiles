@@ -29,6 +29,10 @@ Operates on every Git repository in the current directory, where <command> is:
 "
 
 unpushed() {
+    if ! git -C "$1" branch | grep . > /dev/null; then
+        printf '%s\n' "$1"
+        return 0
+    fi
     local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local pushed=
     local unpushed=
@@ -48,6 +52,9 @@ unpushed() {
 }
 
 unpulled() {
+    if ! git -C "$1" branch | grep . > /dev/null; then
+        return 0
+    fi
     local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local remotes=
     local remote
@@ -65,7 +72,7 @@ unpulled() {
 
 fetch() {
     printf '[%s]\n' "$1"
-    git -C "$1" fetch --all
+    git -C "$1" fetch --all || true
 }
 
 submodule() {
@@ -86,7 +93,7 @@ fi
 case "$1" in
     unpushed|unpulled|fetch|submodule|ff)
         for d in *; do
-            [ -d "$d" ] && "$1" "$d"
+            [ -d "$d/.git" ] && "$1" "$d"
         done
         ;;
     -h|--help)
