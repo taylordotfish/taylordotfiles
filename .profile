@@ -1,5 +1,6 @@
 [ -n "$SOURCED_FROM_PROFILE" ] && return 1
-. /etc/profile
+# Ensure PATH has been reset
+[ -n "$SOURCED_FROM_BASHRC" ] && PS1= . /etc/profile
 
 export GOPATH="$HOME/go"
 PATH=$GOPATH/bin:$PATH
