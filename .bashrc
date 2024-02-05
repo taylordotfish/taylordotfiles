@@ -141,3 +141,7 @@ which cargo > /dev/null && cargo() {
     RUSTDOCFLAGS="$RUSTDOCFLAGS ${docflags:1}" \
         env cargo "$@" "${args[@]}"
 }
+
+if which ds > /dev/null; then
+    complete -F _command ds
+fi
