@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -euf
 sink="$(pactl list short sinks | tail -1 | cut -f1)"
 if [ -z "$sink" ]; then
     echo >&2 "error: no sinks available"

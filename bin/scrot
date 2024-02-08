@@ -1,16 +1,13 @@
 #!/bin/sh
 # Copyright (C) 2024 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
-set -eu
+set -euf
 
-. ~/scripts/monitor-utils.sh
-
-set -f
 fullwidth=0
 fullheight=0
 IFS='
 '
-for line in $(monitors); do
+for line in $(~/scripts/monitor-utils.sh monitors); do
     width=$(printf '%s\n' "$line" | cut -f2)
     height=$(printf '%s\n' "$line" | cut -f3)
     posx=$(printf '%s\n' "$line" | cut -f4)
@@ -22,7 +19,7 @@ for line in $(monitors); do
 done
 
 im_args=
-for line in $(monitors); do
+for line in $(~/scripts/monitor-utils.sh monitors); do
     width=$(printf '%s\n' "$line" | cut -f2)
     height=$(printf '%s\n' "$line" | cut -f3)
     posx=$(printf '%s\n' "$line" | cut -f4)

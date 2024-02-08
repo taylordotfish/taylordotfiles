@@ -1,6 +1,6 @@
 #!/bin/sh
 # Usage: git-retag-annotated <tag>
-set -eu
+set -euf
 
 adate=$(git show -s "$1^{commit}" --format=%ai)
 cdate=$(git show -s "$1^{commit}" --format=%ci)

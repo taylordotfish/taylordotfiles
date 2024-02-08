@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-set -eu
+set -euf
 
 USAGE="\
 Usage: $(basename "$0") <command>
@@ -33,13 +33,16 @@ unpushed() {
         printf '%s\n' "$1"
         return 0
     fi
+    if ! git -C "$1" diff --name-only --exit-code > /dev/null; then
+        local uncommitted=1
+    fi
     local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local pushed=
     local unpushed=
     local remote
     for remote in $(git -C "$1" remote); do
-        if git -C "$1" diff "$remote/$branch..." --name-only \
-            --exit-code > /dev/null
+        if [ -z "${uncommitted-}" ] && git -C "$1" diff "$remote/$branch..." \
+            --name-only --exit-code > /dev/null
         then
             pushed="${pushed:+$pushed,}$remote"
         else
@@ -92,7 +95,9 @@ fi
 
 case "$1" in
     unpushed|unpulled|fetch|submodule|ff)
+        set +f
         for d in *; do
+            set -f
             [ -d "$d/.git" ] && "$1" "$d"
         done
         ;;

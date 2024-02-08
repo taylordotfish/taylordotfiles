@@ -199,26 +199,15 @@ bindsym $mod+d exec --no-startup-id dmenu_run \
 ifdefn(`DMENU_COLORS', ` DMENU_COLORS')
 
 # terminal shortcuts
-define_default(`TERM_ENV', ifdefn(
-    `MONOCHROME', ```MONOCHROME= '''))dnl
-define_default(`TERM_ALT_ENV', ifdefn(
-    `MONOCHROME',, ```MONOCHROME=1 ''')ifdefn(
-    `HIDPI',, ```HIDPI=1 '''))dnl
-ifelse(ifelse(defn(`MONOCHROME'), `2', `
-    define(`TMP', defn(`TERM_ENV'))
-    define(`TERM_ENV', defn(`TERM_ALT_ENV'))
-    define(`TERM_ALT_ENV', defn(`TMP'))
-'))dnl
-dnl
-bindsym $mod+Mod1+Return exec --no-startup-id \
-    TERM_ALT_ENV`'urxvt -title urxvt -e tmux -2
-bindsym $mod+Mod1+Shift+Return exec --no-startup-id \
-    TERM_ALT_ENV`'urxvt -title urxvt -e bash
-
 bindsym $mod+Return exec --no-startup-id \
-    TERM_ENV`'urxvt -title urxvt -e tmux -2
+    URXVT_MONITOR=7:1 urxvt -title urxvt -e tmux -2
 bindsym $mod+Shift+Return exec --no-startup-id \
-    TERM_ENV`'urxvt -title urxvt -e bash
+    URXVT_MONITOR=7:1 urxvt -title urxvt -e bash
+
+bindsym $mod+Mod1+Return exec --no-startup-id \
+    URXVT_MONITOR=7:2 urxvt -title urxvt -e tmux -2
+bindsym $mod+Mod1+Shift+Return exec --no-startup-id \
+    URXVT_MONITOR=7:2 urxvt -title urxvt -e bash
 
 ifelse(defn(`MONOCHROME'), `2', `dnl
 client.focused          #000000 #ffffff #000000 #ffffff #000000

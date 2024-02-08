@@ -1,4 +1,5 @@
 #!/bin/sh
+set -uf
 while true; do
     x11vnc -localhost \
         -forever \

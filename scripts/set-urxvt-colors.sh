@@ -1,4 +1,5 @@
 #!/bin/sh
+set -euf
 printf '\033]4'
 printf ';0;[75]#000000'
 printf ';8;[75]#4d4d4d'

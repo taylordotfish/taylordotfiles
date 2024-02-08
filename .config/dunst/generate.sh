@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -euf
 cd "$(dirname "$0")"
 echo '# AUTOMATICALLY GENERATED!' > dunstrc
 echo '# CHANGES WILL BE LOST!' >> dunstrc

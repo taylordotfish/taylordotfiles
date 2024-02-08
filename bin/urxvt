@@ -1,7 +1,42 @@
 #!/bin/sh
 # Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
-set -eu
+set -euf
+
+case "${URXVT_MONITOR-}" in
+    "")
+        monitor_field=1
+        monitor_value=0
+        ;;
+    *:*)
+        monitor_field=$(printf '%s\n' "$URXVT_MONITOR" | cut -d: -f1)
+        monitor_value=$(printf '%s\n' "$URXVT_MONITOR" | cut -d: -f2-)
+        ;;
+    *)
+        monitor_field=1
+        monitor_value=$URXVT_MONITOR
+        ;;
+esac
+unset URXVT_MONITOR
+
+IFS='
+'
+properties=
+for line in $(~/scripts/monitor-utils.sh monitors); do
+    value=$(printf '%s\n' "$line" | cut -f"$monitor_field")
+    [ "$value" = "$monitor_value" ] || continue
+    properties=$(printf '%s\n' "$line" | cut -f8)
+    break
+done
+
+prop_mono=
+prop_hidpi=
+case ",$properties," in
+    *,mono,*) prop_mono=1 ;;
+esac
+case ",$properties," in
+    *,hidpi,*) prop_hidpi=1 ;;
+esac
 
 args=
 cmd=
@@ -37,26 +72,26 @@ for arg in "$@"; do
 done
 
 cmd=${cmd:-bash}
-if [ -n "${MONOCHROME-}" ]; then
+if [ -n "$prop_mono" ]; then
     which monoterm > /dev/null && cmd="monoterm -b $cmd"
 elif [ -z "${KEEPCOLORS-}" ] && [ -x ~/scripts/set-urxvt-colors.sh ]; then
     cmd="~/scripts/set-urxvt-colors.sh $cmd"
 fi
 
-if [ -n "${HIDPI-}" ] && [ -x ~/scripts/hidpi.sh ]; then
+if [ -n "$prop_hidpi" ] && [ -x ~/scripts/hidpi.sh ]; then
     cmd="~/scripts/hidpi.sh $cmd"
 fi
 
 if [ -z "${name-}" ]; then
     name=Rxvt
-    if [ -n "${MONOCHROME-}" ]; then
+    if [ -n "$prop_mono" ]; then
         name="$name.mono"
     fi
-    if [ -n "${HIDPI-}" ]; then
+    if [ -n "$prop_hidpi" ]; then
         name="$name.2x"
     fi
-    if [ -n "${HIDPI-}" ] && [ -z "${MONOCHROME-}" ]; then
-        [ -z "${HEAVY_BLOCKS+x}" ] && export HEAVY_BLOCKS=1
+    if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
+        export HEAVY_BLOCKS=${HEAVY_BLOCKS-1}
     fi
 fi
 

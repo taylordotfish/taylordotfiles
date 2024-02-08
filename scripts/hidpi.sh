@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -euf
 if [ -n "${DISPLAY-}" ]; then
     dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
 else

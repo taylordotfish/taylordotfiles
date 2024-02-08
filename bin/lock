@@ -1,20 +1,17 @@
 #!/bin/sh
 # Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
-set -eu
-
-. ~/scripts/monitor-utils.sh
+set -euf
 
 if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
-    rm -f screen_*.png
+    (set +f; rm -f screen_*.png)
     OLDIFS=$IFS
     IFS='
 '
-    set -f
     maxx=0
     maxy=0
     trap "rm -f screen_*.png" EXIT
-    for line in $(monitors); do
+    for line in $(~/scripts/monitor-utils.sh monitors); do
         index=$(printf '%s\n' "$line" | cut -f1)
         width=$(printf '%s\n' "$line" | cut -f2)
         height=$(printf '%s\n' "$line" | cut -f3)
@@ -25,13 +22,16 @@ if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
         endy=$((posy+height))
         [ "$endx" -gt "$maxx" ] && maxx=$endx
         [ "$endy" -gt "$maxy" ] && maxy=$endy
-        if ! printf '%s\n' "$properties" | grep '\bmono\b' > /dev/null; then
-            scrot -M "$index" screen_"$index".png
-            mogrify -blur 10x10 screen_"$index".png
-        fi
+        case ",$properties," in
+            *,mono,*) ;;
+            *)
+                scrot -M "$index" screen_"$index".png
+                mogrify -blur 10x10 screen_"$index".png
+                ;;
+        esac
     done
     im_args=
-    for line in $(monitors); do
+    for line in $(~/scripts/monitor-utils.sh monitors); do
         index=$(printf '%s\n' "$line" | cut -f1)
         posx=$(printf '%s\n' "$line" | cut -f4)
         posy=$(printf '%s\n' "$line" | cut -f5)
