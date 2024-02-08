@@ -55,7 +55,7 @@ if [ -z "${name-}" ]; then
     if [ -n "${HIDPI-}" ]; then
         name="$name.2x"
     fi
-    if [ -n "${HIDPI-}" ] && [ -z "${MONOCHROME}" ]; then
+    if [ -n "${HIDPI-}" ] && [ -z "${MONOCHROME-}" ]; then
         [ -z "${HEAVY_BLOCKS+x}" ] && export HEAVY_BLOCKS=1
     fi
 fi

@@ -230,29 +230,7 @@ client.unfocused        #444444 #000000 #909090 #000000 #000000
 client.focused_inactive #444444 #202020 #909090 #000000 #000000
 ')dnl
 
-bar {
-    tray_output primary
-    status_command i3status | python3 -u ~/.i3/status-wrapper.py
-    colors {
-ifelse(defn(`MONOCHROME'), `2', `dnl
-        background #ffffff
-        statusline #000000
-        separator #000000
-        focused_workspace #000000 #ffffff #000000
-        active_workspace #000000 #ffffff #000000
-        inactive_workspace #ffffff #ffffff #000000
-', `dnl
-        background #000000
-        statusline #ffffff
-ifdefn(`MONOCHROME', `dnl
-        separator #bbbbbb
-')dnl
-        focused_workspace #303030 #303030 #ffffff
-        active_workspace #202020 #202020 #c0c0c0
-        inactive_workspace #101010 #101010 #909090
-')dnl
-    }
-}
+syscmd(`./bar.sh')dnl
 
 sinclude(`config.post.m4')dnl
 `#' `vim:ft=conf'

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 # Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
@@ -14,12 +14,7 @@ color_good = "#60ff80"
 color_degraded = "#ffd060"
 color_bad = "#ff5050"
 
-if os.getenv("MONOCHROME"):
-    color_good = "#8fffa5"
-    color_degraded = "#fcda88"
-    color_bad = "#ff9a9a"
-
-if os.getenv("MONOCHROME") == 2:
+if os.getenv("MONOCHROME") == "2":
     color_normal = "#000000"
     color_good = color_normal
     color_degraded = color_normal

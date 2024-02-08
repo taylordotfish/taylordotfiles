@@ -7,8 +7,8 @@ DEFAULT_TARGET=i3
 
 if which i3 > /dev/null; then
     start_i3() {
-        ~/.config/i3/generate.sh
         prepare_desktop
+        ~/.config/i3/generate.sh
         exec i3
     }
 fi
@@ -49,12 +49,12 @@ prepare_session() {
 }
 
 prepare_desktop() {
+    prepare_session
     ~/.config/dunst/generate.sh
     dbus-update-activation-environment --all
     dbus-update-activation-environment --systemd DISPLAY
     systemctl --user import-environment DISPLAY
     systemctl --user start dunst || true
-    prepare_session
 }
 
 target=$DEFAULT_TARGET

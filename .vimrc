@@ -29,6 +29,7 @@ set comments-=mb:*
 set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
 set modeline
+set ttimeoutlen=0
 
 filetype indent on
 syntax on
