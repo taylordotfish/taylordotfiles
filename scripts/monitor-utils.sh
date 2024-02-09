@@ -67,11 +67,24 @@ if [ -z "${NOTSOURCED-}" ]; then
     return 0
 fi
 
-cmd=${1-monitors}
-case "$cmd" in
+USAGE="\
+Usage: "$(basename "$0")" <command>
+
+Commands:
+  monitors  Display a list of all monitors. Fields are: index, width, height,
+            pos_x, pos_y, name, priority, properties.
+"
+
+case "${1-}" in
     monitors)
-        "$cmd"
+        "$1"
+        ;;
+    -h|--help)
+        printf '%s' "$USAGE"
+        exit 0
         ;;
     *)
+        printf >&2 '%s' "$USAGE"
+        exit 1
         ;;
 esac
