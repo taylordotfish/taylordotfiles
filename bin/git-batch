@@ -62,6 +62,11 @@ unpulled() {
     local remotes=
     local remote
     for remote in $(git -C "$1" remote); do
+        if ! git -C "$1" rev-parse --abbrev-ref "$remote/$branch" \
+            > /dev/null 2>&1
+        then
+            continue
+        fi
         if git -C "$1" log "..$remote/$branch" --format=oneline |
             grep . > /dev/null
         then
