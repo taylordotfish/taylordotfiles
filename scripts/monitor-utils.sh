@@ -59,7 +59,7 @@ monitors() {
     done
     case "$opts" in
         *f*) ;;
-        *) set +f
+        *) set +f ;;
     esac
 }
 
