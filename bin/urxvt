@@ -97,4 +97,5 @@ fi
 
 title=${title-urxvt}
 urxvt=$(PATH=/usr/bin:/usr/local/bin which urxvt)
-eval 'exec "$urxvt" -name "$name" -title "$title" '"$args -e $cmd"
+eval "set -- $args -e $cmd"
+exec "$urxvt" -name "$name" -title "$title" "$@"

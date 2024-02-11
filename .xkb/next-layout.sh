@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -euf
 cd "$(dirname "$0")"
 tail +2 layout.conf > .layout.conf.tmp
 head -1 layout.conf >> .layout.conf.tmp

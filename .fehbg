@@ -18,13 +18,13 @@ for line in $(~/scripts/monitor-utils.sh monitors); do
     eval "mimage_$index=\$image"
 done
 
-args=
 i=0
+set --
 while true; do
     eval "mimage=\${mimage_$i-}"
     [ -z "$mimage" ] && break
-    args="$args \"\$mimage_$i\""
+    set -- "$@" "$mimage"
     i=$((i+1))
 done
 
-eval "feh --no-fehbg --bg-fill $args"
+feh --no-fehbg --bg-fill "$@"
