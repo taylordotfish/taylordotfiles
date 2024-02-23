@@ -24,8 +24,9 @@ Operates on every Git repository in the current directory, where <command> is:
   unpushed   Find local changes not present in remotes.
   unpulled   Find remotes with changes not merged locally.
   fetch      Fetch all remotes.
-  submodule  Initialize and update submodules.
   ff         Try to fast-forward to the remote tracking branch.
+  submodule  Initialize and update submodules.
+  sync       Sync submodule URLs.
 "
 
 unpushed() {
@@ -41,12 +42,15 @@ unpushed() {
     local unpushed=
     local remote
     for remote in $(git -C "$1" remote); do
-        if [ -z "${uncommitted-}" ] && git -C "$1" diff "$remote/$branch..." \
-            --name-only --exit-code > /dev/null
+        if [ -n "${uncommitted-}" ] ||
+            ! git -C "$1" rev-parse --abbrev-ref "$remote/$branch" \
+                > /dev/null 2>&1 ||
+            ! git -C "$1" diff "$remote/$branch..." --name-only --exit-code \
+                > /dev/null
         then
-            pushed="${pushed:+$pushed,}$remote"
-        else
             unpushed="${unpushed:+$unpushed,}$remote"
+        else
+            pushed="${pushed:+$pushed,}$remote"
         fi
     done
     if [ -n "$unpushed" ]; then
@@ -83,14 +87,19 @@ fetch() {
     git -C "$1" fetch --all || true
 }
 
+ff() {
+    printf '[%s]\n' "$1"
+    git -C "$1" merge --ff-only || true
+}
+
 submodule() {
     printf '[%s]\n' "$1"
     git -C "$1" submodule update --init --recursive
 }
 
-ff() {
+sync() {
     printf '[%s]\n' "$1"
-    git -C "$1" merge --ff-only || true
+    git -C "$1" submodule sync --recursive
 }
 
 if [ "$#" -ne 1 ]; then
@@ -99,7 +108,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 case "$1" in
-    unpushed|unpulled|fetch|submodule|ff)
+    unpushed|unpulled|fetch|ff|submodule|sync)
         set +f
         for d in *; do
             set -f

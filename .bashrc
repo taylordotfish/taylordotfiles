@@ -10,7 +10,6 @@ PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
-export MIRIFLAGS="-Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
 export NODE_PATH=~/.local/lib/node_modules
 
 alias grep="grep --color"
@@ -130,15 +129,18 @@ which cargo > /dev/null && cargo() {
         return
     fi
 
-    local rustflags=" -Z macro-backtrace -Z proc-macro-backtrace"
-    local docflags=" -Z unstable-options"
+    local RUSTFLAGS=$RUSTFLAGS
+    local RUSTDOCFLAGS=$RUSTDOCFLAGS
+    local MIRIFLAGS=$MIRIFLAGS
+    RUSTFLAGS+=" -Z macro-backtrace -Z proc-macro-backtrace"
+    RUSTDOCFLAGS+=" -Z unstable-options"
+    MIRIFLAGS+=" -Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
     # Necessary to use local std docs
-    [ "$1" = "test" ] || docflags+=" --extern-html-root-takes-precedence"
+    [ "$1" = test ] || RUSTDOCFLAGS+=" --extern-html-root-takes-precedence"
 
     local args=()
-    [ "$1" = "doc" ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
-    RUSTFLAGS="$RUSTFLAGS ${rustflags:1}" \
-    RUSTDOCFLAGS="$RUSTDOCFLAGS ${docflags:1}" \
+    [ "$1" = doc ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
+    RUSTFLAGS=$RUSTFLAGS RUSTDOCFLAGS=$RUSTDOCFLAGS MIRIFLAGS=$MIRIFLAGS \
         env cargo "$@" "${args[@]}"
 }
 
