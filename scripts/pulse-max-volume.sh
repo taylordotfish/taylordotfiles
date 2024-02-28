@@ -11,13 +11,21 @@ while true; do
     prev_inputs=$inputs
 
     for id in $new; do
-        volume=$(pactl list sink-inputs |
+        if ! volume=$(pactl list sink-inputs |
             grep -A15 "^Sink Input #$id$" |
             grep '^\s*Volume:' |
             grep -o '[0-9]\+%' |
             head -1
-        )
-        if [ "$volume" != "100%" ]; then
+        ); then
+            printf '%s\n' "Could not find volume of $id"
+            continue
+        fi
+        volume_int=0
+        case "$volume" in
+            *[!0-9]*%|%) ;;
+            *%) volume_int=${volume%'%'} ;;
+        esac
+        if [ "$volume_int" -lt 100 ]; then
             printf '%s\n' "Setting volume of $id from $volume to 100%"
             pactl set-sink-input-volume "$id" "100%"
         fi

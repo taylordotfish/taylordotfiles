@@ -90,9 +90,16 @@ if [ -z "${name-}" ]; then
     if [ -n "$prop_hidpi" ]; then
         name="$name.2x"
     fi
-    if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
-        export HEAVY_BLOCKS=${HEAVY_BLOCKS-1}
-    fi
+fi
+
+if [ -n "$prop_mono" ]; then
+    export MONOCHROME=${MONOCHROME-1}
+else
+    unset MONOCHROME
+fi
+
+if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
+    export HEAVY_BLOCKS=${HEAVY_BLOCKS-1}
 fi
 
 title=${title-urxvt}
