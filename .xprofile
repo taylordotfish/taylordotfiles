@@ -14,7 +14,7 @@ xprofile_main() {
         [ -f "$fontdir/fonts.dir" ] && xset fp+ "$fontdir"
     done
     local script
-    for script in ~/scripts/display.sh ~/scripts/controls.sh; do
+    for script in ~/scripts/displays.sh ~/scripts/controls.sh; do
         [ -x "$script" ] && "$script"
     done
     true
