@@ -27,7 +27,9 @@ while true; do
         esac
         if [ "$volume_int" -lt 100 ]; then
             printf '%s\n' "Setting volume of $id from $volume to 100%"
-            pactl set-sink-input-volume "$id" "100%"
+            if ! pactl set-sink-input-volume "$id" "100%"; then
+                printf '%s\n' "Failed to set volume of $id"
+            fi
         fi
     done
     sleep 0.5

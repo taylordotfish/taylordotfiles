@@ -7,3 +7,4 @@ if len(sys.argv) > 1:
 else:
     file = sys.stdin
 json.dump(json.load(file), sys.stdout, indent=4)
+print()
