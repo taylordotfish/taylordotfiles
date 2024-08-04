@@ -24,13 +24,18 @@ for line in $(~/scripts/monitor-utils.sh monitors); do
     height=$(printf '%s\n' "$line" | cut -f3)
     posx=$(printf '%s\n' "$line" | cut -f4)
     posy=$(printf '%s\n' "$line" | cut -f5)
-    im_args="$im_args -draw 'rectangle $posx,0 $((posx+width)),$posy'"
-    im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
-    im_args="$im_args $((posx+width)),$fullheight'"
+    if [ "$posy" -gt 0 ]; then
+        im_args="$im_args -draw 'rectangle $posx,0"
+        im_args="$im_args $((posx+width-1)),$((posy-1))'"
+    fi
+    if [ "$((posy+height))" -lt "$fullheight" ]; then
+        im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
+        im_args="$im_args $((posx+width-1)),$((fullheight-1))'"
+    fi
 done
 
 fullsize="$fullwidth"x"$fullheight"
 scrot=$(PATH=/usr/bin:/usr/local/bin which scrot)
 "$scrot" -e "\
-[ \"\\\$(identify -format '%%wx%%h' '\$f')\" = \"$fullsize\" ] && \
-mogrify -fill white $im_args -alpha off '\$f'" "$@"
+if [ \"\\\$(identify -format '%%wx%%h' '\$f')\" = \"$fullsize\" ]; then \
+mogrify -fill white $im_args -alpha off '\$f'; fi" "$@"
