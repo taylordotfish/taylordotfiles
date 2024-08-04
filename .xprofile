@@ -17,6 +17,21 @@ xprofile_main() {
     for script in ~/scripts/displays.sh ~/scripts/controls.sh; do
         [ -x "$script" ] && "$script"
     done
+    local dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
+    if [ "${dpi:-96}" != 96 ]; then
+        GDK_DPI_SCALE=$(printf '%.2g' "$(echo "scale=3;96/$dpi" | bc)")
+        QT_FONT_DPI=96
+    fi
+    local script=~/.config/gtk-4.0/generate.sh
+    [ -x "$script" ] && "$script"
     true
 }
-(set -euf; xprofile_main)
+eval "$(\
+    set -euf
+    xprofile_main > /dev/null
+    for var in GDK_DPI_SCALE QT_FONT_DPI; do
+        if eval "[ -n \"\${$var+x}\" ] && val=\$$var"; then
+            printf 'export %s=%s\n' "$var" "$val"
+        fi
+    done
+)"
