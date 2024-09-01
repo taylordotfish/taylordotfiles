@@ -2,9 +2,10 @@
 # Ensure PATH has been reset
 [ -n "$SOURCED_FROM_BASHRC" ] && PS1= . /etc/profile
 
-export GOPATH="$HOME/go"
+export GOPATH=~/go
 PATH=$GOPATH/bin:$PATH
-export PYENV_ROOT="$HOME/.pyenv"
+PATH=~/.virtualenv/bin:$PATH
+export PYENV_ROOT=~/.pyenv
 PATH=$PYENV_ROOT/bin:$PATH
 PATH=~/.cargo/bin:$PATH
 PATH=~/.local/bin:$PATH
