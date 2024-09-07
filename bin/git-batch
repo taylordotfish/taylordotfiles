@@ -27,6 +27,7 @@ Operates on every Git repository in the current directory, where <command> is:
   ff         Try to fast-forward to the remote tracking branch.
   submodule  Initialize and update submodules.
   sync       Sync submodule URLs.
+  branch     Show the current branch.
 "
 
 unpushed() {
@@ -50,11 +51,11 @@ unpushed() {
         then
             unpushed="${unpushed:+$unpushed,}$remote"
         else
-            pushed="${pushed:+$pushed,}$remote"
+            pushed="${pushed:+$pushed,}-$remote"
         fi
     done
     if [ -n "$unpushed" ]; then
-        printf '%s: %s%s\n' "$1" "$unpushed" "${pushed:+ (-$pushed)}"
+        printf '%s: %s%s\n' "$1" "$unpushed" "${pushed:+ ($pushed)}"
     fi
 }
 
@@ -102,6 +103,22 @@ sync() {
     git -C "$1" submodule sync --recursive
 }
 
+branch() {
+    local maxlen=0
+    set +f --
+    for d in *; do
+        set -f
+        [ -d "$d/.git" ] || continue
+        set -- "$@" "$d"
+        local len=$(printf '%s' "$d" | wc -c)
+        [ "$len" -gt "$maxlen" ] && maxlen=$len
+    done
+    for d in "$@"; do
+        printf "% ${maxlen}s: " "$d"
+        git -C "$d" branch --show-current
+    done
+}
+
 if [ "$#" -ne 1 ]; then
     printf >&2 '%s' "$USAGE"
     exit 1
@@ -114,6 +131,9 @@ case "$1" in
             set -f
             [ -d "$d/.git" ] && "$1" "$d"
         done
+        ;;
+    branch)
+        branch
         ;;
     -h|--help)
         printf '%s' "$USAGE"
