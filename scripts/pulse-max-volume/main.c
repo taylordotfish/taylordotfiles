@@ -26,8 +26,8 @@
 #include <poll.h>
 #include <string.h>
 
-#define MIN_DELAY 200000
-#define NAME_MAX_LEN 50
+#define MIN_DELAY 200000 // microseconds
+#define NAME_MAX_LEN 40
 
 typedef struct State {
     bool request_pending;
@@ -63,22 +63,26 @@ static void on_inputs(
         // This input has already been processed.
         return;
     }
-    if (!input->has_volume) {
+    if (!input->has_volume || input->volume.channels <= 0) {
         return;
     }
     pa_cvolume volume = input->volume;
-    if (pa_cvolume_channels_equal_to(&volume, PA_VOLUME_NORM)) {
-        return;
+    const int old_percent = pa_cvolume_avg(&volume) * 100 / PA_VOLUME_NORM;
+    for (size_t i = 0; i < volume.channels; ++i) {
+        if (volume.values[i] >= PA_VOLUME_NORM) {
+            return;
+        }
+        volume.values[i] = PA_VOLUME_NORM;
     }
 
-    printf("Setting volume of \"");
+    printf("Changing volume of \"");
     const char * const name = input->name;
     if (name && strlen(name) > NAME_MAX_LEN) {
         printf("%.*s...", NAME_MAX_LEN - 3, name);
     } else {
         printf("%s", name);
     }
-    printf("\" (%"PRIu32") to 100%%\n", input->index);
+    printf("\" (%"PRIu32") from %d%% to 100%%\n", input->index, old_percent);
     pa_cvolume_set(&volume, volume.channels, PA_VOLUME_NORM);
     if (!pa_context_set_sink_input_volume(
         context,
