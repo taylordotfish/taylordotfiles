@@ -17,14 +17,14 @@
 
 #define _GNU_SOURCE
 #include <pulse/pulseaudio.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <inttypes.h>
-#include <stdbool.h>
-#include <time.h>
-#include <signal.h>
 #include <poll.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MIN_DELAY 200000 // microseconds
 #define NAME_MAX_LEN 40
@@ -77,7 +77,7 @@ static void on_inputs(
 
     printf("Changing volume of \"");
     const char * const name = input->name;
-    if (name && strlen(name) > NAME_MAX_LEN) {
+    if (name && strnlen(name, NAME_MAX_LEN + 1) > NAME_MAX_LEN) {
         printf("%.*s...", NAME_MAX_LEN - 3, name);
     } else {
         printf("%s", name);
