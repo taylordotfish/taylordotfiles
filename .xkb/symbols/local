@@ -1,9 +1,5 @@
 partial
 xkb_symbols {
-    # Right Control is Left Super
-    key <RCTL> { [ Super_L ] };
-    modifier_map Mod4 { <RCTL> };
-
     # Caps Lock is Left Control
     key <CAPS> { [ Control_L ] };
     modifier_map Control { <CAPS> };
