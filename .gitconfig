@@ -5,3 +5,5 @@
 [init]
     defaultBranch = master
 [user]
+[advice]
+	diverging = false
