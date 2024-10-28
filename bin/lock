@@ -3,6 +3,21 @@
 # License: GNU GPL version 3 or later
 set -euf
 
+run_i3lock_blocking() {
+    local picom=
+    if pkill '^picom$'; then
+        picom=1
+    fi
+    i3lock -n "$@"
+    if [ -n "$picom" ]; then
+        exec picom
+    fi
+}
+
+run_i3lock() {
+    run_i3lock_blocking "$@" > /dev/null 2>&1 &
+}
+
 if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
     (set +f; rm -f screen_*.png)
     OLDIFS=$IFS
@@ -42,12 +57,12 @@ if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
     done
     IFS=$OLDIFS
     convert -size "$maxx"x"$maxy" xc:white $im_args full.png
-    i3lock -i full.png
+    run_i3lock -i full.png
     exit
 fi
 
 if [ -n "${MONOCHROME-}" ]; then
-    i3lock -c ffffff
+    run_i3lock -c ffffff
 else
-    i3lock -c 000000
+    run_i3lock -c 000000
 fi
