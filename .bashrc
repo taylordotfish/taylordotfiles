@@ -11,6 +11,7 @@ PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
 export NODE_PATH=~/.local/lib/node_modules
+export LC_COLLATE=C
 
 alias grep="grep --color"
 alias rm="rm -I"
