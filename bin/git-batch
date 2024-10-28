@@ -31,7 +31,7 @@ Operates on every Git repository in the current directory, where <command> is:
 "
 
 unpushed() {
-    if ! git -C "$1" branch | grep . > /dev/null; then
+    if ! git -C "$1" branch | grep -q .; then
         printf '%s\n' "$1"
         return 0
     fi
@@ -60,7 +60,7 @@ unpushed() {
 }
 
 unpulled() {
-    if ! git -C "$1" branch | grep . > /dev/null; then
+    if ! git -C "$1" branch | grep -q .; then
         return 0
     fi
     local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
@@ -72,8 +72,7 @@ unpulled() {
         then
             continue
         fi
-        if git -C "$1" log "..$remote/$branch" --format=oneline |
-            grep . > /dev/null
+        if git -C "$1" log "..$remote/$branch" --format=oneline | grep -q .
         then
             remotes="${remotes:+$remotes,}$remote"
         fi

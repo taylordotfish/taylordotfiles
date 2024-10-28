@@ -32,3 +32,4 @@ hi Ignore       ctermfg=246  ctermbg=none cterm=none
 hi StatusLine   ctermfg=none ctermbg=235  cterm=none
 hi Search       ctermfg=15   ctermbg=30   cterm=none
 hi NonText      ctermfg=74   ctermbg=none cterm=none
+hi Folded       ctermfg=43   ctermbg=none  cterm=none
