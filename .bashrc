@@ -5,6 +5,7 @@ unalias -a
 source ~/.profile || true
 # Source default .bashrc
 [ -f /etc/skel/.bashrc ] && source /etc/skel/.bashrc
+unset _bashrc_sourced
 
 # Non-color prompt
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '

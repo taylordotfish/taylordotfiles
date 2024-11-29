@@ -21,6 +21,7 @@ source_bashrc() {
             . "$HOME/.bashrc" || true
         fi
     fi
+    unset _profile_sourced
 }
 
 # If this file is used as a shared script that other .profile files source, it
