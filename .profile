@@ -1,6 +1,7 @@
-[ -n "$SOURCED_FROM_PROFILE" ] && return 1
-# Ensure PATH has been reset
-[ -n "$SOURCED_FROM_BASHRC" ] && PS1= . /etc/profile
+[ -n "$_profile_sourced" ] && return 1
+_profile_sourced=1
+[ -z "${ORIG_PATH+x}" ] && export ORIG_PATH=$PATH
+PATH=$ORIG_PATH
 
 export GOPATH=~/go
 PATH=$GOPATH/bin:$PATH
@@ -12,11 +13,12 @@ PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
 
 source_bashrc() {
+    unset -f source_bashrc
     # if running bash
     if [ -n "$BASH_VERSION" ]; then
         # include .bashrc if it exists
         if [ -f "$HOME/.bashrc" ]; then
-            SOURCED_FROM_PROFILE=1 . "$HOME/.bashrc" || true
+            . "$HOME/.bashrc" || true
         fi
     fi
 }

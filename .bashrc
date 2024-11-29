@@ -1,9 +1,10 @@
-[ -n "$SOURCED_FROM_BASHRC" ] && return 1
+[ -n "$_bashrc_sourced" ] && return 1
+_bashrc_sourced=1
 unalias -a
 
-SOURCED_FROM_BASHRC=1 source ~/.profile || true
+source ~/.profile || true
 # Source default .bashrc
-source /etc/skel/.bashrc
+[ -f /etc/skel/.bashrc ] && source /etc/skel/.bashrc
 
 # Non-color prompt
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
