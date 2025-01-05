@@ -48,6 +48,9 @@ function SetDefaultIndent()
     endif
 endfunction
 
+command ResetIndent set indentexpr=
+command UseCIndent set indentexpr=GetCIndent()
+
 function SetM4Options()
     set matchpairs+=`:'
     set cpoptions+=%M
