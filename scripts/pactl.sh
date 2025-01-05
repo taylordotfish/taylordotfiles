@@ -1,8 +1,9 @@
 #!/bin/sh
 set -euf
+unset sink
 sink="$(pactl list short sinks | tail -1 | cut -f1)"
-if [ -z "$sink" ]; then
-    echo >&2 "error: no sinks available"
-    exit 1
+if [ -n "$sink" ]; then
+    exec pactl "$1" "$sink" "$2"
 fi
-pactl "$1" "$sink" "$2"
+printf >&2 '%s\n' "error: no sinks available"
+exit 1
