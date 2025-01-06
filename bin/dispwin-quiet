@@ -1,0 +1,11 @@
+#!/bin/sh
+set -euf
+unset out
+if ! out=$(dispwin "$@" 2>&1); then
+    printf >&2 '%s\n' "$out"
+    printf >&2 '%s\n' "command failed: dispwin $*"
+    return 1
+fi
+printf '%s\n' "$out" |
+    grep -v " 8 doesn't match actual 10$" |
+    grep -v -- "- assuming linear$" || true
