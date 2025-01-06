@@ -1,6 +1,5 @@
 [ -n "$_bashrc_sourced" ] && return 1
 _bashrc_sourced=1
-unalias -a
 
 source ~/.profile || true
 # Source default .bashrc

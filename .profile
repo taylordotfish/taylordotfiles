@@ -1,5 +1,7 @@
 [ -n "$_profile_sourced" ] && return 1
 _profile_sourced=1
+unalias -a
+
 [ -z "${ORIG_PATH+x}" ] && export ORIG_PATH=$PATH
 PATH=$ORIG_PATH
 
@@ -11,6 +13,18 @@ PATH=$PYENV_ROOT/bin:$PATH
 PATH=~/.cargo/bin:$PATH
 PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
+
+delayed_exec() {
+    local time='cut -d\  -f1 /proc/uptime'
+    local expr=$(eval "$time")
+    "$@"
+    local status=$?
+    expr="$(eval "$time")-$expr>=${TIMEOUT-5}"
+    [ "$(printf '%s\n' "$expr" | bc)" -eq 1 ] && logout "$status"
+    return "$status"
+}
+
+alias delayed-exec=delayed_exec
 
 source_bashrc() {
     unset -f source_bashrc
