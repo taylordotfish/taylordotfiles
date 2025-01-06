@@ -20,7 +20,7 @@ delayed_exec() {
     "$@"
     local status=$?
     expr="$(eval "$time")-$expr>=${TIMEOUT-5}"
-    [ "$(printf '%s\n' "$expr" | bc)" -eq 1 ] && logout "$status"
+    [ "$(printf '%s\n' "$expr" | bc)" -eq 1 ] && exit "$status"
     return "$status"
 }
 
