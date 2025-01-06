@@ -5,7 +5,7 @@ while true; do
         -forever \
         -rfbauth ~/.vnc/passwd \
         -rfbport 5901 \
-        -display :0 \
+        -display "${DISPLAY:-:0}" \
         -noxdamage \
         "$@"
     sleep 2
