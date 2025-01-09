@@ -16,7 +16,8 @@
 
 set -euf
 
-USAGE="\
+usage() {
+    cat << EOF
 Usage: $(basename "$0") <command>
 
 Operates on every Git repository in the current directory, where <command> is:
@@ -28,7 +29,27 @@ Operates on every Git repository in the current directory, where <command> is:
   submodule  Initialize and update submodules.
   sync       Sync submodule URLs.
   branch     Show the current branch.
-"
+EOF
+}
+
+alias get_subdir_repos='
+    set +f; set -f -- *
+    local d 2> /dev/null || true
+    for d do
+        shift
+        if [ -d "$d/.git" ]; then
+            set -- "$@" "$d"
+        fi
+    done
+'
+
+alias get_repos='
+    if [ -d .git ]; then
+        set -- .
+    else
+        get_subdir_repos
+    fi
+'
 
 unpushed() {
     if ! git -C "$1" branch | grep -q .; then
@@ -103,42 +124,37 @@ sync() {
 }
 
 branch() {
-    local maxlen=0
-    set +f --
-    for d in *; do
-        set -f
-        [ -d "$d/.git" ] || continue
-        set -- "$@" "$d"
-        local len=$(printf '%s' "$d" | wc -c)
-        [ "$len" -gt "$maxlen" ] && maxlen=$len
-    done
-    for d in "$@"; do
-        printf "% ${maxlen}s: " "$d"
+    get_repos
+    local maxlen=$(printf '%s\n' "$@" | awk '
+        length($0) > n { n = length($0) }
+        END { print n }
+    ')
+    for d do
+        printf "%${maxlen}s: " "$d"
         git -C "$d" branch --show-current
     done
 }
 
 if [ "$#" -ne 1 ]; then
-    printf >&2 '%s' "$USAGE"
+    usage >&2
     exit 1
 fi
 
 case "$1" in
     unpushed|unpulled|fetch|ff|submodule|sync)
-        set +f
-        for d in *; do
-            set -f
-            [ -d "$d/.git" ] && "$1" "$d"
+        get_repos
+        for d do
+            "$1" "$d"
         done
         ;;
     branch)
         branch
         ;;
     -h|--help)
-        printf '%s' "$USAGE"
+        usage
         ;;
     *)
-        printf >&2 '%s' "$USAGE"
+        usage >&2
         exit 1
         ;;
 esac
