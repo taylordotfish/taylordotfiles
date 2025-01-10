@@ -32,25 +32,6 @@ Operates on every Git repository in the current directory, where <command> is:
 EOF
 }
 
-alias get_subdir_repos='
-    set +f; set -f -- *
-    local d 2> /dev/null || true
-    for d do
-        shift
-        if [ -d "$d/.git" ]; then
-            set -- "$@" "$d"
-        fi
-    done
-'
-
-alias get_repos='
-    if [ -d .git ]; then
-        set -- .
-    else
-        get_subdir_repos
-    fi
-'
-
 unpushed() {
     if ! git -C "$1" branch | grep -q .; then
         printf '%s\n' "$1"
@@ -124,37 +105,65 @@ sync() {
 }
 
 branch() {
-    get_repos
     local maxlen=$(printf '%s\n' "$@" | awk '
         length($0) > n { n = length($0) }
         END { print n }
     ')
+    local d
     for d do
         printf "%${maxlen}s: " "$d"
         git -C "$d" branch --show-current
     done
 }
 
-if [ "$#" -ne 1 ]; then
+cmd_foreach() {
+    local cmd=$1
+    shift
+    local d
+    for d do
+        "$cmd" "$d"
+    done
+}
+
+if [ "$#" -eq 0 ]; then
     usage >&2
     exit 1
 fi
-
 case "$1" in
-    unpushed|unpulled|fetch|ff|submodule|sync)
-        get_repos
-        for d do
-            "$1" "$d"
-        done
-        ;;
-    branch)
-        branch
-        ;;
     -h|--help)
         usage
+        exit 0
+        ;;
+esac
+
+unset target
+case "$1" in
+    unpushed|unpulled|fetch|ff|submodule|sync)
+        target="cmd_foreach $1"
+        ;;
+    branch)
+        target=branch
         ;;
     *)
-        usage >&2
+        printf >&2 '%s\n' "error: unknown command"
         exit 1
         ;;
 esac
+
+shift
+if [ "${1-}" = -- ]; then
+    shift
+elif [ "$#" -gt 0 ]; then
+    printf >&2 '%s\n' "error: unexpected argument"
+    exit 1
+else
+    set +f; set -f -- *
+    for d do
+        shift
+        if [ -d "$d/.git" ]; then
+            set -- "$@" "$d"
+        fi
+    done
+fi
+
+$target "$@"
