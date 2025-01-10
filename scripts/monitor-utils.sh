@@ -1,23 +1,20 @@
 #!/usr/bin/env -S NOTSOURCED=1 /bin/sh -euf
-# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2024-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
 [ -f ~/.config/monitordef ] && . ~/.config/monitordef
 
 monitors() {
     if [ -z "${NOCACHE-}" ]; then
-        if [ -f ~/.cache/monitor-utils/monitors ]; then
-            def_date=$(date -r ~/.config/monitordef '+%s')
-            cache_date=$(date -r ~/.cache/monitor-utils/monitors '+%s')
-            if [ "$def_date" -le "$cache_date" ]; then
-                cat ~/.cache/monitor-utils/monitors
-                return
-            fi
+        if [ -f ~/.cache/monitor-utils/monitors ] &&
+            [ ~/.cache/monitor-utils/monitors -nt ~/.config/monitordef ]
+        then
+            cat ~/.cache/monitor-utils/monitors
+            return
         fi
 
         if [ -d ~/.cache/monitor-utils ]; then
-            NOCACHE=1 monitors > ~/.cache/monitor-utils/monitors
-            cat ~/.cache/monitor-utils/monitors
+            NOCACHE=1 monitors | tee ~/.cache/monitor-utils/monitors
         else
             NOCACHE=1 monitors
         fi
@@ -26,10 +23,8 @@ monitors() {
 
     local monitors=${monitordef_names-}
     local propertydefs=${monitordef_properties-}
-    local tab=$(printf '\t')
-    local num_defined=$(printf '%s'"${monitors:+\\t}" "$monitors" |
-        grep -o "$tab" |
-        wc -l
+    local num_defined=$(printf '%s\n' "$monitors" |
+        awk -vFS='\t' '{ print NF }'
     )
     local script=$(printf '%s' 's/^\s*\([0-9]\+\):\s*\S*\s*' \
         '\([0-9]\+\)[^x]*x\([0-9]\+\)[^+]*' \
@@ -43,12 +38,11 @@ monitors() {
     local line
     for line in $(xrandr --listactivemonitors | sed -n "$script"); do
         local name=$(printf '%s\n' "$line" | cut -f6)
-        local priority=$(printf '%s\t\n' "$monitors" |
-            grep -o "^\(.*$tab\)*$name$tab" |
-            grep -o "$tab" |
-            wc -l
+        local priority=$(printf '%s\t%s\n' "$name" "$monitors" |
+            tr '\t' '\n' |
+            awk 'NR == 1 { m = $0; next } { ++n } $0 == m { print n; exit }'
         )
-        if [ "$priority" -eq 0 ]; then
+        if [ -z "$priority" ]; then
             num_defined=$((num_defined+1))
             priority=$num_defined
         fi
@@ -67,24 +61,26 @@ if [ -z "${NOTSOURCED-}" ]; then
     return 0
 fi
 
-USAGE="\
-Usage: "$(basename "$0")" <command>
+usage() {
+    cat << EOF
+Usage: $(basename "$0") <command>
 
 Commands:
   monitors  Display a list of all monitors. Fields are: index, width, height,
             pos_x, pos_y, name, priority, properties.
-"
+EOF
+}
 
 case "${1-}" in
     monitors)
         "$1"
         ;;
     -h|--help)
-        printf '%s' "$USAGE"
+        usage
         exit 0
         ;;
     *)
-        printf >&2 '%s' "$USAGE"
+        usage >&2
         exit 1
         ;;
 esac
