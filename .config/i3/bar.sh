@@ -4,7 +4,9 @@ set -euf
 IFS='
 '
 for line in $(monitors); do
-    [ -n "${newline-}" ] && printf '\n'
+    if [ -n "${newline-}" ]; then
+        printf '\n'
+    fi
     name=$(printf '%s\n' "$line" | cut -f6)
     properties=$(printf '%s\n' "$line" | cut -f8)
     prop_mono=
