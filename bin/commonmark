@@ -5,7 +5,7 @@ run_cmark() {
     case "${1-}" in
         -*) set -- ./"$1" ;;
     esac
-    command cmark "$@"
+    cmark "$@"
 }
 
 pulldown_cmark() {
