@@ -122,12 +122,12 @@ git-gc-all() {
 }
 
 which rg > /dev/null && rg() {
-    env rg -p "$@" | less -FR
+    command rg -p "$@" | less -FR
 }
 
 which cargo > /dev/null && cargo() {
-    if ! env cargo --version | grep '\bnightly\b' > /dev/null; then
-        env cargo "$@"
+    if ! command cargo --version | grep '\bnightly\b' > /dev/null; then
+        command cargo "$@"
         return
     fi
 
@@ -143,7 +143,7 @@ which cargo > /dev/null && cargo() {
     local args=()
     [ "$1" = doc ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
     RUSTFLAGS=$RUSTFLAGS RUSTDOCFLAGS=$RUSTDOCFLAGS MIRIFLAGS=$MIRIFLAGS \
-        env cargo "$@" "${args[@]}"
+        command cargo "$@" "${args[@]}"
 }
 
 if which ds > /dev/null; then

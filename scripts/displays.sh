@@ -17,7 +17,7 @@ define_monitor() {
         "$(printf '%s\n' "$properties" | sed "$escape")"
 }
 
-if which hsetroot > /dev/null; then
+if command -v hsetroot > /dev/null; then
     setroot=hsetroot
 else
     setroot=xsetroot
@@ -31,7 +31,7 @@ else
     "$setroot" -solid '#000000'
 fi
 
-if (which picom && ! pgrep '^picom$') > /dev/null; then
+if { command -v picom && ! pgrep '^picom$'; } > /dev/null; then
     picom_args=
     if [ "$(picom --version | sed 's/[^0-9]*\([0-9]\+\).*/\1/')" -lt 10 ]; then
         picom_args="$picom_args --experimental-backends"

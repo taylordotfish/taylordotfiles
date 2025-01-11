@@ -1,4 +1,9 @@
 #!/bin/sh
-size=${1-20}
-[ "$#" -gt 0 ] && shift
+set -euf
+unset size
+size=20
+if [ "$#" -gt 0 ]; then
+    size=$1
+    shift
+fi
 exec urxvt -fn "xft:DejaVu Sans Mono:size=$size" +fb +fi +fbi "$@"

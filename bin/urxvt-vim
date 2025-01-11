@@ -1,3 +1,2 @@
 #!/bin/sh
-set -euf
 exec urxvt -e vim "$@"

@@ -6,9 +6,9 @@ old_dpi=$(xrdb -query | grep '^Xft\.dpi:')
 printf 'Xft.dpi: %d\n' "${DPI-96}" | xrdb -override -
 gtk4gen=~/.config/gtk-4.0/generate.sh
 [ -x "$gtk4gen" ] && "$gtk4gen"
-(
+{
     sleep 2
     printf '%s\n' "$old_dpi" | xrdb -override -
     [ -x "$gtk4gen" ] && "$gtk4gen"
-) &
+} &
 exec "$@"

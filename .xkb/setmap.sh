@@ -1,11 +1,11 @@
 #!/bin/sh
-# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
 cd "$(dirname "$0")"
 [ -f layout.conf ] || echo us > layout.conf
-layout=$(cat layout.conf | grep -o '^\w\+' | head -1)
+layout=$(awk '/./ { print $1; exit }' layout.conf)
 
 xcape_map=
 set --
@@ -25,7 +25,7 @@ setxkbmap "-I$HOME/.xkb" \
 run_verbose() {
     xkbcomp "-I$HOME/.xkb" .keymap.xkb "$DISPLAY"
     if [ -z "${NOXCAPE-}" ]; then
-        killall xcape || true
+        pkill '^xcape$' || true
     fi
 }
 

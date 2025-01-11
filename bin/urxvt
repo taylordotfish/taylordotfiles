@@ -1,8 +1,10 @@
 #!/bin/sh
-# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
+unset monitor_field monitor_value properties prop_mono prop_hidpi
+unset line value args cmd name title state arg i urxvt
 case "${URXVT_MONITOR-}" in
     "")
         monitor_field=1
@@ -43,8 +45,8 @@ cmd=
 state=
 i=0
 
-for arg in "$@"; do
-    i=$((i+1))
+for arg do
+    : $((i += 1))
     case "$state" in
         -name)
             name="$arg"
@@ -71,9 +73,11 @@ for arg in "$@"; do
     esac
 done
 
-cmd=${cmd:-bash}
+: ${cmd:=bash}
 if [ -n "$prop_mono" ]; then
-    which monoterm > /dev/null && cmd="monoterm -b $cmd"
+    if command -v monoterm > /dev/null; then
+        cmd="monoterm -b $cmd"
+    fi
 elif [ -z "${KEEPCOLORS-}" ] && [ -x ~/scripts/set-urxvt-colors.sh ]; then
     cmd="~/scripts/set-urxvt-colors.sh $cmd"
 fi
@@ -102,7 +106,7 @@ if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
     export HEAVY_BLOCKS=${HEAVY_BLOCKS-1}
 fi
 
-title=${title-urxvt}
-urxvt=$(PATH=/usr/bin:/usr/local/bin which urxvt)
+: ${title=urxvt}
+urxvt=$(PATH=/usr/bin:/usr/local/bin command -v urxvt)
 eval "set -- $args -e $cmd"
 exec "$urxvt" -name "$name" -title "$title" "$@"

@@ -1,5 +1,5 @@
 #!/bin/sh
-set -uf
+set -euf
 while true; do
     x11vnc -localhost \
         -forever \
@@ -7,6 +7,7 @@ while true; do
         -rfbport 5901 \
         -display "${DISPLAY:-:0}" \
         -noxdamage \
-        "$@"
-    sleep 2
+        "$@" && true
+    printf >&2 '%s\n' "Restarting..."
+    sleep 4
 done

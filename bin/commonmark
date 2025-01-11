@@ -1,16 +1,40 @@
-#!/usr/bin/env python3
-from commonmark import commonmark
-import sys
+#!/bin/sh
+set -euf
 
+run_cmark() {
+    case "${1-}" in
+        -*) set -- ./"$1" ;;
+    esac
+    command cmark "$@"
+}
 
-def main():
-    if len(sys.argv) <= 1:
-        print(commonmark(sys.stdin.read()), end="")
-        return
-    for name in sys.argv[1:]:
-        with open(name) as f:
-            print(commonmark(f.read()), end="")
+pulldown_cmark() {
+    pulldown-cmark -- "$@"
+}
 
+case "${1-}" in
+    -h|--help)
+        printf '%s\n' "usage: $(basename "$0") <file>..."
+        exit
+        ;;
+    --)
+        shift
+        ;;
+esac
 
-if __name__ == "__main__":
-    main()
+unset target
+if command -v cmark > /dev/null; then
+    target=run_cmark
+elif command -v pulldown-cmark > /dev/null; then
+    target=pulldown_cmark
+else
+    printf >&2 '%s\n' 'error: missing (pulldown-)cmark'
+    exit 1
+fi
+
+if [ "$#" -eq 0 ]; then
+    $target
+fi
+for f do
+    $target "$f"
+done

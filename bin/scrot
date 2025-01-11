@@ -1,8 +1,10 @@
 #!/bin/sh
-# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2024-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
+unset fullwidth fullheight width height posx posy right bottom
+unset line im_args fullsize scrot
 fullwidth=0
 fullheight=0
 IFS='
@@ -34,8 +36,8 @@ for line in $(~/scripts/monitor-utils.sh monitors); do
     fi
 done
 
-fullsize="$fullwidth"x"$fullheight"
-scrot=$(PATH=/usr/bin:/usr/local/bin which scrot)
+fullsize=${fullwidth}x${fullheight}
+scrot=$(PATH=/usr/bin:/usr/local/bin command -v scrot)
 "$scrot" -e "\
 if [ \"\\\$(identify -format '%%wx%%h' '\$f')\" = \"$fullsize\" ]; then \
 mogrify -fill white $im_args -alpha off '\$f'; fi" "$@"

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2021, 2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2021, 2024-2025 taylor.fish <contact@taylor.fish>
 #
 # showcolors: Displays all 256 terminal colors.
 #
@@ -18,14 +18,16 @@
 
 set -euf
 
-USAGE="\
+usage() {
+    cat << EOF
 Usage: showcolors [order]
 
-[order] is some permutation of \"rgb\". The first color component will be
+[order] is some permutation of "rgb". The first color component will be
 represented on the X axis of each cube layer, the second component will be
 represented on the Y axis, and the third component will increase with each
-successive layer. Defaults to \"rgb\".
-"
+successive layer. Defaults to "rgb".
+EOF
+}
 
 ansi_256_fg() {
     printf '\033[38;5;%dm' "$1"
@@ -38,6 +40,8 @@ ansi_256_bg() {
 ansi_reset() {
     printf '\033[0m'
 }
+
+unset extra_i
 
 show_extra() {
     extra_i=${extra_i-0}
@@ -55,13 +59,13 @@ show_extra() {
 
 print_cube_layer() {
     local c_3=$1
-    local c_2
-    local c_1
+    local c_2=0
     local r=0
     local g=0
     local b=0
-    for c_2 in $(seq 0 5); do
-        for c_1 in $(seq 0 5); do
+    while [ "$c_2" -lt 6 ]; do
+        local c_1=0
+        while [ "$c_1" -lt 6 ]; do
             eval "$component_map"
             local color=$((16 + (36 * r) + (6 * g) + b))
             local light=$((g == 5 ||
@@ -75,16 +79,18 @@ print_cube_layer() {
             fi
             ansi_256_bg "$color"
             printf '   %3d   ' "$color"
+            : $((c_1 += 1))
         done
         ansi_reset
         show_extra
         printf '\n'
+        : $((c_2 += 1))
     done
 }
 
 case "${1-}" in
     -h|--help)
-        printf '%s' "$USAGE"
+        usage
         exit
         ;;
 esac
@@ -107,16 +113,20 @@ case "${order-}" in
 esac
 
 component_map=
-for i in $(seq 3); do
+i=1
+while [ "$i" -le 3 ]; do
     component=$(printf '%s\n' "$order" | cut -c"$i")
     component_map="$component_map$component=\$c_$i;"
+    : $((i += 1))
 done
 
-for c_3 in $(seq 0 5); do
+c_3=0
+while [ "$c_3" -lt 6 ]; do
     if [ "$c_3" -gt 0 ]; then
         printf '%54s' ''
         show_extra
         printf '\n'
     fi
     print_cube_layer "$c_3"
+    : $((c_3 += 1))
 done
