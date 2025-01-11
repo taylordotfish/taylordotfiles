@@ -6,4 +6,4 @@
     defaultBranch = master
 [user]
 [advice]
-	diverging = false
+    diverging = false
