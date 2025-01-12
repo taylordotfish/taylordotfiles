@@ -34,9 +34,14 @@ EOF
 
 unpushed() {
     if ! git -C "$1" branch | grep -q .; then
-        printf '%s\n' "$1"
+        printf '%s: ' "$1"
+        printf ',%s' $(git -C "$1" remote) | tail -c+2
+        printf '\n'
         return 0
     fi
+    local upstream
+    upstream=$(git -C "$1" rev-parse --abbrev-ref '@{u}' 2> /dev/null) ||
+        upstream=
     if ! git -C "$1" diff --name-only --exit-code > /dev/null; then
         local uncommitted=1
     fi
@@ -45,10 +50,14 @@ unpushed() {
     local unpushed=
     local remote
     for remote in $(git -C "$1" remote); do
+        local rbranch=$remote/$branch
+        case "$upstream" in
+            "$remote"/*) rbranch=$upstream ;;
+        esac
         if [ -n "${uncommitted-}" ] ||
-            ! git -C "$1" rev-parse --abbrev-ref "$remote/$branch" \
+            ! git -C "$1" rev-parse --abbrev-ref "$rbranch" \
                 > /dev/null 2>&1 ||
-            ! git -C "$1" diff "$remote/$branch..." --name-only --exit-code \
+            ! git -C "$1" diff "$rbranch..." --name-only --exit-code \
                 > /dev/null
         then
             unpushed="${unpushed:+$unpushed,}$remote"
@@ -65,16 +74,23 @@ unpulled() {
     if ! git -C "$1" branch | grep -q .; then
         return 0
     fi
+    local upstream
+    upstream=$(git -C "$1" rev-parse --abbrev-ref '@{u}' 2> /dev/null) ||
+        upstream=
     local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local remotes=
     local remote
     for remote in $(git -C "$1" remote); do
-        if ! git -C "$1" rev-parse --abbrev-ref "$remote/$branch" \
+        local rbranch=$remote/$branch
+        case "$upstream" in
+            "$remote"/*) rbranch=$upstream ;;
+        esac
+        if ! git -C "$1" rev-parse --abbrev-ref "$rbranch" \
             > /dev/null 2>&1
         then
             continue
         fi
-        if git -C "$1" log "..$remote/$branch" --format=oneline | grep -q .
+        if git -C "$1" log "..$rbranch" --format=oneline | grep -q .
         then
             remotes="${remotes:+$remotes,}$remote"
         fi
