@@ -121,11 +121,11 @@ git-gc-all() {
         -c gc.pruneExpire=now gc "${@:2}"
 }
 
-which rg > /dev/null && rg() {
+if (unset -f rg; command -v rg > /dev/null); then rg() {
     command rg -p "$@" | less -FR
-}
+} fi
 
-which cargo > /dev/null && cargo() {
+if (unset -f cargo; command -v cargo > /dev/null); then cargo() {
     if ! command cargo --version | grep '\bnightly\b' > /dev/null; then
         command cargo "$@"
         return
@@ -144,8 +144,8 @@ which cargo > /dev/null && cargo() {
     [ "$1" = doc ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
     RUSTFLAGS=$RUSTFLAGS RUSTDOCFLAGS=$RUSTDOCFLAGS MIRIFLAGS=$MIRIFLAGS \
         command cargo "$@" "${args[@]}"
-}
+} fi
 
-if which ds > /dev/null; then
+if command -v ds > /dev/null; then
     complete -F _command ds
 fi
