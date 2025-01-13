@@ -2,4 +2,4 @@
 if [ -n "$LOGVERBOSE" ]; then
     set -- -logverbose "$LOGVERBOSE" "$@"
 fi
-exec /usr/lib/xorg/Xorg -nolisten tcp "$@" vt$XDG_VTNR
+exec /usr/lib/xorg/Xorg -nolisten tcp "$@" vt"$XDG_VTNR"
