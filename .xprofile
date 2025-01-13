@@ -7,31 +7,47 @@ xprofile_main() {
     xset -dpms
     xset b off
     xset fp default
-    local fontdir
-    set +f -- /usr/local ~/.local
-    for fontdir in "$@"/share/fonts/X11/*; do
-        set -f
-        [ -f "$fontdir/fonts.dir" ] && xset fp+ "$fontdir"
+    set --
+    local dir
+    for dir in /usr/local ~/.local; do
+        set +f
+        set -f -- "$@" "$dir"/share/fonts/X11/*
+    done
+    for dir do
+        if [ -f "$dir/fonts.dir" ]; then
+            xset fp+ "$dir"
+        fi
     done
     local script
     for script in ~/scripts/displays.sh ~/scripts/controls.sh; do
-        [ -x "$script" ] && "$script"
+        if [ -x "$script" ]; then
+            "$script"
+        fi
     done
     local dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
     if [ "${dpi:-96}" != 96 ]; then
-        GDK_DPI_SCALE=$(printf '%.2g' "$(echo "scale=3;96/$dpi" | bc)")
+        GDK_DPI_SCALE=$(awk 'BEGIN { printf "%.2g\n", 96/ARGV[1] }' "$dpi")
         QT_FONT_DPI=96
     fi
-    local script=~/.config/gtk-4.0/generate.sh
-    [ -x "$script" ] && "$script"
-    true
+    set -- ~/.config/gtk-4.0/generate.sh
+    if [ -x "$1" ]; then
+        "$1"
+    fi
 }
-eval "$(\
+
+eval "$({
     set -euf
     xprofile_main > /dev/null
     for var in GDK_DPI_SCALE QT_FONT_DPI; do
-        if eval "[ -n \"\${$var+x}\" ] && val=\$$var"; then
-            printf 'export %s=%s\n' "$var" "$val"
-        fi
+        eval "value=\$$var"
+        case "$value" in
+            "") ;;
+            *[!A-Za-z0-9._-]*)
+                printf >&2 '%s\n' "warning: bad characters in \$$var"
+                ;;
+            *)
+                printf '%s\n' "export $var=$val"
+                ;;
+        esac
     done
-)"
+})"
