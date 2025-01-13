@@ -1,9 +1,11 @@
-[ -n "$_bashrc_sourced" ] && return 1
+[ -z "$_bashrc_sourced" ] || return 1
 _bashrc_sourced=1
 
 source ~/.profile || true
 # Source default .bashrc
-[ -f /etc/skel/.bashrc ] && source /etc/skel/.bashrc
+if [ -f /etc/skel/.bashrc ]; then
+    source /etc/skel/.bashrc
+fi
 unset _bashrc_sourced
 
 # Non-color prompt
@@ -24,21 +26,37 @@ alias pep8=pycodestyle
 alias yad="yad --splash"
 alias cal="ncal -C"
 alias mail="MBOX=$HOME/Documents/mbox mail"
+alias less="less -F"
 
 get-alias() {
-    printf '%s' "${BASH_ALIASES[$1]-$1}"
+    local def
+    if ! def=$(alias "$1" 2> /dev/null); then
+        printf '%s\n' "$1"
+        return 0
+    fi
+    eval "def=${def#*=}"
+    printf '%s\n' "$def"
 }
 
-# Adds the option "--si" to a command if "-h" is present.
+# Replaces `-h` with `--si`.
 si() {
+    local cmd=$1
+    shift
+    local done
     local arg
-    for arg in "${@:2}"; do
-        if [[ "$arg" != --* ]] && [[ "$arg" == -*h* ]]; then
-            "$@" --si
-            return
-        fi
+    for arg do
+        shift
+        [ -n "${done-}" ] || case "$arg" in
+            --) done=1 ;;
+            --*) ;;
+            -*h*)
+                set -- "$@" "${arg%%h*}${arg#*h}" --si
+                continue
+                ;;
+        esac
+        set -- "$@" "$arg"
     done
-    "$@"
+    "$cmd" "$@"
 }
 
 alias ls="si $(get-alias ls)"
@@ -59,11 +77,11 @@ clang++s() {
 }
 
 g++i() {
-    g++s "$@" -fdiagnostics-color=always |& less -FR
+    g++s "$@" -fdiagnostics-color=always |& less -R
 }
 
 clang++i() {
-    clang++s "$@" -fdiagnostics-color=always |& less -FR
+    clang++s "$@" -fdiagnostics-color=always |& less -R
 }
 
 clear-history() {
@@ -78,12 +96,13 @@ clear-history() {
 clear-clipboard() {
     local c
     for c in p s b; do
-        printf '' | xsel "-$c"
+        xsel "-$c" < /dev/null
     done
 }
 
 clear-all() {
-    clear-history && clear-clipboard
+    clear-history
+    clear-clipboard
 }
 
 cd-parent() {
@@ -94,56 +113,64 @@ ansireset() {
     printf '\033[0m'
 }
 
-[ -f ~/scripts/keyboard.sh ] && keyboard() {
+if [ -x ~/scripts/keyboard.sh ]; then keyboard() {
     ~/scripts/keyboard.sh "$@"
-}
+} fi
 
-[ -f ~/scripts/mouse.sh ] && mouse() {
+if [ -x ~/scripts/mouse.sh ]; then mouse() {
     ~/scripts/mouse.sh
-}
+} fi
 
-[ -f ~/scripts/controls.sh ] && controls() {
+if [ -x ~/scripts/controls.sh ]; then controls() {
     ~/scripts/controls.sh
-}
+} fi
 
-[ -f ~/scripts/displays.sh ] && displays() {
+if [ -x ~/scripts/displays.sh ]; then displays() {
     ~/scripts/displays.sh
-}
+} fi
 
 git-gc-all() {
     if [ "$1" != "--confirm" ]; then
         echo >&2 "error: pass --confirm to confirm"
         return 1
     fi
+    shift
     # https://stackoverflow.com/a/14729486
     git -c gc.reflogExpire=0 -c gc.reflogExpireUnreachable=0 \
         -c gc.rerereresolved=0 -c gc.rerereunresolved=0 \
-        -c gc.pruneExpire=now gc "${@:2}"
+        -c gc.pruneExpire=now gc "$@"
 }
 
 if (unset -f rg; command -v rg > /dev/null); then rg() {
-    command rg -p "$@" | less -FR
+    command rg -p "$@" | less -R
 } fi
 
 if (unset -f cargo; command -v cargo > /dev/null); then cargo() {
-    if ! command cargo --version | grep '\bnightly\b' > /dev/null; then
+    if ! command cargo --version |
+        sed 's/[^A-Za-z]/ /g;s/.*/ & /' |
+        grep -q ' nightly '
+    then
         command cargo "$@"
         return
     fi
 
-    local RUSTFLAGS=$RUSTFLAGS
-    local RUSTDOCFLAGS=$RUSTDOCFLAGS
-    local MIRIFLAGS=$MIRIFLAGS
-    RUSTFLAGS+=" -Z macro-backtrace -Z proc-macro-backtrace"
-    RUSTDOCFLAGS+=" -Z unstable-options"
-    MIRIFLAGS+=" -Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
-    # Necessary to use local std docs
-    [ "$1" = test ] || RUSTDOCFLAGS+=" --extern-html-root-takes-precedence"
+    local rf=$RUSTFLAGS
+    local rdf=$RUSTDOCFLAGS
+    local mf=$MIRIFLAGS
+    rf="$rf -Z macro-backtrace -Z proc-macro-backtrace"
+    rdf="$rdf -Z unstable-options"
+    mf="$mf -Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
 
-    local args=()
-    [ "$1" = doc ] && args+=(-Zrustdoc-map -Zrustdoc-scrape-examples)
-    RUSTFLAGS=$RUSTFLAGS RUSTDOCFLAGS=$RUSTDOCFLAGS MIRIFLAGS=$MIRIFLAGS \
-        command cargo "$@" "${args[@]}"
+    case "$1" in
+        test)
+            # Necessary to use local std docs
+            rdf="$rdf --extern-html-root-takes-precedence"
+            ;;
+        doc)
+            set -- "$@" -Zrustdoc-map -Zrustdoc-scrape-examples
+            ;;
+    esac
+    RUSTFLAGS=$rf RUSTDOCFLAGS=$rdf MIRIFLAGS=$mf command cargo "$@"
 } fi
 
 if command -v ds > /dev/null; then

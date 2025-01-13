@@ -1,8 +1,8 @@
-[ -n "$_profile_sourced" ] && return 1
+[ -z "$_profile_sourced" ] || return 1
 _profile_sourced=1
 unalias -a
 
-[ -z "${ORIG_PATH+x}" ] && export ORIG_PATH=$PATH
+[ -n "${ORIG_PATH+x}" ] || export ORIG_PATH=$PATH
 PATH=$ORIG_PATH
 
 export GOPATH=~/go
@@ -15,13 +15,16 @@ PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
 
 delayed_exec() {
-    local time='cut -d\  -f1 /proc/uptime'
-    local expr=$(eval "$time")
-    "$@"
-    local status=$?
-    expr="$(eval "$time")-$expr>=${TIMEOUT-5}"
-    [ "$(printf '%s\n' "$expr" | bc)" -eq 1 ] && exit "$status"
-    return "$status"
+    set -- "$(awk '{ print $1 }' /proc/uptime)" "$@"
+    (shift; "$@")
+    set -- "$1" "$?"
+    if awk -- '
+        BEGIN { ARGC = 2 }
+        { exit $1 - ARGV[2] < ARGV[3] ? 0 : 1 }
+    ' /proc/uptime "$1" "${TIMEOUT:-5}"; then
+        return "$2"
+    fi
+    exit "$2"
 }
 
 alias delayed-exec=delayed_exec
