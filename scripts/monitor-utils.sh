@@ -55,9 +55,9 @@ monitors() {
         print mon_index, mon_width, mon_height, mon_posx, mon_posy, mon_name
     }'); do
         local name=$(printf '%s\n' "$line" | cut -f6)
-        local priority=$(printf '%s\n' "$monitors" | awk -F'\n' -vRS='\t' -- '
-            BEGIN { name = ARGV[1]; ARGC = 1 }
-            $1 == name { print NR; exit }
+        local priority=$(printf '%s\n' "$monitors" | awk -F'\n' -vRS='\t' '
+            BEGIN { ARGC = 1 }
+            $1 == ARGV[1] { print NR; exit }
         ' "$name")
         if [ -z "$priority" ]; then
             num_defined=$((num_defined+1))
