@@ -23,25 +23,42 @@ monitors() {
 
     local monitors=${monitordef_names-}
     local propertydefs=${monitordef_properties-}
-    local num_defined=$(printf '%s\n' "$monitors" |
-        awk -vFS='\t' '{ print NF }'
-    )
-    local script=$(printf '%s' 's/^\s*\([0-9]\+\):\s*\S*\s*' \
-        '\([0-9]\+\)[^x]*x\([0-9]\+\)[^+]*' \
-        '+\([0-9]\+\)+\([0-9]\+\)\s*\(\S\+\).*' \
-        '/\1\t\2\t\3\t\4\t\5\t\6/p'
-    )
+    local num_defined=$(printf '%s\n' "$monitors" | awk -F'\t' '{ print NF }')
     local IFS='
 '
     local opts=$-
     set -f
     local line
-    for line in $(xrandr --listactivemonitors | sed -n "$script"); do
+    for line in $(xrandr --listactivemonitors | awk -vOFS='\t' 'NF >= 4 {
+        split($1, a, ":")
+        if (length(a) != 2) next
+        if (a[1] !~ /^[0-9]+$/) next
+        if (a[2] != "") next
+        mon_index = a[1]
+
+        split($3, a, "+")
+        if (length(a) != 3) next
+        if (a[2] a[3] !~ /^[0-9]+$/) next
+        mon_posx = a[2]
+        mon_posy = a[3]
+
+        split(a[1], a, "x")
+        if (length(a) != 2) next
+        for (i in a) {
+            sub(/[^0-9].*/, "", a[i])
+            if (a[i] == "") next
+        }
+        mon_width = a[1]
+        mon_height = a[2]
+
+        mon_name = $4
+        print mon_index, mon_width, mon_height, mon_posx, mon_posy, mon_name
+    }'); do
         local name=$(printf '%s\n' "$line" | cut -f6)
-        local priority=$(printf '%s\t%s\n' "$name" "$monitors" |
-            tr '\t' '\n' |
-            awk 'NR == 1 { m = $0; next } { ++n } $0 == m { print n; exit }'
-        )
+        local priority=$(printf '%s\n' "$monitors" | awk -F'\n' -vRS='\t' -- '
+            BEGIN { name = ARGV[1]; ARGC = 1 }
+            $1 == name { print NR; exit }
+        ' "$name")
         if [ -z "$priority" ]; then
             num_defined=$((num_defined+1))
             priority=$num_defined

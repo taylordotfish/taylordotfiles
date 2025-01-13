@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
@@ -33,7 +33,13 @@ fi
 
 if { command -v picom && ! pgrep '^picom$'; } > /dev/null; then
     picom_args=
-    if [ "$(picom --version | sed 's/[^0-9]*\([0-9]\+\).*/\1/')" -lt 10 ]; then
+    if ! awk -F'[^0-9]+' '{
+        for (i = 1; i <= NF; ++i) {
+            if ($(i) != "") {
+                exit $(i) >= 10 ? 0 : 1;
+            }
+        }
+    }'; then
         picom_args="$picom_args --experimental-backends"
     fi
     picom $picom_args > /dev/null 2>&1 &
