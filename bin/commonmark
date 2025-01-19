@@ -5,7 +5,7 @@ run_cmark() {
     case "${1-}" in
         -*) set -- ./"$1" ;;
     esac
-    cmark "$@"
+    cmark --unsafe "$@"
 }
 
 pulldown_cmark() {
