@@ -3,10 +3,9 @@ set -euf
 . ~/scripts/monitor-utils.sh
 IFS='
 '
+first=1
 for line in $(monitors); do
-    if [ -n "${newline-}" ]; then
-        printf '\n'
-    fi
+    [ -n "${first}" ] || printf '\n'
     name=$(printf '%s\n' "$line" | cut -f6)
     properties=$(printf '%s\n' "$line" | cut -f8)
     prop_mono=
@@ -19,5 +18,5 @@ for line in $(monitors); do
     esac
     m4 -D MONITOR_NAME="$name" -D MONITOR_MONO="$prop_mono" \
         -D MONITOR_HIDPI="$prop_hidpi" bar.m4
-    newline=1
+    first=
 done
