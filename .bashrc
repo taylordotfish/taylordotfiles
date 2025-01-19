@@ -141,11 +141,19 @@ git-gc-all() {
         -c gc.pruneExpire=now gc "$@"
 }
 
-if (unset -f rg; command -v rg > /dev/null); then rg() {
-    command rg -p "$@" | less -R
-} fi
+unset -f rg
+if command -v rg > /dev/null; then
+    rg() {
+        command rg -p "$@" | less -R
+    }
 
-if (unset -f cargo; command -v cargo > /dev/null); then cargo() {
+    rgg() {
+        rg -. '-g!.git' "$@"
+    }
+fi
+
+unset -f cargo
+if command -v cargo > /dev/null; then cargo() {
     if ! command cargo --version |
         sed 's/[^A-Za-z]/ /g;s/.*/ & /' |
         grep -q ' nightly '
