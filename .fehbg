@@ -22,9 +22,9 @@ i=0
 set --
 while true; do
     eval "mimage=\${mimage_$i-}"
-    [ -z "$mimage" ] && break
+    [ -n "$mimage" ] || break
     set -- "$@" "$mimage"
     i=$((i+1))
 done
 
-feh --no-fehbg --bg-fill "$@"
+exec feh --no-fehbg --bg-fill "$@"
