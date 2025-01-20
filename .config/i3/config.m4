@@ -120,8 +120,6 @@ bindsym Mod1+Mod4+Shift+h move workspace to output left
 # brightness keys
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
 bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
-bindsym XF86AudioPrev exec --no-startup-id brightnessctl set 5%-
-bindsym XF86AudioPlay exec --no-startup-id brightnessctl set +5%
 
 # volume keys
 bindsym XF86AudioMute exec --no-startup-id \
