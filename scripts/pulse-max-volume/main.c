@@ -162,8 +162,13 @@ static int mainloop_poll(
 }
 
 int main(void) {
+    static const int signals[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
     sigset_t blocked;
     sigemptyset(&blocked);
+    for (size_t i = 0; i < sizeof(signals) / sizeof(*signals); ++i) {
+        sigaddset(&blocked, signals[i]);
+    }
+
     sigset_t oldsigset;
     if (sigprocmask(SIG_BLOCK, &blocked, &oldsigset) != 0) {
         perror("sigprocmask() failed");
@@ -173,7 +178,9 @@ int main(void) {
         .sa_handler = on_sigint,
     };
     sigemptyset(&action.sa_mask);
-    sigaction(SIGINT, &action, NULL);
+    for (size_t i = 0; i < sizeof(signals) / sizeof(*signals); ++i) {
+        sigaction(signals[i], &action, NULL);
+    }
 
     pa_mainloop * const loop = pa_mainloop_new();
     if (!loop) {
