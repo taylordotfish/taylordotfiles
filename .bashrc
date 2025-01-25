@@ -50,7 +50,14 @@ si() {
             --) done=1 ;;
             --*) ;;
             -*h*)
-                set -- "$@" "${arg%%h*}${arg#*h}" --si
+                case "$cmd" in
+                    free) ;;
+                    *) arg=${arg%%h*}${arg#*h} ;;
+                esac
+                if [ "$arg" != - ]; then
+                    set -- "$@" "$arg"
+                fi
+                set -- "$@" --si
                 continue
                 ;;
         esac
