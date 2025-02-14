@@ -20,12 +20,24 @@ alias grep="grep --color"
 alias rm="rm -I"
 alias mv="mv -i"
 alias cp="cp -i"
-alias tmux="tmux -2"
-alias git="FILTER_BRANCH_SQUELCH_WARNING=1 git"
-alias pep8=pycodestyle
-alias yad="yad --splash"
-alias cal="ncal -C"
-alias mail="MBOX=$HOME/Documents/mbox mail"
+if command -v tmux > /dev/null; then
+    alias tmux="tmux -2"
+fi
+if command -v git > /dev/null; then
+    alias git="FILTER_BRANCH_SQUELCH_WARNING=1 git"
+fi
+if command -v pycodestyle > /dev/null; then
+    alias pep8=pycodestyle
+fi
+if command -v yad > /dev/null; then
+    alias yad="yad --splash"
+fi
+if command -v ncal > /dev/null; then
+    alias cal="ncal -C"
+fi
+if command -v mail > /dev/null; then
+    alias mail="MBOX=$HOME/Documents/mbox mail"
+fi
 alias less="less -F"
 
 get-alias() {
