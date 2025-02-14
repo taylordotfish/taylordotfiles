@@ -33,10 +33,10 @@ fi
 
 if { command -v picom && ! pgrep '^picom$'; } > /dev/null; then
     picom_args=
-    if ! awk -F'[^0-9]+' '{
+    if ! picom --version | awk -F'[^0-9]+' '{
         for (i = 1; i <= NF; ++i) {
             if ($(i) != "") {
-                exit $(i) >= 10 ? 0 : 1;
+                exit $(i) >= 10 ? 0 : 1
             }
         }
     }'; then
