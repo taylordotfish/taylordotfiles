@@ -9,6 +9,7 @@ export GOPATH=~/go
 PATH=$GOPATH/bin:$PATH
 PATH=~/.virtualenv/bin:$PATH
 export PYENV_ROOT=~/.pyenv
+export PYENV_DIR=~
 PATH=$PYENV_ROOT/bin:$PATH
 PATH=~/.cargo/bin:$PATH
 PATH=~/.local/bin:$PATH
