@@ -2,12 +2,10 @@
 # Copyright (C) 2024-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
-[ -f ~/.config/monitordef ] && . ~/.config/monitordef
-
 monitors() {
     if [ -z "${NOCACHE-}" ]; then
         if [ -f ~/.cache/monitor-utils/monitors ] &&
-            [ ~/.cache/monitor-utils/monitors -nt ~/.config/monitordef ]
+            [ ~/.cache/monitor-utils/monitors -nt ~/.cache/monitor-utils/defs ]
         then
             cat ~/.cache/monitor-utils/monitors
             return
@@ -21,9 +19,9 @@ monitors() {
         return
     fi
 
-    local monitors=${monitordef_names-}
-    local propertydefs=${monitordef_properties-}
-    local num_defined=$(printf '%s\n' "$monitors" | awk -F'\t' '{ print NF }')
+    local defs=~/.cache/monitor-utils/defs
+    [ -f "$defs" ] || defs=/dev/null
+    local num_defined=$(wc -l < "$defs")
     local IFS='
 '
     local opts=$-
@@ -55,15 +53,18 @@ monitors() {
         print mon_index, mon_width, mon_height, mon_posx, mon_posy, mon_name
     }'); do
         local name=$(printf '%s\n' "$line" | cut -f6)
-        local priority=$(printf '%s\n' "$monitors" | awk -F'\n' -vRS='\t' '
-            BEGIN { ARGC = 1 }
-            $1 == ARGV[1] { print NR; exit }
-        ' "$name")
+        local priority=$(awk -F'\t' '
+            BEGIN { ARGC = 2 }
+            $1 == ARGV[2] { print NR; exit }
+        ' "$defs" "$name")
         if [ -z "$priority" ]; then
-            num_defined=$((num_defined+1))
+            : $((num_defined += 1))
             priority=$num_defined
         fi
-        local properties=$(printf '%s\n' "$propertydefs" | cut -f"$priority")
+        local properties=$(awk -F'\t' '
+            BEGIN { ARGC = 2 }
+            NR == ARGV[2] { print $2; exit }
+        ' "$defs" "$priority")
         properties=${properties:--}
         printf '%s\t%s\t%s\n' "$(printf '%s\n' "$line" | cut -f1-6)" \
             "$priority" "$properties"

@@ -3,18 +3,13 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-printf > ~/.config/monitordef '%s=\n' monitordef_names monitordef_properties
+mkdir -p ~/.cache/monitor-utils
+> ~/.cache/monitor-utils/defs
 
 define_monitor() {
     local name=$1
     local properties=${2:--}
-    local escape='s/\\/\\\\/g;s/"/\\"/g'
-    local fmt='monitordef_names="${monitordef_names:+$monitordef_names\t}%s"\n'
-    fmt="$fmt"'monitordef_properties="${monitordef_properties:+'
-    fmt="$fmt"'$monitordef_properties\t}%s"\n'
-    printf >> ~/.config/monitordef "$fmt" \
-        "$(printf '%s\n' "$name" | sed "$escape")" \
-        "$(printf '%s\n' "$properties" | sed "$escape")"
+    printf >> ~/.cache/monitor-utils/defs '%s\t%s\n' "$name" "$properties"
 }
 
 if command -v hsetroot > /dev/null; then
@@ -29,6 +24,12 @@ elif [ -n "${MONOCHROME-}" ]; then
     "$setroot" -solid '#ffffff'
 else
     "$setroot" -solid '#000000'
+fi
+
+if cat ~/.config/color.jcnf 2> /dev/null | grep -q .; then
+    set -- dispwin-quiet
+    command -v "$1" > /dev/null || set -- dispwin
+    "$1" -L || true
 fi
 
 if { command -v picom && ! pgrep '^picom$'; } > /dev/null; then
