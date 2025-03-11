@@ -1,42 +1,62 @@
 " Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
-let g:indent = 4
+let fancyterm = $TERM !~ '^vt'
+let utf8_supported = $LANG =~ '[Uu][Tt][Ff]-\?8$'
+let latin1_supported = $LANG =~ '[Ii][Ss][Oo]-\?8859-\?1$'
+
+let indent = 4
 set autoindent
 set cinoptions=(1s
 set expandtab
-execute "set shiftwidth=" . g:indent
-execute "set softtabstop=" . g:indent
-execute "set tabstop=" . g:indent
-set background=dark
+execute "set shiftwidth=" . indent
+execute "set softtabstop=" . indent
+execute "set tabstop=" . indent
+if fancyterm
+    set background=dark
+endif
 set number
 set nowrap
 set linebreak
 set list
 set noshowmatch
 set colorcolumn=80
-set t_Co=256
+if fancyterm
+    set t_Co=256
+endif
 set textwidth=79
 set formatoptions=ql
 set viminfo='100,<2000,s2000,h
 set nojoinspaces
 set laststatus=2
 set hlsearch
-set cursorline
+if fancyterm
+    set cursorline
+endif
 set wrapmargin=0
 set comments-=://
 set comments-=mb:*
 set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
 set modeline
-set ttimeoutlen=0
+if fancyterm
+    set ttimeoutlen=0
+endif
+if latin1_supported
+    set encoding=utf-8
+    set termencoding=latin1
+endif
 
 filetype indent on
-syntax on
-colorscheme bluegreen
+if fancyterm
+    syntax on
+    colorscheme bluegreen
+endif
 
 au FileType * call SetDefaultIndent()
-au FileType * syntax sync fromstart
+if fancyterm
+    au FileType * syntax sync fromstart
+endif
 au FileType markdown,text,gitcommit ResetIndent
 au FileType make,lua TabMode
 au FileType vim set comments+=:\"
@@ -58,19 +78,21 @@ noremap Yp :read ~/.vimclip<CR>
 noremap YP O<Esc>:read ~/.vimclip<CR>kdd
 
 " For monochrome displays
-if $MONOCHROME != ""
+if fancyterm && $MONOCHROME != ""
     hi MatchParen ctermfg=none ctermbg=none cterm=underline
 endif
 
-" Highlight trailing space
-hi Ws ctermfg=243 cterm=none
-function HiTrailingWs()
-    hi TrailingWs ctermfg=40 ctermbg=none cterm=reverse
-endfunction
-au InsertEnter * hi clear TrailingWs
-au InsertLeave * call HiTrailingWs()
-call HiTrailingWs()
-call matchadd("TrailingWs", "\\s\\+$", -1)
+if fancyterm
+    " Highlight trailing space
+    hi Ws ctermfg=243 cterm=none
+    function HiTrailingWs()
+        hi TrailingWs ctermfg=40 ctermbg=none cterm=reverse
+    endfunction
+    au InsertEnter * hi clear TrailingWs
+    au InsertLeave * call HiTrailingWs()
+    call HiTrailingWs()
+    call matchadd("TrailingWs", '\s\+$', -1)
+endif
 
 au InsertEnter * execute "set listchars-=" . lc_normal
 au InsertLeave * execute "set listchars+=" . lc_normal
@@ -79,11 +101,18 @@ au InsertLeave * execute "set listchars+=" . lc_normal
 function TabMode()
     call ClearWsMode()
     set noexpandtab softtabstop=0
-    let g:lc_normal = "trail:·"
-    execute "set listchars+=tab:\\ \\ ,lead:·," . g:lc_normal
-    call add(g:ws_ids, matchadd("Ws", "\\(^\\s*\\)\\@<= ", -2))
-    call add(g:ws_ids, matchadd("Ws", " \\ze\\s*$", -2))
-    call add(g:ws_ids, matchadd("TrailingWs", "\\(\\S.*\\)\\@<=\\t", -1))
+    if g:utf8_supported
+        let spacechar="·"
+    else
+        let spacechar="`"
+    endif
+    let g:lc_normal = "trail:" . spacechar
+    execute 'set listchars+=tab:\ \ ,lead:' . spacechar . "," . g:lc_normal
+    if g:fancyterm
+        call add(g:ws_ids, matchadd("Ws", '\(^\s*\)\@<= ', -2))
+        call add(g:ws_ids, matchadd("Ws", ' \ze\s*$', -2))
+        call add(g:ws_ids, matchadd("TrailingWs", '\(\S.*\)\@<=\t', -1))
+    endif
 endfunction
 command TabMode call TabMode()
 
@@ -92,12 +121,17 @@ function SpaceMode()
     call ClearWsMode()
     execute "set expandtab softtabstop=" . g:indent
     let g:lc_normal = ""
-    if $HEAVY_BLOCKS != ""
-        set listchars+=tab:┣━┫
+    if !g:utf8_supported
+        let tabchars='\|-\|'
+    elseif $HEAVY_BLOCKS != ""
+        let tabchars="┣━┫"
     else
-        set listchars+=tab:├─┤
+        let tabchars="├─┤"
     endif
-    call add(g:ws_ids, matchadd("Ws", "\\t", -2))
+    execute "set listchars+=tab:" . tabchars
+    if g:fancyterm
+        call add(g:ws_ids, matchadd("Ws", '\t', -2))
+    endif
 endfunction
 command SpaceMode call SpaceMode()
 
