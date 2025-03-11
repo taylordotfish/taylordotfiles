@@ -116,6 +116,7 @@ def add_timer(blocks: list[Block], timer_blocks: list[Block]) -> None:
 
 
 TIMER_FIFO_PATH = os.path.join(os.path.dirname(__file__), ".timer_fifo")
+TIMER_ENABLED = os.getenv("MONITOR_PRIORITY") == "1"
 
 
 def open_fifo_as_fd() -> int:
@@ -140,7 +141,9 @@ def reopen_fifo(fifo: BinaryIO, poll: select.poll) -> BinaryIO:
 
 def main() -> None:
     poll = select.poll()
-    fifo = open_fifo(poll)
+    fifo = None
+    if TIMER_ENABLED:
+        fifo = open_fifo(poll)
     stdin = sys.stdin.buffer
     assert isinstance(stdin, io.BufferedIOBase)
     poll.register(stdin, select.POLLIN)
@@ -196,6 +199,8 @@ def main() -> None:
             if fd == stdin.fileno() and events & select.POLLHUP:
                 return
 
+            if fifo is None:
+                continue
             fifo_closed = False
             if fd == fifo.fileno() and events & select.POLLIN:
                 data = fifo.read()
