@@ -20,9 +20,6 @@ alias grep="grep --color"
 alias rm="rm -I"
 alias mv="mv -i"
 alias cp="cp -i"
-if command -v tmux > /dev/null; then
-    alias tmux="tmux -2"
-fi
 if command -v git > /dev/null; then
     alias git="FILTER_BRANCH_SQUELCH_WARNING=1 git"
 fi
