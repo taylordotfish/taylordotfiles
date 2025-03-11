@@ -27,4 +27,6 @@ while true; do
     i=$((i+1))
 done
 
-exec feh --no-fehbg --bg-fill "$@"
+if [ "$#" -gt 0 ]; then
+    exec feh --no-fehbg --bg-fill "$@"
+fi
