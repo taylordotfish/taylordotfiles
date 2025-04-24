@@ -75,7 +75,7 @@ si() {
     "$cmd" "$@"
 }
 
-alias ls="si $(get-alias ls)"
+alias ls="si $(get-alias ls) -v"
 alias du="si $(get-alias du)"
 alias df="si $(get-alias df)"
 alias free="si $(get-alias free)"
