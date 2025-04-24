@@ -72,28 +72,28 @@ bindsym $mod+q focus child
 # switch keyboard layout
 bindsym $mod+Mod1+space exec --no-startup-id ~/.xkb/next-layout.sh
 
-set $ws1 1: web
-set $ws2 2: chat
-set $ws3 3: code
-set $ws4 4: term
-set $ws5 5: mail
-set $ws6 6: music
+set $ws1 1: one
+set $ws2 2: two
+set $ws3 3: three
+set $ws4 4: four
+set $ws5 5: five
+set $ws6 6: six
 set $ws7 7: seven
 set $ws8 8: eight
 set $ws9 9: nine
-set $ws10 10: audio
+set $ws10 10: ten
 
 # switch to workspace
-bindsym $mod+1 workspace $ws1
-bindsym $mod+2 workspace $ws2
-bindsym $mod+3 workspace $ws3
-bindsym $mod+4 workspace $ws4
-bindsym $mod+5 workspace $ws5
-bindsym $mod+6 workspace $ws6
-bindsym $mod+7 workspace $ws7
-bindsym $mod+8 workspace $ws8
-bindsym $mod+9 workspace $ws9
-bindsym $mod+0 workspace $ws10
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $ws1
@@ -160,6 +160,7 @@ mode "resize" {
     bindsym Escape mode "default"
 }
 
+# enter resize mode
 bindsym $mod+r mode "resize"
 
 # borders
@@ -218,6 +219,10 @@ client.focused_inactive #444444 #202020 #909090 #000000 #000000
 ')dnl
 
 syscmd(`./bar.sh')dnl
+
+# rename workspace
+bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
+    prompt -f "I3_FONT"
 
 sinclude(`config.post.m4')dnl
 `#' `vim:ft=conf'
