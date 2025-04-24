@@ -28,6 +28,7 @@ rm_scr_parts() {
 }
 
 on_exit() {
+    trap - INT HUP QUIT TERM EXIT
     local status=$?
     if [ -n "${any_scr_parts-}" ]; then
         rm_scr_parts

@@ -54,7 +54,7 @@ unset pid
 
 on_exit() {
     local status=$?
-    trap - HUP INT QUIT TERM
+    trap - HUP INT QUIT TERM EXIT
     stty "$stty_settings"
     if [ -n "${pid-}" ]; then
         kill "$pid" 2> /dev/null || true
