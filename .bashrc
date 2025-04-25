@@ -101,12 +101,13 @@ clang++i() {
 }
 
 clear-history() {
-    history -wc
+    history -c
     rm -f ~/.*_history
     rm -f ~/.viminfo
     rm -f ~/.vimclip
     rm -f ~/.vim/.netrwhist
     rm -f ~/.lesshst
+    rm -f ~/.wget-hsts
 }
 
 clear-clipboard() {
