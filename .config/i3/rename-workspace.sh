@@ -14,15 +14,19 @@ prompt() {
 rename() {
     #exec 2>&1 >> "$(dirname "$0")"/rename-workspace.log
     local new_name=$1
-    local new_number
+    local new_number=${new_name%%:*}
+    case "$new_number" in
+        *[!0-9]*) new_number= ;;
+    esac
     local new_label
-    new_number=$(printf '%s\n' "$new_name" | sed -nE 's/^ *([0-9]+) *:.*/\1/p')
-    new_label=$(printf '%s\n' "$new_name" |
-        sed -nE 's/^([^:]*:)? *([^ ]*( *[^ ])*).*/\2/p')
-    if [ -z "$new_number" ]; then
+    if [ -n "$new_number" ]; then
+        new_label=${new_name#*:}
+        new_label=${new_label# }
+    else
         new_number=$(i3-msg -t get_workspaces |
             jq -r 'map(select(.focused).name)[0] // empty' |
             sed 's/^\([0-9]*\).*/\1/')
+        new_label=$new_name
     fi
     local final_name
     if [ -n "$new_number" ]; then
