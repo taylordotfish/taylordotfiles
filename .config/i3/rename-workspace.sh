@@ -14,6 +14,7 @@ prompt() {
 rename() {
     #exec 2>&1 >> "$(dirname "$0")"/rename-workspace.log
     local new_name=$1
+    [ -n "$new_name" ] || return
     local new_number=${new_name%%:*}
     case "$new_number" in
         *[!0-9]*) new_number= ;;
