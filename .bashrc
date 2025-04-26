@@ -161,13 +161,35 @@ git-gc-all() {
 unset -f rg
 if command -v rg > /dev/null; then
     rg() {
-        command rg -p "$@" | less -R
+        if [ -t 1 ]; then
+            command rg -p "$@" | less -R
+        else
+            command rg "$@"
+        fi
     }
 
     rgg() {
         rg -. '-g!.git' "$@"
     }
 fi
+
+unset -f jq
+if command -v jq > /dev/null; then jq() {
+    if [ -t 1 ]; then
+        command jq -C "$@" | less -R
+    else
+        command jq "$@"
+    fi
+} fi
+
+unset -f xxd
+if command -v xxd > /dev/null; then xxd() {
+    if [ -t 1 ]; then
+        command xxd -Ralways "$@" | less -R
+    else
+        command xxd "$@"
+    fi
+} fi
 
 unset -f cargo
 if command -v cargo > /dev/null; then cargo() {
