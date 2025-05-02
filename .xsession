@@ -45,18 +45,16 @@ start_lock() {
 }
 
 prepare_session() {
-    [ -f ~/.xprofile ] && . ~/.xprofile
+    if [ -f ~/.xprofile ]; then
+        . ~/.xprofile
+    fi
 }
 
 prepare_desktop() {
     prepare_session
     ~/.config/dunst/generate.sh
-    dbus-update-activation-environment --all
-    dbus-update-activation-environment --systemd DISPLAY
-    systemctl --user import-environment DISPLAY
     systemctl --user start dunst || true
 }
 
-target=$DEFAULT_TARGET
-[ $# -ge 1 ] && target=$1
+target=${1-$DEFAULT_TARGET}
 "start_$target"
