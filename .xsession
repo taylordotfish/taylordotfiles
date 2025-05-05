@@ -54,6 +54,9 @@ prepare_desktop() {
     prepare_session
     ~/.config/dunst/generate.sh
     systemctl --user start dunst || true
+    if { command -v lxpolkit && ! pgrep -x lxpolkit; } > /dev/null; then
+        lxpolkit &
+    fi
 }
 
 target=${1-$DEFAULT_TARGET}
