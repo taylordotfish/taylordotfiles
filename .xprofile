@@ -1,6 +1,6 @@
 #!/bin/sh
 xprofile_main() {
-    xrdb ~/.Xresources -cpp m4
+    xrdb ~/.Xresources.m4 -cpp m4
     xset s off
     xset s noblank
     xset dpms 65535 65535 65535
