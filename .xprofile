@@ -39,7 +39,7 @@ eval "$({
     set -euf
     xprofile_main > /dev/null
     for var in GDK_DPI_SCALE QT_FONT_DPI; do
-        eval "value=\$$var"
+        eval "value=\${$var-}"
         case "$value" in
             "") ;;
             *[!A-Za-z0-9._-]*)
