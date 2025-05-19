@@ -167,8 +167,11 @@ bindsym $mod+r mode "resize"
 for_window [class=".*"] border normal 0
 
 # floating
-for_window [instance="^display(-|$)"] floating enable
-for_window [instance="^display(-|$)"] move position ifdefn(
+for_window [instance="^jack-keyboard([^A-Za-z]|$)"] floating enable
+for_window [instance="^notes-ui$"] floating enable  # carla
+for_window [title="^Event Tester$"] floating enable
+for_window [instance="^display([^A-Za-z0-9]|$)"] floating enable
+for_window [instance="^display([^A-Za-z0-9]|$)"] move position ifdefn(
     `HIDPI', `800 450', `400 225')
 for_window [instance="^kmag$"] floating enable
 for_window [instance="^kmag$"] resize set ifdefn(
