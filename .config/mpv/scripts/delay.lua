@@ -6,7 +6,7 @@
 --
 -- This should theoretically be possible with --audio-wait-open, but that
 -- option doesn't seem to take effect, even with --audio-stream-silence, as of
--- mpv 0.36.0.
+-- mpv 0.40.0 (at least with --ao=jack).
 
 mp.set_property("audio-stream-silence", "yes")
 if mp.get_property("pause") == "no" then
