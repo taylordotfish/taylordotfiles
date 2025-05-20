@@ -54,7 +54,7 @@ show_extra() {
     ansi_256_bg "$extra_i"
     printf '         '
     ansi_reset
-    extra_i=$((extra_i + 1))
+    : $((extra_i += 1))
 }
 
 print_cube_layer() {
