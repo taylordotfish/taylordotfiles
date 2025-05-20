@@ -1,4 +1,4 @@
-#!/usr/bin/env -S NOTSOURCED=1 /bin/sh -euf
+#!/usr/bin/env -S NOTSOURCED=1 /bin/sh
 # Copyright (C) 2024-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
@@ -78,6 +78,8 @@ monitors() {
 if [ -z "${NOTSOURCED-}" ]; then
     return 0
 fi
+set -euf
+unset NOTSOURCED
 
 usage() {
     cat << EOF
