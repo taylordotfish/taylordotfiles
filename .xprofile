@@ -1,5 +1,12 @@
-#!/bin/sh
-xprofile_main() {
+#!/usr/bin/env -S NOTSOURCED=1 /bin/sh
+if [ -z "${NOTSOURCED-}" ]; then
+    eval "$(NOTSOURCED=1 sh ~/.xprofile eval)"
+    return 0
+fi
+set -euf
+unset NOTSOURCED
+
+initialize() {
     xrdb ~/.Xresources.m4 -cpp m4
     xset s off
     xset s noblank
@@ -18,36 +25,30 @@ xprofile_main() {
             xset fp+ "$dir"
         fi
     done
+    set -- ~/scripts/displays.sh \
+        ~/scripts/controls.sh \
+        ~/.config/gtk-4.0/generate.sh
     local script
-    for script in ~/scripts/displays.sh ~/scripts/controls.sh; do
+    for script do
         if [ -x "$script" ]; then
             "$script"
         fi
     done
+}
+
+print_env() {
     local dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
     if [ "${dpi:-96}" != 96 ]; then
-        GDK_DPI_SCALE=$(awk 'BEGIN { printf "%.2g\n", 96/ARGV[1] }' "$dpi")
-        QT_FONT_DPI=96
-    fi
-    set -- ~/.config/gtk-4.0/generate.sh
-    if [ -x "$1" ]; then
-        "$1"
+        cat << EOF
+export GDK_DPI_SCALE=$(awk 'BEGIN { printf "%.2g\n", 96/ARGV[1] }' "$dpi")
+export QT_FONT_DPI=96
+EOF
     fi
 }
 
-eval "$({
-    set -euf
-    xprofile_main > /dev/null
-    for var in GDK_DPI_SCALE QT_FONT_DPI; do
-        eval "value=\${$var-}"
-        case "$value" in
-            "") ;;
-            *[!A-Za-z0-9._-]*)
-                printf >&2 '%s\n' "warning: bad characters in \$$var"
-                ;;
-            *)
-                printf '%s\n' "export $var=$val"
-                ;;
-        esac
-    done
-})"
+if [ "${1-}" = eval ]; then
+    initialize >&2
+    print_env
+else
+    initialize
+fi
