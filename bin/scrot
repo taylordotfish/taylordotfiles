@@ -3,41 +3,76 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-unset fullwidth fullheight width height posx posy right bottom
-unset line im_args fullsize scrot
-fullwidth=0
-fullheight=0
+dir=$(dirname "$0")
+path=:$PATH:
+case "$path" in
+    *:$dir:*) path=${path%%:$dir:*}:${path#*:$dir:} ;;
+esac
+path=${path#:}
+path=${path%:}
+if ! scrot=$(PATH=$path command -v scrot); then
+    printf >&2 '%s\n' 'error: missing scrot'
+    exit 1
+fi
+
 IFS='
 '
+fullwidth=0
+fullheight=0
+im_args=
+
+handle_monitor() {
+    local width=$1
+    local height=$2
+    local posx=$3
+    local posy=$4
+    local right=$((posx+width))
+    local bottom=$((posy+height))
+    [ "$right" -le "$fullwidth" ] || fullwidth=$right
+    [ "$bottom" -le "$fullheight" ] || fullheight=$bottom
+}
+
 for line in $(~/scripts/monitor-utils.sh monitors); do
-    width=$(printf '%s\n' "$line" | cut -f2)
-    height=$(printf '%s\n' "$line" | cut -f3)
-    posx=$(printf '%s\n' "$line" | cut -f4)
-    posy=$(printf '%s\n' "$line" | cut -f5)
-    right=$((posx+width))
-    bottom=$((posy+height))
-    [ "$right" -gt "$fullwidth" ] && fullwidth=$right
-    [ "$bottom" -gt "$fullheight" ] && fullheight=$bottom
+    handle_monitor $(printf '%s\n' "$line" | tr '\t' '\n')
 done
 
-im_args=
-for line in $(~/scripts/monitor-utils.sh monitors); do
-    width=$(printf '%s\n' "$line" | cut -f2)
-    height=$(printf '%s\n' "$line" | cut -f3)
-    posx=$(printf '%s\n' "$line" | cut -f4)
-    posy=$(printf '%s\n' "$line" | cut -f5)
+handle_monitor() {
+    local width=$1
+    local height=$2
+    local posx=$3
+    local posy=$4
     if [ "$posy" -gt 0 ]; then
-        im_args="$im_args -draw 'rectangle $posx,0"
-        im_args="$im_args $((posx+width-1)),$((posy-1))'"
+        local p1=$posx,0
+        local p2=$((posx+width-1)),$((posy-1))
+        im_args="$im_args -draw 'rectangle $p1 $p2'"
     fi
     if [ "$((posy+height))" -lt "$fullheight" ]; then
-        im_args="$im_args -draw 'rectangle $posx,$((posy+height))"
-        im_args="$im_args $((posx+width-1)),$((fullheight-1))'"
+        local p1=$posx,$((posy+height))
+        local p2=$((posx+width-1)),$((fullheight-1))
+        im_args="$im_args -draw 'rectangle $p1 $p2'"
     fi
+}
+
+for line in $(~/scripts/monitor-utils.sh monitors); do
+    handle_monitor $(printf '%s\n' "$line" | tr '\t' '\n')
 done
 
 fullsize=${fullwidth}x${fullheight}
-scrot=$(PATH=/usr/bin:/usr/local/bin command -v scrot)
-"$scrot" -e "\
-if [ \"\\\$(identify -format '%%wx%%h' '\$f')\" = \"$fullsize\" ]; then \
-mogrify -fill white $im_args -alpha off '\$f'; fi" "$@"
+
+dir=$(dirname "$0")
+path=:$PATH:
+case "$path" in
+    *:$dir:*)
+        path=${path%:$dir:*}:${path#*:$dir:}
+        ;;
+esac
+path=${path#:}
+path=${path%:}
+scrot=$(PATH=$path command -v scrot)
+
+"$scrot" -e "$(cat << EOF
+if [ "\$(identify -format '%%wx%%h' '\$f')" = "$fullsize" ]; then
+    mogrify -fill white $im_args -alpha off '\$f'
+fi
+EOF
+)" "$@"

@@ -3,8 +3,18 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-unset monitor_field monitor_value properties prop_mono prop_hidpi
-unset line value args cmd name title state arg i urxvt
+dir=$(dirname "$0")
+path=:$PATH:
+case "$path" in
+    *:$dir:*) path=${path%%:$dir:*}:${path#*:$dir:} ;;
+esac
+path=${path#:}
+path=${path%:}
+if ! urxvt=$(PATH=$path command -v urxvt); then
+    printf >&2 '%s\n' 'error: missing urxvt'
+    exit 1
+fi
+
 case "${URXVT_MONITOR-}" in
     "")
         monitor_field=1
@@ -42,6 +52,8 @@ esac
 
 args=
 cmd=
+unset name
+unset title
 state=
 i=0
 
@@ -73,20 +85,34 @@ for arg do
     esac
 done
 
+[ -n "$cmd" ] || cmd=$(awk -vFS=: '
+    BEGIN {
+        uid = ARGV[2]
+        ARGC = 2
+    }
+
+    $3 == uid {
+        print $7
+    }
+' /etc/passwd "$(id -u)")
 : ${cmd:=bash}
+
+colors_sh=~/scripts/"set-urxvt-colors.sh"
 if [ -n "$prop_mono" ]; then
     if command -v monoterm > /dev/null; then
         cmd="monoterm -b $cmd"
     fi
-elif [ -z "${KEEPCOLORS-}" ] && [ -x ~/scripts/set-urxvt-colors.sh ]; then
-    cmd="~/scripts/set-urxvt-colors.sh $cmd"
+elif [ -z "${KEEPCOLORS-}" ] && [ -x "$colors_sh" ]; then
+    cmd="\"\$colors_sh\" $cmd"
+fi
+unset KEEPCOLORS
+
+hidpi_sh=~/scripts/hidpi.sh
+if [ -n "$prop_hidpi" ] && [ -x "$hidpi_sh" ]; then
+    cmd="\"\$hidpi_sh\" $cmd"
 fi
 
-if [ -n "$prop_hidpi" ] && [ -x ~/scripts/hidpi.sh ]; then
-    cmd="~/scripts/hidpi.sh $cmd"
-fi
-
-if [ -z "${name-}" ]; then
+if [ -z "${name+x}" ]; then
     name=Rxvt
     if [ -n "$prop_mono" ]; then
         name="$name.mono"
@@ -107,6 +133,5 @@ if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
 fi
 
 : ${title=urxvt}
-urxvt=$(PATH=/usr/bin:/usr/local/bin command -v urxvt)
 eval "set -- $args -e $cmd"
 exec "$urxvt" -name "$name" -title "$title" "$@"

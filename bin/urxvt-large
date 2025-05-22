@@ -1,9 +1,8 @@
 #!/bin/sh
 set -euf
-unset size
 size=20
 if [ "$#" -gt 0 ]; then
-    size=$1
+    size=${1:-$size}
     shift
 fi
 exec urxvt -fn "xft:DejaVu Sans Mono:size=$size" +fb +fi +fbi "$@"

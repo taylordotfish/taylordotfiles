@@ -25,7 +25,7 @@ setxkbmap "-I$HOME/.xkb" \
 run_verbose() {
     xkbcomp "-I$HOME/.xkb" .keymap.xkb "$DISPLAY"
     if [ -z "${NOXCAPE-}" ]; then
-        pkill '^xcape$' || true
+        pkill -x xcape || true
     fi
 }
 

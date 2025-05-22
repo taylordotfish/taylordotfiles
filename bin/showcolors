@@ -41,10 +41,9 @@ ansi_reset() {
     printf '\033[0m'
 }
 
-unset extra_i
+extra_i=0
 
 show_extra() {
-    extra_i=${extra_i-0}
     [ "$extra_i" -gt 255 ] && return
     if [ "$extra_i" -eq 16 ]; then
         extra_i=232

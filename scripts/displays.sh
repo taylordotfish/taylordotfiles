@@ -32,7 +32,7 @@ if cat ~/.config/color.jcnf 2> /dev/null | grep -q .; then
     "$1" -L || true
 fi
 
-if { command -v picom && ! pgrep '^picom$'; } > /dev/null; then
+if { command -v picom && ! pgrep -x picom; } > /dev/null; then
     picom_args=
     if ! picom --version | awk -F'[^0-9]+' '{
         for (i = 1; i <= NF; ++i) {

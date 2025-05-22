@@ -5,7 +5,7 @@ set -euf
 
 run_i3lock_blocking() {
     local picom=
-    if pkill '^picom$'; then
+    if pkill -x picom; then
         picom=1
     fi
     i3lock -n "$@"
@@ -24,7 +24,7 @@ rm_scr_parts() {
     set +f
     rm -f ~/.cache/i3lock-screenshots/screen_*.png
     set -f
-    any_scr_parts=
+    unset any_scr_parts
 }
 
 on_exit() {
