@@ -60,9 +60,9 @@ unpushed() {
             ! git -C "$1" diff "$rbranch..." --name-only --exit-code \
                 > /dev/null
         then
-            unpushed="${unpushed:+$unpushed,}$remote"
+            unpushed=${unpushed:+$unpushed,}$remote
         else
-            pushed="${pushed:+$pushed,}-$remote"
+            pushed=${pushed:+$pushed,}-$remote
         fi
     done
     if [ -n "$unpushed" ]; then
@@ -92,7 +92,7 @@ unpulled() {
         fi
         if git -C "$1" log "..$rbranch" --format=oneline | grep -q .
         then
-            remotes="${remotes:+$remotes,}$remote"
+            remotes=${remotes:+$remotes,}$remote
         fi
     done
     if [ -n "$remotes" ]; then

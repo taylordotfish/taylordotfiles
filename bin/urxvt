@@ -61,12 +61,12 @@ for arg do
     : $((i += 1))
     case "$state" in
         -name)
-            name="$arg"
+            name=$arg
             state=
             continue
             ;;
         -title)
-            title="$arg"
+            title=$arg
             state=
             continue
             ;;
@@ -77,7 +77,7 @@ for arg do
     esac
     case "${arg-}" in
         -name|-title|-e)
-            state="$arg"
+            state=$arg
             ;;
         *)
             args="$args \"\$$i\""
@@ -115,10 +115,10 @@ fi
 if [ -z "${name+x}" ]; then
     name=Rxvt
     if [ -n "$prop_mono" ]; then
-        name="$name.mono"
+        name=$name.mono
     fi
     if [ -n "$prop_hidpi" ]; then
-        name="$name.2x"
+        name=$name.2x
     fi
 fi
 
