@@ -58,18 +58,6 @@ for line in $(~/scripts/monitor-utils.sh monitors); do
 done
 
 fullsize=${fullwidth}x${fullheight}
-
-dir=$(dirname "$0")
-path=:$PATH:
-case "$path" in
-    *:$dir:*)
-        path=${path%:$dir:*}:${path#*:$dir:}
-        ;;
-esac
-path=${path#:}
-path=${path%:}
-scrot=$(PATH=$path command -v scrot)
-
 "$scrot" -e "$(cat << EOF
 if [ "\$(identify -format '%%wx%%h' '\$f')" = "$fullsize" ]; then
     mogrify -fill white $im_args -alpha off '\$f'
