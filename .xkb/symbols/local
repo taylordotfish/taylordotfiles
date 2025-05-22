@@ -1,10 +1,10 @@
 partial
 xkb_symbols {
-    # Caps Lock is Left Control
+    // Caps Lock is Left Control
     key <CAPS> { [ Control_L ] };
     modifier_map Control { <CAPS> };
 
-    # Unused Caps Lock key for xcape
+    // Unused Caps Lock key for xcape
     key <I248> { [ Caps_Lock ] };
 };
 # vim:ft=xkb
