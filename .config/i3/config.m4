@@ -12,6 +12,7 @@ merge_env(`HIDPI', `MONOCHROME')dnl
 sinclude(`config.pre.m4')dnl
 dnl
 set $mod Mod4
+set $alt Mod1
 
 # use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -70,7 +71,7 @@ bindsym $mod+a focus parent
 bindsym $mod+q focus child
 
 # switch keyboard layout
-bindsym $mod+Mod1+space exec --no-startup-id ~/.xkb/next-layout.sh
+bindsym $mod+$alt+space exec --no-startup-id ~/.xkb/next-layout.sh
 
 set $ws1 1: one
 set $ws2 2: two
@@ -108,14 +109,14 @@ bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # workspace navigation
-bindsym Mod1+Mod4+Right workspace next
-bindsym Mod1+Mod4+Left workspace prev
-bindsym Mod1+Mod4+l workspace next
-bindsym Mod1+Mod4+h workspace prev
-bindsym Mod1+Mod4+Shift+Right move workspace to output right
-bindsym Mod1+Mod4+Shift+Left move workspace to output left
-bindsym Mod1+Mod4+Shift+l move workspace to output right
-bindsym Mod1+Mod4+Shift+h move workspace to output left
+bindsym $mod+$alt+Right workspace next
+bindsym $mod+$alt+Left workspace prev
+bindsym $mod+$alt+l workspace next
+bindsym $mod+$alt+h workspace prev
+bindsym $mod+$alt+Shift+Right move workspace to output right
+bindsym $mod+$alt+Shift+Left move workspace to output left
+bindsym $mod+$alt+Shift+l move workspace to output right
+bindsym $mod+$alt+Shift+h move workspace to output left
 
 # brightness keys
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
@@ -206,9 +207,9 @@ bindsym $mod+Return exec --no-startup-id \
 bindsym $mod+Shift+Return exec --no-startup-id \
     URXVT_MONITOR=7:1 urxvt -title urxvt -e bash
 
-bindsym $mod+Mod1+Return exec --no-startup-id \
+bindsym $mod+$alt+Return exec --no-startup-id \
     URXVT_MONITOR=7:2 urxvt -title urxvt -e tmux -2
-bindsym $mod+Mod1+Shift+Return exec --no-startup-id \
+bindsym $mod+$alt+Shift+Return exec --no-startup-id \
     URXVT_MONITOR=7:2 urxvt -title urxvt -e bash
 
 ifelse(defn(`MONOCHROME'), `2', `dnl
