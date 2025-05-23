@@ -33,5 +33,5 @@ if cat ~/.config/color.jcnf 2> /dev/null | grep -q .; then
 fi
 
 if { command -v picom && ! pgrep -x picom; } > /dev/null; then
-    "$(dirname "$0")"/picom.sh > /dev/null 2>&1 < /dev/null &
+    "$(dirname "$0")"/picom.sh --daemon
 fi
