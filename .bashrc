@@ -4,12 +4,16 @@ _bashrc_sourced=1
 source ~/.profile || true
 # Source default .bashrc
 if [ -f /etc/skel/.bashrc ]; then
-    source /etc/skel/.bashrc
+    case "$TERM" in
+        *-color) non_color_term=${TERM%-*} ;;
+        *color) non_color_term=${TERM%color} ;;
+        *) non_color_term=$TERM ;;
+    esac
+    # Override $TERM to get a non-color prompt
+    TERM=$non_color_term source /etc/skel/.bashrc
+    unset non_color_term
 fi
 unset _bashrc_sourced
-
-# Non-color prompt
-PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
@@ -35,17 +39,7 @@ fi
 if command -v mail > /dev/null; then
     alias mail="MBOX=$HOME/Documents/mbox mail"
 fi
-alias less="less -F"
-
-get-alias() {
-    local def
-    if ! def=$(alias "$1" 2> /dev/null); then
-        printf '%s\n' "$1"
-        return 0
-    fi
-    eval "def=${def#*=}"
-    printf '%s\n' "$def"
-}
+alias less="less -F --redraw-on-quit"
 
 # Replaces `-h` with `--si`.
 si() {
@@ -75,29 +69,43 @@ si() {
     "$cmd" "$@"
 }
 
-alias ls="si $(get-alias ls) -v"
-alias du="si $(get-alias du)"
-alias df="si $(get-alias df)"
-alias free="si $(get-alias free)"
+unalias ls 2> /dev/null || true
+ls() {
+    if [ -t 1 ]; then
+        set -- -C --color=always "$@"
+    fi
+    set -- si command ls -v "$@"
+    if [ -t 1 ]; then
+        COLUMNS=$(tput cols) "$@" | less -R
+    else
+        "$@"
+    fi
+}
+
+alias du="si du"
+alias df="si df"
+alias free="si free"
+
+_run_gcc_like() {
+    local bin=$1
+    shift
+    if [ -t 1 ]; then
+        command "$bin" -fdiagnostics-color=always "$@" |& less -R
+    else
+        command "$bin" "$@"
+    fi
+}
 
 gccs() {
-    gcc -std=c11 -Wall -Wextra -Werror -pedantic -Og "$@"
+    _run_gcc_like gcc -std=c11 -Wall -Wextra -Werror -pedantic -Og "$@"
 }
 
 g++s() {
-    g++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
+    _run_gcc_like g++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
 }
 
 clang++s() {
-    clang++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
-}
-
-g++i() {
-    g++s "$@" -fdiagnostics-color=always |& less -R
-}
-
-clang++i() {
-    clang++s "$@" -fdiagnostics-color=always |& less -R
+    _run_gcc_like clang++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
 }
 
 clear-history() {
@@ -157,6 +165,15 @@ git-gc-all() {
         -c gc.rerereresolved=0 -c gc.rerereunresolved=0 \
         -c gc.pruneExpire=now gc "$@"
 }
+
+unset -f tree
+if command -v tree > /dev/null; then tree() {
+    if [ -t 1 ]; then
+        command tree -C "$@" | less -R
+    else
+        command tree "$@"
+    fi
+} fi
 
 unset -f rg
 if command -v rg > /dev/null; then
