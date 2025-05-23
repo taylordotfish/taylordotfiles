@@ -33,15 +33,5 @@ if cat ~/.config/color.jcnf 2> /dev/null | grep -q .; then
 fi
 
 if { command -v picom && ! pgrep -x picom; } > /dev/null; then
-    picom_args=
-    if ! picom --version | awk -F'[^0-9]+' '{
-        for (i = 1; i <= NF; ++i) {
-            if ($(i) != "") {
-                exit $(i) >= 10 ? 0 : 1
-            }
-        }
-    }'; then
-        picom_args="$picom_args --experimental-backends"
-    fi
-    picom $picom_args > /dev/null 2>&1 &
+    "$(dirname "$0")"/picom.sh > /dev/null 2>&1 < /dev/null &
 fi

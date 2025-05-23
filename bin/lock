@@ -9,7 +9,11 @@ run_i3lock_blocking() {
         picom=1
     fi
     i3lock -n "$@"
-    if [ -n "$picom" ]; then
+    if [ -z "$picom" ]; then
+        :
+    elif [ -x ~/scripts/picom.sh ]; then
+        exec ~/scripts/picom.sh
+    else
         exec picom
     fi
 }
