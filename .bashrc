@@ -36,7 +36,7 @@ if command -v ncal > /dev/null; then
     alias cal="ncal -C"
 fi
 if command -v mail > /dev/null; then
-    alias mail="MBOX=$HOME/Documents/mbox mail"
+    alias mail="MBOX=~/Documents/mbox mail"
 fi
 less_args=(-F)
 if ! less --version | awk '$2 ~ /^[0-9]+$/ { exit $2 < 608 ? 0 : 1 }'; then
