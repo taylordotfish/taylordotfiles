@@ -19,7 +19,7 @@ run_i3lock_blocking() {
 }
 
 run_i3lock() {
-    run_i3lock_blocking "$@" > /dev/null 2>&1 &
+    run_i3lock_blocking "$@" > /dev/null 2>&1 < /dev/null &
 }
 
 unset any_scr_parts
