@@ -39,7 +39,11 @@ if command -v mail > /dev/null; then
     alias mail="MBOX=~/Documents/mbox mail"
 fi
 less_args=(-F)
-if ! less --version | awk '$2 ~ /^[0-9]+$/ { exit $2 < 608 ? 0 : 1 }'; then
+if ! less --version | awk '{
+    for (i = 1; i <= NF; ++i)
+        if ($(i) ~ /^[0-9]+$/)
+            exit $2 < 608 ? 0 : 1
+}'; then
     less_args+=(--redraw-on-quit)
 fi
 alias less="less ${less_args[*]}"
