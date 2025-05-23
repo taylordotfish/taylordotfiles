@@ -38,7 +38,12 @@ fi
 if command -v mail > /dev/null; then
     alias mail="MBOX=$HOME/Documents/mbox mail"
 fi
-alias less="less -F --redraw-on-quit"
+less_args=(-F)
+if ! less --version | awk '$2 ~ /^[0-9]+$/ { exit $2 < 608 ? 0 : 1 }'; then
+    less_args+=(--redraw-on-quit)
+fi
+alias less="less ${less_args[*]}"
+unset less_args
 
 # Replaces `-h` with `--si`.
 si() {
