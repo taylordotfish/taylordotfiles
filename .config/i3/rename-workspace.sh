@@ -12,7 +12,7 @@ prompt() {
 }
 
 rename() {
-    #exec 2>&1 >> "$(dirname "$0")"/rename-workspace.log
+    #exec >> "$(dirname "$0")"/rename-workspace.log 2>&1
     local new_name=$1
     [ -n "$new_name" ] || return
     local new_number=${new_name%%:*}
