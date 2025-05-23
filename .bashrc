@@ -5,8 +5,7 @@ source ~/.profile || true
 # Source default .bashrc
 if [ -f /etc/skel/.bashrc ]; then
     case "$TERM" in
-        *-color) non_color_term=${TERM%-*} ;;
-        *color) non_color_term=${TERM%color} ;;
+        *-color|*-256color) non_color_term=${TERM%-*} ;;
         *) non_color_term=$TERM ;;
     esac
     # Override $TERM to get a non-color prompt
