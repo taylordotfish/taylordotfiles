@@ -1,6 +1,6 @@
 #!/bin/sh
 set -euf
-cd "$(dirname "$0")"
+dir=$(dirname "$0")
 
 ed=ed
 if command -v ed > /dev/null; then
@@ -11,8 +11,8 @@ elif command -v vi > /dev/null; then
     ed="vi -e"
 fi
 
-$ed -s layout.conf << 'EOF'
+$ed -s "$dir"/layout.conf << 'EOF'
 1m$
 w
 EOF
-exec ./setmap.sh
+exec "$dir"/setmap.sh

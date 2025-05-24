@@ -3,6 +3,8 @@
 # License: GNU GPL version 3 or later
 set -euf
 
+screenshot_dir=~/.cache/i3lock-screenshots
+
 run_i3lock_blocking() {
     local picom=
     if pkill -x picom; then
@@ -25,7 +27,7 @@ unset any_scr_parts
 rm_scr_parts() {
     (
         set +f
-        rm -f ~/.cache/i3lock-screenshots/screen_*.png
+        rm -f "$screenshot_dir"/screen_*.png
     )
     unset any_scr_parts
 }
@@ -41,7 +43,7 @@ on_exit() {
 
 trap on_exit INT HUP QUIT TERM EXIT
 
-if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
+if [ -d "$screenshot_dir" ]; then
     rm_scr_parts
     oldifs=$IFS
     IFS='
@@ -63,25 +65,25 @@ if cd ~/.cache/i3lock-screenshots 2> /dev/null; then
             *,mono,*) ;;
             *)
                 any_scr_parts=1
-                scrot -M "$index" screen_"$index".png
-                mogrify -blur 10x10 screen_"$index".png
+                scrot -M "$index" "$screenshot_dir"/screen_"$index".png
+                mogrify -blur 10x10 "$screenshot_dir"/screen_"$index".png
                 ;;
         esac
     done
-    im_args=
+    set --
     for line in $(~/scripts/monitor-utils.sh monitors); do
         index=$(printf '%s\n' "$line" | cut -f1)
         posx=$(printf '%s\n' "$line" | cut -f4)
         posy=$(printf '%s\n' "$line" | cut -f5)
-        if [ -f "screen_$index.png" ]; then
-            im_args="$im_args screen_$index.png -geometry +$posx+$posy"
-            im_args="$im_args -composite"
+        if [ -f "$screenshot_dir/screen_$index.png" ]; then
+            set -- "$@" "$screenshot_dir/screen_$index.png" \
+                -geometry "+$posx+$posy" -composite
         fi
     done
     IFS=$oldifs
-    convert -size "$maxx"x"$maxy" xc:white $im_args full.png
+    convert -size "$maxx"x"$maxy" xc:white "$@" "$screenshot_dir"/full.png
     rm_scr_parts
-    run_i3lock -i full.png
+    run_i3lock -i "$screenshot_dir"/full.png
     exit
 fi
 

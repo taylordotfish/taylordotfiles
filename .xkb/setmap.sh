@@ -2,10 +2,10 @@
 # Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
+dir=$(dirname "$0")
 
-cd "$(dirname "$0")"
-[ -f layout.conf ] || echo us > layout.conf
-layout=$(awk '/./ { print $1; exit }' layout.conf)
+[ -f "$dir"/layout.conf ] || echo us > "$dir"/layout.conf
+layout=$(awk '/./ { print $1; exit }' "$dir"/layout.conf)
 
 xcape_map=
 set --
@@ -20,10 +20,10 @@ setxkbmap "-I$HOME/.xkb" \
     -option local \
     "$@" \
     -layout "$layout" \
-    -print > .keymap.xkb
+    -print > "$dir"/.keymap.xkb
 
 run_verbose() {
-    xkbcomp "-I$HOME/.xkb" .keymap.xkb "$DISPLAY"
+    xkbcomp "-I$HOME/.xkb" "$dir"/.keymap.xkb "$DISPLAY"
     if [ -z "${NOXCAPE-}" ]; then
         pkill -x xcape || true
     fi
