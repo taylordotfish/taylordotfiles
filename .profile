@@ -16,16 +16,57 @@ PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
 
 delayed_exec() {
-    set -- "$(awk '{ print $1 }' /proc/uptime)" "$@"
-    (shift; "$@")
-    set -- "$1" "$?"
+    local timeout=5
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -h|--help)
+                cat << EOF
+Usage: delayed-exec [--timeout=<seconds>] [command [args...]]
+EOF
+                return 0
+                ;;
+            --timeout)
+                if [ "$#" -lt 2 ]; then
+                    printf >&2 '%s\n' "error: missing argument for $1"
+                    return 1
+                fi
+                timeout=$2
+                shift
+                ;;
+            --timeout=*)
+                timeout=${1#*=}
+                ;;
+            --)
+                shift
+                break
+                ;;
+            -*)
+                printf >&2 '%s\n' "error: unrecognized option: $1"
+                return 1
+                ;;
+            *)
+                break
+                ;;
+        esac
+        shift
+    done
+    case "$timeout" in
+        *[!0-9.]*|*.*.*|.|"")
+            printf >&2 '%s\n' "error: invalid timeout: '$timeout'"
+            return 1
+            ;;
+    esac
+    [ "$#" -gt 0 ] || return 0
+    local start_time=$(awk '{ print $1 }' /proc/uptime)
+    "$@" && true
+    local status=$?
     if awk -- '
         BEGIN { ARGC = 2 }
         { exit $1 - ARGV[2] < ARGV[3] ? 0 : 1 }
-    ' /proc/uptime "$1" "${TIMEOUT:-5}"; then
-        return "$2"
+    ' /proc/uptime "$start_time" "$timeout"; then
+        return "$status"
     fi
-    exit "$2"
+    exit "$status"
 }
 
 alias delayed-exec=delayed_exec
