@@ -53,11 +53,11 @@ unset less_args
 si() {
     local cmd=$1
     shift
-    local done
+    local done=
     local arg
     for arg do
         shift
-        [ -n "${done-}" ] || case "$arg" in
+        [ -n "$done" ] || case "$arg" in
             --) done=1 ;;
             --*) ;;
             -*h*)
