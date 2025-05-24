@@ -21,11 +21,15 @@ monitors() {
 
     local defs=~/.cache/monitor-utils/defs
     [ -f "$defs" ] || defs=/dev/null
-    local num_defined=$(wc -l < "$defs")
+    local num_defined
+    num_defined=$(wc -l < "$defs")
     local IFS='
 '
     local opts=$-
     set -f
+    local name
+    local priority
+    local properties
     local line
     for line in $(xrandr --listactivemonitors | awk -vOFS='\t' 'NF >= 4 {
         split($1, a, ":")
@@ -52,8 +56,8 @@ monitors() {
         mon_name = $4
         print mon_index, mon_width, mon_height, mon_posx, mon_posy, mon_name
     }'); do
-        local name=$(printf '%s\n' "$line" | cut -f6)
-        local priority=$(awk -F'\t' '
+        name=$(printf '%s\n' "$line" | cut -f6)
+        priority=$(awk -F'\t' '
             BEGIN { ARGC = 2 }
             $1 == ARGV[2] { print NR; exit }
         ' "$defs" "$name")
@@ -61,7 +65,7 @@ monitors() {
             : $((num_defined += 1))
             priority=$num_defined
         fi
-        local properties=$(awk -F'\t' '
+        properties=$(awk -F'\t' '
             BEGIN { ARGC = 2 }
             NR == ARGV[2] { print $2; exit }
         ' "$defs" "$priority")

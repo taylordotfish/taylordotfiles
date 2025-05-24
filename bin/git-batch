@@ -45,7 +45,8 @@ unpushed() {
     if ! git -C "$1" diff --name-only --exit-code > /dev/null; then
         local uncommitted=1
     fi
-    local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
+    local branch
+    branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local pushed=
     local unpushed=
     local remote
@@ -77,7 +78,8 @@ unpulled() {
     local upstream
     upstream=$(git -C "$1" rev-parse --abbrev-ref '@{u}' 2> /dev/null) ||
         upstream=
-    local branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
+    local branch
+    branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
     local remotes=
     local remote
     for remote in $(git -C "$1" remote); do
@@ -121,7 +123,8 @@ sync() {
 }
 
 branch() {
-    local maxlen=$(printf '%s\n' "$@" | awk '
+    local maxlen
+    maxlen=$(printf '%s\n' "$@" | awk '
         length > n { n = length }
         END { print n }
     ')

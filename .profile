@@ -57,7 +57,8 @@ EOF
             ;;
     esac
     [ "$#" -gt 0 ] || return 0
-    local start_time=$(awk '{ print $1 }' /proc/uptime)
+    local start_time
+    start_time=$(awk '{ print $1 }' /proc/uptime)
     "$@" && true
     local status=$?
     if awk -- '

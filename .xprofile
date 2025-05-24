@@ -37,7 +37,8 @@ initialize() {
 }
 
 print_env() {
-    local dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
+    local dpi
+    dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
     if [ "${dpi:-96}" != 96 ]; then
         cat << EOF
 export GDK_DPI_SCALE=$(awk 'BEGIN { printf "%.2g\n", 96/ARGV[1] }' "$dpi")
