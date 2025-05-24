@@ -23,9 +23,10 @@ run_i3lock() {
 unset any_scr_parts
 
 rm_scr_parts() {
-    set +f
-    rm -f ~/.cache/i3lock-screenshots/screen_*.png
-    set -f
+    (
+        set +f
+        rm -f ~/.cache/i3lock-screenshots/screen_*.png
+    )
     unset any_scr_parts
 }
 
