@@ -4,13 +4,17 @@ _bashrc_sourced=1
 source ~/.profile || true
 # Source default .bashrc
 if [ -f /etc/skel/.bashrc ]; then
-    case "$TERM" in
-        *-color|*-256color) non_color_term=${TERM%-*} ;;
-        *) non_color_term=$TERM ;;
+    skel_term=$TERM
+    # Non-color prompt
+    case "$skel_term" in
+        *-color|*-256color) skel_term=${skel_term%-*} ;;
     esac
-    # Override $TERM to get a non-color prompt
-    TERM=$non_color_term source /etc/skel/.bashrc
-    unset non_color_term
+    # Don't set window title
+    case "$skel_term" in
+        xterm*|rxvt*) skel_term=screen ;;
+    esac
+    TERM=$skel_term source /etc/skel/.bashrc
+    unset skel_term
 fi
 unset _bashrc_sourced
 
