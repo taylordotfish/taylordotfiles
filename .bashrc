@@ -212,13 +212,24 @@ if command -v jq > /dev/null; then jq() {
 } fi
 
 unset -f xxd
-if command -v xxd > /dev/null; then xxd() {
-    if [ -t 1 ]; then
-        command xxd -Ralways "$@" | less -R
-    else
-        command xxd "$@"
+if command -v xxd > /dev/null; then
+    xxd_args=()
+    if ! xxd -Ralways /dev/null 2>&1 > /dev/null | grep -q .; then
+        xxd_args+=(-Ralways)
     fi
-} fi
+    alias xxd_interactive="command xxd ${xxd_args[*]}"
+    unset xxd_args
+fi
+if alias xxd_interactive >& /dev/null; then
+    xxd() {
+        if [ -t 1 ] && ! { [ -t 0 ] && [ "$#" -eq 0 ]; }; then
+            xxd_interactive "$@" | less -R
+        else
+            command xxd "$@"
+        fi
+    }
+    unalias xxd_interactive
+fi
 
 unset -f cargo
 if command -v cargo > /dev/null; then cargo() {
