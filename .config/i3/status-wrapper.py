@@ -2,6 +2,7 @@
 # Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any, BinaryIO, Iterator, Optional
 import io
@@ -50,13 +51,33 @@ def get_cpu_temps() -> Iterator[Decimal]:
                 yield Decimal(prop[1])
 
 
-def get_mem_available_gb() -> Optional[Decimal]:
+@dataclass
+class MemoryInfo:
+    available_bytes: int
+    total_bytes: int
+
+    @property
+    def available_gb(self) -> Decimal:
+        return Decimal(self.available_bytes) / 1_000_000_000
+
+
+def get_memory_info() -> Optional[MemoryInfo]:
+    available = None
+    total = None
     with open("/proc/meminfo") as f:
         for line in f:
-            if not line.startswith("MemAvailable:"):
-                continue
-            return (Decimal(line.split()[1]) * 1024) / 1_000_000_000
-    return None
+            if line.startswith("MemAvailable:"):
+                available = line.split(None, 2)[1]
+            elif line.startswith("MemTotal:"):
+                total = line.split(None, 2)[1]
+    if available is None or total is None:
+        return None
+    try:
+        available_bytes = int(available) * 1024
+        total_bytes = int(total) * 1024
+    except ValueError:
+        return None
+    return MemoryInfo(available_bytes=available_bytes, total_bytes=total_bytes)
 
 
 def modify_wireless(blocks: list[Block]) -> None:
@@ -85,17 +106,20 @@ def add_cpu_temperature(blocks: list[Block]) -> None:
 
 
 def add_memory(blocks: list[Block]) -> None:
-    available = get_mem_available_gb()
-    if available is None:
+    mem_info = get_memory_info()
+    if mem_info is None:
         return
-    color = color_normal
-    if available < 4:
+    available = mem_info.available_bytes
+    total = mem_info.total_bytes
+    if total < available // 8 or available < 2_000_000_000:
         color = color_bad
-    elif available < 10:
+    elif total < available // 3 or available < 4_000_000_000:
         color = color_degraded
+    else:
+        color = color_normal
     blocks.insert(0, {
         "name": "memory",
-        "full_text": "{:.1f} GB".format(available),
+        "full_text": "{:.1f} GB".format(mem_info.available_gb),
         "color": color,
     })
 
