@@ -13,12 +13,12 @@ function s:Escape(string)
 endfunction
 
 function s:ChangeQuote(startquote, endquote)
-    let s:startquote = s:Escape(a:startquote)
-    let s:endquote = s:Escape(a:endquote)
+    let startquote = s:Escape(a:startquote)
+    let endquote = s:Escape(a:endquote)
     syn clear m4String
-    if s:startquote != "" && s:endquote != ""
-        execute 'syn region m4String start="' . s:startquote . '" end="'
-            \ . s:endquote . '" contains=m4Constants,m4Special,m4Variable,'
+    if startquote != "" && endquote != ""
+        execute 'syn region m4String start="' . startquote . '" end="'
+            \ . endquote . '" contains=m4Constants,m4Special,m4Variable,'
             \ . 'm4Command,m4Statement,m4Function,m4String'
     endif
 endfunction
