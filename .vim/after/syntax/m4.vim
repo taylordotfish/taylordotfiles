@@ -1,9 +1,29 @@
 " Copyright (C) 2023, 2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
+
 set matchpairs+=`:'
 set cpoptions+=%M
-let s:startquote="`"
-let s:endquote="'"
+
+let s:startquote = "`"
+let s:endquote = "'"
+let s:modeline_found = 0
+
+function s:Escape(string)
+    return substitute(a:string, '["\\]', '\\\0', '')
+endfunction
+
+function s:ChangeQuote(startquote, endquote)
+    let s:startquote = s:Escape(a:startquote)
+    let s:endquote = s:Escape(a:endquote)
+    syn clear m4String
+    if s:startquote != "" && s:endquote != ""
+        execute 'syn region m4String start="' . s:startquote . '" end="'
+            \ . s:endquote . '" contains=m4Constants,m4Special,m4Variable,'
+            \ . 'm4Command,m4Statement,m4Function,m4String'
+    endif
+endfunction
+
+command -nargs=* M4ChangeQuote call s:ChangeQuote(<f-args>)
 
 function s:ParseLine(n)
     let line = getline(a:n)
@@ -11,6 +31,7 @@ function s:ParseLine(n)
     if opts == line
         return
     endif
+    let s:modeline_found = 1
     let startquote = substitute(opts, '.*\<startquote=\(\S*\).*', '\1', '')
     if startquote != opts
         let s:startquote = startquote
@@ -32,9 +53,8 @@ while s:i <= line("$")
     let s:i += 1
 endwhile
 
-syn clear m4String
-if s:startquote != "" && s:endquote != ""
-    execute 'syn region m4String start="' . s:startquote . '" end="'
-        \ . s:endquote . '" contains=m4Constants,m4Special,m4Variable,'
-        \ . 'm4Command,m4Statement,m4Function,m4String'
+if !s:modeline_found && search('\<changequote(', 'cnw', 0, 500) > 0
+    let s:startquote = ""
+    let s:endquote = ""
 endif
+call s:ChangeQuote(s:startquote, s:endquote)
