@@ -66,7 +66,8 @@ if [ -d "$screenshot_dir" ]; then
             *)
                 any_scr_parts=1
                 scrot -M "$index" "$screenshot_dir"/screen_"$index".png
-                mogrify -blur 10x10 "$screenshot_dir"/screen_"$index".png
+                mogrify -colorspace RGB -blur 10x10 -colorspace sRGB \
+                    "$screenshot_dir"/screen_"$index".png
                 ;;
         esac
     done
