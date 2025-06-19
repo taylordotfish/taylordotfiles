@@ -25,9 +25,7 @@ order += "disk /"
 #order += "run_watch VPN"
 order += "wireless _first_"
 order += "ethernet _first_"
-ifelse(
-    vsyscmd(`ls /sys/class/power_supply/BAT* 2> /dev/null'),
-    `0',
+ifelse(vsyscmd(`[ -e /sys/class/power_supply/BAT* ]'), `0',
     `order += "battery 0"'
 )dnl
 order += "load"
