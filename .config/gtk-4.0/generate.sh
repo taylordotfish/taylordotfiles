@@ -1,11 +1,11 @@
 #!/bin/sh
 set -euf
 dir=$(dirname "$0")
-{
-    cat << 'EOF'
+exec > "$dir"/settings.ini
+cat << 'EOF'
 # AUTOMATICALLY GENERATED!
 # CHANGES WILL BE LOST!
 
 EOF
-    m4 "$dir"/settings.ini.m4
-} > "$dir"/settings.ini
+cd "$dir"
+m4 settings.ini.m4
