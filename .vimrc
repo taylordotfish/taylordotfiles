@@ -2,37 +2,36 @@
 " License: GNU GPL version 3 or later
 
 let s:fancyterm = $TERM !~ '^vt'
-let s:utf8_supported = $LANG =~ '[Uu][Tt][Ff]-\?8$'
-let s:latin1_supported = $LANG =~ '[Ii][Ss][Oo]-\?8859-\?1$'
+let s:is_utf8 = $LANG =~ '[Uu][Tt][Ff]-\?8$'
+let s:is_latin1 = $LANG =~ '[Ii][Ss][Oo]-\?8859-\?1$'
 
-let s:indent = 4
+function s:SetIndentWidth(width)
+    let s:indent = a:width
+    execute "set shiftwidth=" . s:indent
+    execute "set softtabstop=" . s:indent
+    execute "set tabstop=" . s:indent
+endfunction
+
+function s:SetTextWidth(width)
+    execute "set textwidth=" . a:width
+    execute "set colorcolumn=" . (a:width + 1)
+endfunction
+
+call s:SetIndentWidth(4)
+call s:SetTextWidth(79)
 set autoindent
 set cinoptions=(1s
 set expandtab
-execute "set shiftwidth=" . s:indent
-execute "set softtabstop=" . s:indent
-execute "set tabstop=" . s:indent
-if s:fancyterm
-    set background=dark
-endif
 set number
 set nowrap
 set linebreak
 set list
 set noshowmatch
-set colorcolumn=80
-if s:fancyterm
-    set t_Co=256
-endif
-set textwidth=79
 set formatoptions=ql
 set viminfo='100,<2000,s2000,h
 set nojoinspaces
 set laststatus=2
 set hlsearch
-if s:fancyterm
-    set cursorline
-endif
 set wrapmargin=0
 set comments-=://
 set comments-=mb:*
@@ -40,9 +39,12 @@ set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
 set modeline
 if s:fancyterm
+    set background=dark
+    set t_Co=256
+    set cursorline
     set ttimeoutlen=0
 endif
-if s:latin1_supported
+if s:is_latin1
     set encoding=utf-8
     set termencoding=latin1
 endif
@@ -101,7 +103,7 @@ au InsertLeave * execute "set listchars+=" . s:lc_normal
 function s:TabMode()
     call s:ClearWsMode()
     set noexpandtab softtabstop=0
-    if s:utf8_supported
+    if s:is_utf8
         let spacechar="·"
     else
         let spacechar="`"
@@ -121,7 +123,7 @@ function s:SpaceMode()
     call s:ClearWsMode()
     execute "set expandtab softtabstop=" . s:indent
     let s:lc_normal = ""
-    if !s:utf8_supported
+    if !s:is_utf8
         let tabchars='\|-\|'
     elseif $HEAVY_BLOCKS != ""
         let tabchars="┣━┫"
