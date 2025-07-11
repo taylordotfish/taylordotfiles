@@ -25,9 +25,13 @@ order += "disk /"
 #order += "run_watch VPN"
 order += "wireless _first_"
 order += "ethernet _first_"
-ifelse(vsyscmd(`[ -e /sys/class/power_supply/BAT* ]'), `0',
-    `order += "battery 0"'
-)dnl
+define(`BATTERY', esyscmd(`printf \\140
+printf "%s\n" /sys/class/power_supply/BAT* | head -1 | tr -dc "[0-9]"
+printf \\47
+'))dnl
+ifelse(defn(`BATTERY'),,, `dnl
+order += "battery BATTERY"
+')dnl
 order += "load"
 order += "tztime local"
 
@@ -44,11 +48,13 @@ ethernet _first_ {
     format_up = "E: %ip"
     format_down = "E: down"
 }
+ifelse(defn(`BATTERY'),,, `dnl
+define_default(`BATTERY_FORMAT', `%status %percentage %remaining')dnl
 
-battery 0 {
-    #format = "%status %percentage %remaining"
-    format = "%status %percentage"
+battery BATTERY {
+    format = "defn(`BATTERY_FORMAT')"
 }
+')dnl
 
 run_watch DHCP {
     pidfile = "/var/run/dhclient*.pid"
