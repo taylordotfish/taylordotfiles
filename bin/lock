@@ -62,12 +62,16 @@ if [ -d "$screenshot_dir" ]; then
         [ "$endx" -le "$maxx" ] || maxx=$endx
         [ "$endy" -le "$maxy" ] || maxy=$endy
         case ",$properties," in
+            *,hidpi,*) blur_sigma=16 ;;
+            *) blur_sigma=8 ;;
+        esac
+        case ",$properties," in
             *,mono,*) ;;
             *)
                 any_scr_parts=1
                 scrot -M "$index" "$screenshot_dir"/screen_"$index".png
-                mogrify -colorspace RGB -blur 10x10 -colorspace sRGB \
-                    "$screenshot_dir"/screen_"$index".png
+                mogrify -colorspace RGB -blur 0x"$blur_sigma" \
+                    -colorspace sRGB "$screenshot_dir"/screen_"$index".png
                 ;;
         esac
     done
