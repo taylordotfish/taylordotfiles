@@ -8,7 +8,7 @@ bar {
     output MONITOR_NAME
     tray_output primary
     status_command i3status | `MONITOR_PRIORITY'=MONITOR_PRIORITY ifdefn(
-        `MONITOR_MONO', ``MONOCHROME=2 '')~/.i3/status-wrapper.py
+        `MONITOR_MONO', ``MONOCHROME=2 '')~/.config/i3/status-wrapper.py
 ifdefn(`HIDPI',, ifdefn(`MONITOR_HIDPI', ``dnl
     font I3BAR_HIDPI_FONT
 ''))dnl
