@@ -12,6 +12,10 @@ define_monitor() {
     printf >> ~/.cache/monitor-utils/defs '%s\t%s\n' "$name" "$properties"
 }
 
+if [ -f "$(dirname "$0")"/define-monitors.sh ]; then
+    . "$(dirname "$0")"/define-monitors.sh
+fi
+
 if command -v hsetroot > /dev/null; then
     setroot=hsetroot
 else
