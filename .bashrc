@@ -218,7 +218,7 @@ if command -v jq > /dev/null; then jq() {
 unset -f xxd
 if command -v xxd > /dev/null; then
     xxd_args=()
-    if xxd -Ralways /dev/null 2>&1 > /dev/null; then
+    if xxd -Ralways /dev/null > /dev/null 2>&1; then
         xxd_args+=(-Ralways)
     fi
     alias xxd_interactive="command xxd ${xxd_args[*]}"
