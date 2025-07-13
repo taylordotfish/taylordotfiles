@@ -73,16 +73,26 @@ bindsym $mod+q focus child
 # switch keyboard layout
 bindsym $mod+$alt+space exec --no-startup-id ~/.xkb/next-layout.sh
 
-set $ws1 1: one
-set $ws2 2: two
-set $ws3 3: three
-set $ws4 4: four
-set $ws5 5: five
-set $ws6 6: six
-set $ws7 7: seven
-set $ws8 8: eight
-set $ws9 9: nine
-set $ws10 10: ten
+define_default(`WS1', `one')dnl
+define_default(`WS2', `two')dnl
+define_default(`WS3', `three')dnl
+define_default(`WS4', `four')dnl
+define_default(`WS5', `five')dnl
+define_default(`WS6', `six')dnl
+define_default(`WS7', `seven')dnl
+define_default(`WS8', `eight')dnl
+define_default(`WS9', `nine')dnl
+define_default(`WS10', `ten')dnl
+set $ws1 1: defn(`WS1')
+set $ws2 2: defn(`WS2')
+set $ws3 3: defn(`WS3')
+set $ws4 4: defn(`WS4')
+set $ws5 5: defn(`WS5')
+set $ws6 6: defn(`WS6')
+set $ws7 7: defn(`WS7')
+set $ws8 8: defn(`WS8')
+set $ws9 9: defn(`WS9')
+set $ws10 10: defn(`WS10')
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -196,9 +206,9 @@ define_default(`DMENU_FONT', ifelse(
 define_default(`DMENU_COLORS',
     ifdefn(`MONOCHROME', ``-nf white -sb white -sf black -nb black''))dnl
 dnl
-font I3_FONT
+font defn(`I3_FONT')
 bindsym $mod+d exec --no-startup-id dmenu_run \
-    -fn "DMENU_FONT"dnl
+    -fn "defn(`DMENU_FONT')"dnl
 ifdefn(`DMENU_COLORS', ` DMENU_COLORS')
 
 # terminal shortcuts
@@ -226,7 +236,7 @@ syscmd(`./bar.sh')dnl
 
 # rename workspace
 bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
-    prompt -f "I3_FONT"
+    prompt -f "defn(`I3_FONT')"
 
 sinclude(`config.post.m4')dnl
 `#' `vim:ft=conf'
