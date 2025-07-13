@@ -5,6 +5,9 @@ unalias -a
 [ -n "${ORIG_PATH+x}" ] || export ORIG_PATH=$PATH
 PATH=$ORIG_PATH
 
+if [ -f ~/.profile.pre.sh ]; then
+    . ~/.profile.pre.sh
+fi
 export GOPATH=~/go
 PATH=$GOPATH/bin:$PATH
 PATH=~/.virtualenv/bin:$PATH
@@ -71,6 +74,10 @@ EOF
 }
 
 alias delayed-exec=delayed_exec
+
+if [ -f ~/.profile.post.sh ]; then
+    . ~/.profile.post.sh
+fi
 
 source_bashrc() {
     unset -f source_bashrc
