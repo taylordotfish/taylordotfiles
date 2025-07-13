@@ -2,6 +2,10 @@
 _bashrc_sourced=1
 
 source ~/.profile || true
+if [ -f ~/.bashrc.pre.sh ]; then
+    source ~/.bashrc.pre.sh
+fi
+
 # Source default .bashrc
 if [ -f /etc/skel/.bashrc ]; then
     skel_term=$TERM
@@ -214,7 +218,7 @@ if command -v jq > /dev/null; then jq() {
 unset -f xxd
 if command -v xxd > /dev/null; then
     xxd_args=()
-    if ! xxd -Ralways /dev/null 2>&1 > /dev/null | grep -q .; then
+    if xxd -Ralways /dev/null 2>&1 > /dev/null; then
         xxd_args+=(-Ralways)
     fi
     alias xxd_interactive="command xxd ${xxd_args[*]}"
@@ -262,4 +266,8 @@ if command -v cargo > /dev/null; then cargo() {
 
 if command -v ds > /dev/null; then
     complete -F _command ds
+fi
+
+if [ -f ~/.bashrc.post.sh ]; then
+    source ~/.bashrc.post.sh
 fi
