@@ -3,6 +3,11 @@
 # License: GNU GPL version 3 or later
 set -euf
 
+if [ -f "$(dirname "$0")"/monitor-utils.sh ]; then
+    . "$(dirname "$0")"/monitor-utils.sh
+fi
+
+old_monitors=$(monitors)
 mkdir -p ~/.cache/monitor-utils
 > ~/.cache/monitor-utils/defs
 
@@ -16,13 +21,18 @@ if [ -f "$(dirname "$0")"/define-monitors.sh ]; then
     . "$(dirname "$0")"/define-monitors.sh
 fi
 
+if [ "$(monitors)" != "$old_monitors" ] && pgrep -x i3 > /dev/null; then
+    ~/.config/i3/generate.sh
+    i3-msg -q reload
+fi
+
 if command -v hsetroot > /dev/null; then
     setroot=hsetroot
 else
     setroot=xsetroot
 fi
 
-if [ -f ~/.fehbg ]; then
+if [ -x ~/.fehbg ]; then
     ~/.fehbg
 elif [ -n "${MONOCHROME-}" ]; then
     "$setroot" -solid '#ffffff'
