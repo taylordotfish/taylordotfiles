@@ -13,11 +13,15 @@ if [ -n "${NOSRVRKEYS-}" ]; then
     set -- "$@" -option srvrkeys:none
 fi
 
+if [ -f "$dir"/rules/source/Makefile ]; then
+    make --quiet -C "$dir"/rules/source
+fi
 setxkbmap "-I$HOME/.xkb" \
-    -rules local \
+    -rules 'local' \
     -option compose:menu \
     -option compose:rwin \
-    -option local \
+    -option compose:ralt \
+    -option 'local' \
     "$@" \
     -layout "$layout" \
     -print > "$dir"/.keymap.xkb

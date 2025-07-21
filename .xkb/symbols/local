@@ -7,4 +7,4 @@ xkb_symbols {
     // Unused Caps Lock key for xcape
     key <I248> { [ Caps_Lock ] };
 };
-# vim:ft=xkb
+// vim:ft=xkb
