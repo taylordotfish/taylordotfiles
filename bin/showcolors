@@ -67,9 +67,14 @@ print_cube_layer() {
         while [ "$c_1" -lt 6 ]; do
             eval "$component_map"
             local color=$((16 + (36 * r) + (6 * g) + b))
-            local light=$((g == 5 ||
-                g == 4 && (r > 0 || b > 1) ||
-                g == 3 && r > 3 && (r > 4 || b > 3)
+            # Colors with CIELAB L* > 75, assuming sRGB with D65 white point.
+            local light=$((
+                color >= 40 && color <= 51 ||
+                color >= 76 && color <= 87 ||
+                color >= 112 && color <= 123 ||
+                color >= 148 && color <= 159 ||
+                color >= 182 && color <= 195 ||
+                color >= 214
             ))
             if [ "$light" -ne 0 ]; then
                 ansi_256_fg 16
