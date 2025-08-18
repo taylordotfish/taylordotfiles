@@ -34,14 +34,14 @@ rm_scr_parts() {
 
 on_exit() {
     local status=$?
-    trap - INT HUP QUIT TERM EXIT
+    trap - HUP INT QUIT TERM EXIT
     if [ -n "${any_scr_parts-}" ]; then
         rm_scr_parts
     fi
     exit "$status"
 }
 
-trap on_exit INT HUP QUIT TERM EXIT
+trap on_exit HUP INT QUIT TERM EXIT
 
 if [ -d "$screenshot_dir" ]; then
     rm_scr_parts
