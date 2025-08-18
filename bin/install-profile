@@ -1,0 +1,16 @@
+#!/bin/sh
+set -euf
+
+usage_error() {
+    printf >&2 '%s\n' "usage: install-profile <profile.icc>"
+    exit 1
+}
+
+[ "$#" -eq 1 ] || usage_error
+case "$1" in
+    *.icc) ;;
+    *) usage_error ;;
+esac
+remove-profile
+pkill -x redshift || true
+dispwin-quiet -I "$1"

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -euf
+
+if [ "$#" -ne 0 ]; then
+    printf >&2 '%s\n' "usage: remove-profile"
+    exit 1
+fi
+
+dispwin-quiet -c
+if xprop -notype -root 8c ':YES\n' _ICC_PROFILE | grep -qFx _ICC_PROFILE:YES
+then
+    dispwin-quiet -U
+fi
