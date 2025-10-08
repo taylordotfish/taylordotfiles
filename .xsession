@@ -9,6 +9,10 @@ prepare_session() {
     if [ -f ~/.xprofile ]; then
         . ~/.xprofile
     fi
+    dbus-update-activation-environment \
+        GDK_SCALE \
+        GDK_DPI_SCALE \
+        QT_SCALE_FACTOR
 }
 
 prepare_desktop() {
