@@ -88,7 +88,7 @@ si() {
 unalias ls 2> /dev/null || true
 ls() {
     if [ -t 1 ]; then
-        set -- -C --color=always "$@"
+        set -- -C --color=always --quoting-style=shell-escape "$@"
     fi
     set -- si command ls -v "$@"
     if [ -t 1 ]; then
