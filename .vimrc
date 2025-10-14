@@ -60,6 +60,7 @@ if s:fancyterm
     au FileType * syntax sync fromstart
 endif
 au FileType markdown,text,gitcommit ResetIndent
+au FileType gitcommit call s:SetTextWidth(72)
 au FileType make,lua TabMode
 au FileType vim set comments+=:\"
 au BufRead,BufNewFile *.h++ set filetype=cpp
