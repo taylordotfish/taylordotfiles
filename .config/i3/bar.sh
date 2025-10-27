@@ -1,10 +1,9 @@
 #!/bin/sh
 set -euf
-. ~/scripts/monitor-utils.sh
 IFS='
 '
 first=1
-for line in $(monitors); do
+for line in $(~/scripts/monitor-utils.sh monitors); do
     [ -n "${first}" ] || printf '\n'
     name=$(printf '%s\n' "$line" | cut -f6)
     priority=$(printf '%s\n' "$line" | cut -f7)
