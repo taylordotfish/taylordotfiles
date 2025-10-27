@@ -1,15 +1,11 @@
 " Copyright (C) 2023, 2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
-set matchpairs+=`:'
-set cpoptions+=%M
-
-let s:startquote = "`"
-let s:endquote = "'"
-let s:modeline_found = 0
+setlocal matchpairs+=`:'
+setlocal cpoptions+=%M
 
 function s:Escape(string)
-    return substitute(a:string, '["\\]', '\\\0', '')
+    return '\V' . substitute(a:string, '["\\]', '\\\0', '')
 endfunction
 
 function s:ChangeQuote(startquote, endquote)
@@ -23,38 +19,43 @@ function s:ChangeQuote(startquote, endquote)
     endif
 endfunction
 
-command -nargs=* M4ChangeQuote call s:ChangeQuote(<f-args>)
+command -nargs=+ M4ChangeQuote call s:ChangeQuote(<f-args>)
 
-function s:ParseLine(n)
+function s:ParseLine(n, state)
     let line = getline(a:n)
     let opts = substitute(line, '.*\<vim-m4:\s*', '', '')
     if opts == line
         return
     endif
-    let s:modeline_found = 1
+    let a:state.modeline_found = 1
     let startquote = substitute(opts, '.*\<startquote=\(\S*\).*', '\1', '')
     if startquote != opts
-        let s:startquote = startquote
+        let a:state.startquote = startquote
     endif
     let endquote = substitute(opts, '.*\<endquote=\(\S*\).*', '\1', '')
     if endquote != opts
-        let s:endquote = endquote
+        let a:state.endquote = endquote
     endif
 endfunction
 
-let s:i = 1
-while s:i <= min([&l:modelines, line("$")])
-    call s:ParseLine(s:i)
-    let s:i += 1
-endwhile
-let s:i = max([s:i, line("$") - &l:modelines + 1])
-while s:i <= line("$")
-    call s:ParseLine(s:i)
-    let s:i += 1
-endwhile
+function s:Init()
+    let l:state = #{startquote: "`", endquote: "'", modeline_found: 0}
+    let l:i = 1
+    while l:i <= min([&modelines, line("$")])
+        call s:ParseLine(l:i, l:state)
+        let l:i += 1
+    endwhile
+    let l:i = max([l:i, line("$") - &modelines + 1])
+    while l:i <= line("$")
+        call s:ParseLine(l:i, l:state)
+        let l:i += 1
+    endwhile
 
-if !s:modeline_found && search('\<changequote(', 'cnw', 0, 500) > 0
-    let s:startquote = ""
-    let s:endquote = ""
-endif
-call s:ChangeQuote(s:startquote, s:endquote)
+    if !l:state.modeline_found && search('\<changequote(', 'cnw', 0, 500) > 0
+        let l:state.startquote = ""
+        let l:state.endquote = ""
+    endif
+    call s:ChangeQuote(l:state.startquote, l:state.endquote)
+endfunction
+
+call s:Init()
