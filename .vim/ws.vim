@@ -57,12 +57,12 @@ function s:TabMode()
     call s:ClearWsMode()
     set noexpandtab softtabstop=0
     if g:lang_utf8
-        let spacechar="·"
+        let l:spacechar="·"
     else
-        let spacechar="`"
+        let l:spacechar="`"
     endif
-    let l:lc_normal = "trail:" . spacechar
-    execute 'setlocal listchars+=tab:\ \ ,lead:' . spacechar . ","
+    let l:lc_normal = "trail:" . l:spacechar
+    execute 'setlocal listchars+=tab:\ \ ,lead:' . l:spacechar . ","
         \ . l:lc_normal
     let b:ws_state.lc_normal = l:lc_normal
     if g:fancyterm
@@ -80,13 +80,13 @@ function s:SpaceMode()
     execute "setlocal expandtab softtabstop=" . s:indent
     let b:ws_state.lc_normal = ""
     if !g:lang_utf8
-        let tabchars='\|-\|'
+        let l:tabchars='\|-\|'
     elseif $HEAVY_BLOCKS != ""
-        let tabchars="┣━┫"
+        let l:tabchars="┣━┫"
     else
-        let tabchars="├─┤"
+        let l:tabchars="├─┤"
     endif
-    execute "setlocal listchars+=tab:" . tabchars
+    execute "setlocal listchars+=tab:" . l:tabchars
     if g:fancyterm
         let l:ws_ids = b:ws_state.ws_ids
         call add(l:ws_ids, matchadd("Ws", '\t', -2))

@@ -9,12 +9,12 @@ function s:Escape(string)
 endfunction
 
 function s:ChangeQuote(startquote, endquote)
-    let startquote = s:Escape(a:startquote)
-    let endquote = s:Escape(a:endquote)
+    let l:startquote = s:Escape(a:startquote)
+    let l:endquote = s:Escape(a:endquote)
     syn clear m4String
-    if startquote != "" && endquote != ""
-        execute 'syn region m4String start="' . startquote . '" end="'
-            \ . endquote . '" contains=m4Constants,m4Special,m4Variable,'
+    if l:startquote != "" && l:endquote != ""
+        execute 'syn region m4String start="' . l:startquote . '" end="'
+            \ . l:endquote . '" contains=m4Constants,m4Special,m4Variable,'
             \ . 'm4Command,m4Statement,m4Function,m4String'
     endif
 endfunction
@@ -22,19 +22,19 @@ endfunction
 command -nargs=+ M4ChangeQuote call s:ChangeQuote(<f-args>)
 
 function s:ParseLine(n, state)
-    let line = getline(a:n)
-    let opts = substitute(line, '.*\<vim-m4:\s*', '', '')
-    if opts == line
+    let l:line = getline(a:n)
+    let l:opts = substitute(l:line, '.*\<vim-m4:\s*', '', '')
+    if l:opts == l:line
         return
     endif
     let a:state.modeline_found = 1
-    let startquote = substitute(opts, '.*\<startquote=\(\S*\).*', '\1', '')
-    if startquote != opts
-        let a:state.startquote = startquote
+    let l:startquote = substitute(l:opts, '.*\<startquote=\(\S*\).*', '\1', '')
+    if l:startquote != l:opts
+        let a:state.startquote = l:startquote
     endif
-    let endquote = substitute(opts, '.*\<endquote=\(\S*\).*', '\1', '')
-    if endquote != opts
-        let a:state.endquote = endquote
+    let l:endquote = substitute(l:opts, '.*\<endquote=\(\S*\).*', '\1', '')
+    if l:endquote != l:opts
+        let a:state.endquote = l:endquote
     endif
 endfunction
 
