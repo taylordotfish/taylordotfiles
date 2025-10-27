@@ -1,3 +1,4 @@
+" ws.vim: whitespace/indent configuration
 " Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
