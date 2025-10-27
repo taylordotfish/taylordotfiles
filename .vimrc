@@ -1,24 +1,10 @@
 " Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
-let s:fancyterm = $TERM !~ '^vt'
-let s:is_utf8 = $LANG =~ '[Uu][Tt][Ff]-\?8$'
-let s:is_latin1 = $LANG =~ '[Ii][Ss][Oo]-\?8859-\?1$'
+let g:fancyterm = $TERM !~ '^vt'
+let g:lang_utf8 = $LANG =~? 'UTF-\?8$'
+let g:lang_latin1 = $LANG =~? 'ISO-\?8859-\?1$'
 
-function s:SetIndentWidth(width)
-    let s:indent = a:width
-    execute "set shiftwidth=" . s:indent
-    execute "set softtabstop=" . s:indent
-    execute "set tabstop=" . s:indent
-endfunction
-
-function s:SetTextWidth(width)
-    execute "set textwidth=" . a:width
-    execute "set colorcolumn=" . (a:width + 1)
-endfunction
-
-call s:SetIndentWidth(4)
-call s:SetTextWidth(79)
 set autoindent
 set cinoptions=(1s
 set expandtab
@@ -38,131 +24,40 @@ set comments-=mb:*
 set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
 set modeline
-if s:fancyterm
+if g:fancyterm
     set background=dark
     set t_Co=256
     set cursorline
     set ttimeoutlen=0
 endif
-if s:is_latin1
+if g:lang_latin1
     set encoding=utf-8
     set termencoding=latin1
 endif
 
 filetype indent on
-if s:fancyterm
+if g:fancyterm
     syntax on
     colorscheme bluegreen
 endif
 
-au FileType * call s:SetDefaultIndent()
-if s:fancyterm
+if g:fancyterm
     au FileType * syntax sync fromstart
 endif
-au FileType markdown,text,gitcommit ResetIndent
-au FileType gitcommit call s:SetTextWidth(72)
-au FileType make,lua TabMode
 au FileType vim set comments+=:\"
 au BufRead,BufNewFile *.h++ set filetype=cpp
 
-function s:SetDefaultIndent()
-    if &l:indentexpr == ""
-        UseCIndent
-    endif
-endfunction
-
-command ResetIndent set indentexpr=
-command UseCIndent set indentexpr=s:GetCIndent()
-
-nnoremap <Space> :noh<CR>
+nnoremap <Space> :noh\|echo<CR>
 inoremap # <Space><Backspace>#
-noremap YY :w! ~/.vimclip<CR>
-noremap Yp :read ~/.vimclip<CR>
-noremap YP O<Esc>:read ~/.vimclip<CR>kdd
+vnoremap YY :w! ~/.vimclip<CR>
+vnoremap Yd :w! ~/.vimclip<CR>gvd
+nnoremap Yp :read ~/.vimclip<CR>
+nnoremap YP :execute (line(".") - 1) . "read ~/.vimclip"<CR>
 
 " For monochrome displays
-if s:fancyterm && $MONOCHROME != ""
+if g:fancyterm && $MONOCHROME != ""
     hi MatchParen ctermfg=none ctermbg=none cterm=underline
 endif
 
-if s:fancyterm
-    " Highlight trailing space
-    hi Ws ctermfg=243 cterm=none
-    function s:HiTrailingWs()
-        hi TrailingWs ctermfg=40 ctermbg=none cterm=reverse
-    endfunction
-    au InsertEnter * hi clear TrailingWs
-    au InsertLeave * call s:HiTrailingWs()
-    call s:HiTrailingWs()
-    call matchadd("TrailingWs", '\s\+$', -1)
-endif
-
-au InsertEnter * execute "set listchars-=" . s:lc_normal
-au InsertLeave * execute "set listchars+=" . s:lc_normal
-
-" For files primarily indented with tabs
-function s:TabMode()
-    call s:ClearWsMode()
-    set noexpandtab softtabstop=0
-    if s:is_utf8
-        let spacechar="·"
-    else
-        let spacechar="`"
-    endif
-    let s:lc_normal = "trail:" . spacechar
-    execute 'set listchars+=tab:\ \ ,lead:' . spacechar . "," . s:lc_normal
-    if s:fancyterm
-        call add(s:ws_ids, matchadd("Ws", '\(^\s*\)\@<= ', -2))
-        call add(s:ws_ids, matchadd("Ws", ' \ze\s*$', -2))
-        call add(s:ws_ids, matchadd("TrailingWs", '\(\S.*\)\@<=\t', -1))
-    endif
-endfunction
-command TabMode call s:TabMode()
-
-" For files primarily indented with spaces
-function s:SpaceMode()
-    call s:ClearWsMode()
-    execute "set expandtab softtabstop=" . s:indent
-    let s:lc_normal = ""
-    if !s:is_utf8
-        let tabchars='\|-\|'
-    elseif $HEAVY_BLOCKS != ""
-        let tabchars="┣━┫"
-    else
-        let tabchars="├─┤"
-    endif
-    execute "set listchars+=tab:" . tabchars
-    if s:fancyterm
-        call add(s:ws_ids, matchadd("Ws", '\t', -2))
-    endif
-endfunction
-command SpaceMode call s:SpaceMode()
-
-let s:ws_ids = []
-function s:ClearWsMode()
-    set listchars=extends:$,precedes:$
-    for id in s:ws_ids
-        call matchdelete(id)
-    endfor
-    let s:ws_ids = []
-endfunction
-SpaceMode
-
-function s:GetCIndent()
-    let l1 = prevnonblank(v:lnum - 1)
-    if l1 == 0
-        return 0
-    endif
-    let l2 = prevnonblank(l1 - 1)
-    if getline(l1) !~ '\\$'
-        return cindent(v:lnum)
-    endif
-    if getline(l2) =~ '\\$'
-        return indent(l1)
-    endif
-    return indent(l1) + &shiftwidth
-endfunction
-
-let g:python_indent = {}
-let g:python_indent.open_paren = s:indent
-let g:python_indent.continue = s:indent
+" Whitespace/indent configuration
+so ~/.vim/ws.vim
