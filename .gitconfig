@@ -7,3 +7,5 @@
 [user]
 [advice]
     diverging = false
+[tag]
+    sort = version:refname
