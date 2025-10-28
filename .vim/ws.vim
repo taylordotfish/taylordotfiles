@@ -15,14 +15,14 @@ au FileType markdown,text,gitcommit let s:ft_indent = 0
 let g:python_indent = #{open_paren: s:indent, continue: s:indent}
 
 function s:SetIndent(amount)
-    execute "setlocal shiftwidth=" . a:amount
-    execute "setlocal softtabstop=" . a:amount
-    execute "setlocal tabstop=" . a:amount
+    let &l:shiftwidth = a:amount
+    let &l:softtabstop = a:amount
+    let &l:tabstop = a:amount
 endfunction
 
 function s:SetTextWidth(width)
-    execute "set textwidth=" . a:width
-    execute "set colorcolumn=" . (a:width + 1)
+    let &l:textwidth = a:width
+    let &l:colorcolumn = a:width + 1
 endfunction
 
 function s:SetFtIndent()
@@ -56,7 +56,7 @@ command UseCIndent setlocal indentexpr=s:GetCIndent()
 function s:TabMode()
     call s:ClearWsMode()
     set noexpandtab softtabstop=0
-    if g:lang_utf8
+    if g:term_encoding == "utf8"
         let l:spacechar="·"
     else
         let l:spacechar="`"
@@ -77,9 +77,10 @@ command TabMode call s:TabMode()
 " For files primarily indented with spaces
 function s:SpaceMode()
     call s:ClearWsMode()
-    execute "setlocal expandtab softtabstop=" . s:indent
+    let &l:expandtab = 1
+    let &l:softtabstop = s:indent
     let b:ws_state.lc_normal = ""
-    if !g:lang_utf8
+    if !g:term_encoding == "utf8"
         let l:tabchars='\|-\|'
     elseif $HEAVY_BLOCKS != ""
         let l:tabchars="┣━┫"

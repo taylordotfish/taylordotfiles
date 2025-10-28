@@ -2,8 +2,13 @@
 " License: GNU GPL version 3 or later
 
 let g:fancyterm = $TERM !~ '^vt'
-let g:lang_utf8 = $LANG =~? 'UTF-\?8$'
-let g:lang_latin1 = $LANG =~? 'ISO-\?8859-\?1$'
+if $LANG =~? 'UTF-\?8$'
+    let g:term_encoding = "utf8"
+elseif $LANG =~? 'ISO-\?8859-\?1$'
+    let g:term_encoding = "latin1"
+else
+    let g:term_encoding = "unknown"
+endif
 
 set autoindent
 set cinoptions=(1s
@@ -30,7 +35,7 @@ if g:fancyterm
     set cursorline
     set ttimeoutlen=0
 endif
-if g:lang_latin1
+if g:term_encoding == "latin1"
     set encoding=utf-8
     set termencoding=latin1
 endif
