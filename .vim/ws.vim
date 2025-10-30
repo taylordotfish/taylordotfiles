@@ -55,7 +55,7 @@ command UseCIndent setlocal indentexpr=s:GetCIndent()
 " For files primarily indented with tabs
 function s:TabMode()
     call s:ClearWsMode()
-    set noexpandtab softtabstop=0
+    setlocal noexpandtab softtabstop=0
     if g:term_encoding == "utf8"
         let l:spacechar="·"
     else
@@ -96,12 +96,15 @@ endfunction
 command SpaceMode call s:SpaceMode()
 
 function s:ClearWsMode()
-    set listchars=extends:$,precedes:$
+    setlocal listchars=extends:$,precedes:$
     for id in b:ws_state.ws_ids
         call matchdelete(id)
     endfor
     let b:ws_state.ws_ids = []
 endfunction
+
+au InsertEnter * execute "setlocal listchars-=" . b:ws_state.lc_normal
+au InsertLeave * execute "setlocal listchars+=" . b:ws_state.lc_normal
 
 if g:fancyterm
     " Highlight trailing space
@@ -135,20 +138,28 @@ function s:Refresh()
     call s:SetDefaults()
 endfunction
 
-au InsertEnter * execute "setlocal listchars-=" . b:ws_state.lc_normal
-au InsertLeave * execute "setlocal listchars+=" . b:ws_state.lc_normal
+function s:IsInitialized()
+    return exists("b:ws_state.mode")
+endfunction
 
 function s:OnBufEnter()
-    if !exists("b:ws_state")
+    if !s:IsInitialized()
         call s:Init()
     endif
 endfunction
 
 function s:OnFileType()
-    if exists("b:ws_state") && b:ws_state.ft != &ft
+    if s:IsInitialized() && b:ws_state.ft != &ft
         call s:Refresh()
+    endif
+endfunction
+
+function s:OnBufUnload()
+    if bufnr() == expand("<abuf>")
+        let b:ws_state = v:null
     endif
 endfunction
 
 au BufEnter * call s:OnBufEnter()
 au FileType * call s:OnFileType()
+au BufUnload * call s:OnBufUnload()
