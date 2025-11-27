@@ -2,17 +2,22 @@
 " Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
+let s:default_indent = 4
+let s:default_width = 79
+
 function s:SetDefaults()
-    let s:indent = 4
-    let s:textwidth = 79
-    let s:mode = "space"
-    let s:ft_indent = 1 " Whether to use filetype-based indenting
+    let s:mode = "space"  " 'space' or 'tab'
+    let s:ft_indent = 0  " Whether to use filetype-based indenting
 endfunction
 call s:SetDefaults()
 
+au FileType * let s:ft_indent = 1
 au FileType make,lua let s:mode = "tab"
 au FileType markdown,text,gitcommit let s:ft_indent = 0
-let g:python_indent = #{open_paren: s:indent, continue: s:indent}
+let g:python_indent = #{
+    \ open_paren: s:default_indent,
+    \ continue: s:default_indent,
+\ }
 
 function s:SetIndent(amount)
     let &l:shiftwidth = a:amount
@@ -25,7 +30,13 @@ function s:SetTextWidth(width)
     let &l:colorcolumn = a:width + 1
 endfunction
 
-function s:SetFtIndent()
+let &shiftwidth = s:default_indent
+let &softtabstop = s:default_indent
+let &tabstop = s:default_indent
+let &textwidth = s:default_width
+let &colorcolumn = s:default_width + 1
+
+function s:ApplyFtIndent()
     if !s:ft_indent
         ResetIndent
     elseif &indentexpr == ""
@@ -49,6 +60,8 @@ function s:GetCIndent()
     return indent(l:line) + &shiftwidth
 endfunction
 
+command -nargs=1 SetIndent call s:SetIndent(<f-args>)
+command -nargs=1 SetTextWidth call s:SetTextWidth(<f-args>)
 command ResetIndent setlocal indentexpr=
 command UseCIndent setlocal indentexpr=s:GetCIndent()
 
@@ -78,7 +91,9 @@ command TabMode call s:TabMode()
 function s:SpaceMode()
     call s:ClearWsMode()
     let &l:expandtab = 1
-    let &l:softtabstop = s:indent
+    if &softtabstop == 0
+        let &l:softtabstop = &shiftwidth
+    endif
     let b:ws_state.lc_normal = ""
     if !g:term_encoding == "utf8"
         let l:tabchars='\|-\|'
@@ -127,9 +142,7 @@ endfunction
 
 function s:Refresh()
     let b:ws_state.ft = &ft
-    call s:SetIndent(s:indent)
-    call s:SetTextWidth(s:textwidth)
-    call s:SetFtIndent()
+    call s:ApplyFtIndent()
     if s:mode == "tab"
         TabMode
     else
@@ -139,7 +152,7 @@ function s:Refresh()
 endfunction
 
 function s:IsInitialized()
-    return exists("b:ws_state.mode")
+    return exists("b:ws_state.ft")
 endfunction
 
 function s:OnBufEnter()
