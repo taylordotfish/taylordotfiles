@@ -66,3 +66,6 @@ endif
 
 " Whitespace/indent configuration
 so ~/.vim/ws.vim
+
+" Better % behavior
+packadd! matchit
