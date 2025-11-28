@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2024-2025 taylor.fish <contact@taylor.fish>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from dataclasses import dataclass
-from typing import assert_never, Optional
+from typing import assert_type, Optional, Self
 import bisect
 import fcntl
 import json
@@ -44,6 +44,7 @@ import itertools
 import os
 import re
 import select
+import subprocess
 import sys
 import time
 
@@ -57,6 +58,43 @@ DurationMs = int
 UPDATE_INTERVAL: DurationMs = 50
 UI_PRECISION: DurationMs = 100
 BLINK_INTERVAL: DurationMs = 500
+STANDARD_DPI = 96
+
+
+def scale(px: int, dpi: int) -> int:
+    # Try to avoid division operations by handling common cases.
+    if dpi == STANDARD_DPI:
+        return px
+    if dpi == STANDARD_DPI * 2:
+        return px * 2
+    return (px * dpi + (STANDARD_DPI // 2)) // STANDARD_DPI
+
+
+@dataclass
+class SystemInfo:
+    dpi: int
+
+    @classmethod
+    def _make(cls) -> Self:
+        dpi_str = subprocess.run(
+            r"xrdb -query | grep '^Xft\.dpi:' | cut -f2",
+            shell=True,
+            stdout=subprocess.PIPE,
+            check=True,
+        ).stdout
+        try:
+            dpi = int(dpi_str)
+        except ValueError:
+            dpi = STANDARD_DPI
+        return cls(dpi)
+
+    _instance: Optional["SystemInfo"] = None
+
+    @classmethod
+    def get(cls) -> "SystemInfo":
+        if cls._instance is None:
+            cls._instance = cls._make()
+        return cls._instance
 
 
 def monotonic_ms() -> InstantMs:
@@ -261,8 +299,7 @@ class Timer:
                 padding=0,
                 color="#000000",
             )
-        if not isinstance(self._countdown, RunningCountdown):
-            assert_never(self._countdown)
+        assert_type(self._countdown, RunningCountdown)
 
         remaining = self._countdown.end - now
         if remaining <= 0:
@@ -298,7 +335,7 @@ class Timer:
         }
         if data.padding is None:
             block["background"] = data.color
-            block["min_width"] = WIDTH
+            block["min_width"] = scale(WIDTH, SystemInfo.get().dpi)
             block["align"] = "center"
             right_width = 0
         else:
