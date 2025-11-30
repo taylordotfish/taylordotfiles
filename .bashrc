@@ -27,10 +27,11 @@ export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
 export NODE_PATH=~/.local/lib/node_modules
 export LC_COLLATE=C
 
-alias grep="grep --color"
+alias grep="grep --color=auto"
 alias rm="rm -I"
 alias mv="mv -i"
 alias cp="cp -i"
+alias less="less -F --redraw-on-quit"
 if command -v git > /dev/null; then
     alias git="FILTER_BRANCH_SQUELCH_WARNING=1 git"
 fi
@@ -46,19 +47,10 @@ fi
 if command -v mail > /dev/null; then
     alias mail="MBOX=~/Documents/mbox mail"
 fi
-less_args=(-F)
-if ! less --version | awk '{
-    for (i = 1; i <= NF; ++i)
-        if ($(i) ~ /^[0-9]+$/)
-            exit $2 < 608 ? 0 : 1
-}'; then
-    less_args+=(--redraw-on-quit)
-fi
-alias less="less ${less_args[*]}"
-unset less_args
 
 # Replaces `-h` with `--si`.
 si() {
+    [ "$#" -gt 0 ] || return 1
     local cmd=$1
     shift
     local done=
@@ -85,22 +77,23 @@ si() {
     "$cmd" "$@"
 }
 
-unalias ls 2> /dev/null || true
-ls() {
+alias ls="si ls --color=auto"
+alias du="si du"
+alias df="si df"
+alias free="si free"
+
+# Paged version of `ls`.
+lsp() {
     if [ -t 1 ]; then
         set -- -C --color=always --quoting-style=shell-escape "$@"
     fi
-    set -- si command ls -v "$@"
+    set -- si ls -v "$@"
     if [ -t 1 ]; then
         COLUMNS=$(tput cols) "$@" | less -R
     else
         "$@"
     fi
 }
-
-alias du="si du"
-alias df="si df"
-alias free="si free"
 
 _run_gcc_like() {
     local bin=$1
@@ -216,24 +209,13 @@ if command -v jq > /dev/null; then jq() {
 } fi
 
 unset -f xxd
-if command -v xxd > /dev/null; then
-    xxd_args=()
-    if xxd -Ralways /dev/null > /dev/null 2>&1; then
-        xxd_args+=(-Ralways)
+if command -v xxd > /dev/null; then xxd() {
+    if [ -t 1 ] && ! { [ -t 0 ] && [ "$#" -eq 0 ]; }; then
+        command xxd -Ralways "$@" | less -R
+    else
+        command xxd "$@"
     fi
-    alias xxd_interactive="command xxd ${xxd_args[*]}"
-    unset xxd_args
-fi
-if alias xxd_interactive >& /dev/null; then
-    xxd() {
-        if [ -t 1 ] && ! { [ -t 0 ] && [ "$#" -eq 0 ]; }; then
-            xxd_interactive "$@" | less -R
-        else
-            command xxd "$@"
-        fi
-    }
-    unalias xxd_interactive
-fi
+} fi
 
 unset -f cargo
 if command -v cargo > /dev/null; then cargo() {
