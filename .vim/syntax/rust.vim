@@ -222,7 +222,7 @@ syn match     rustOperator     display "\%(+\|-\|/\|*\|=\|\^\|&\||\|!\|>\|<\|%\)
 " here should make no difference.
 syn match     rustOperator     display "&&\|||"
 " This one depends on consistent use of whitespace after binary-and and
-" boolean-and operators, and not after reference-of operators.
+" boolean-and operators, and not after borrow operators.
 syn match     rustSigil        display /[&*]\+[^&*)= \t]\@=/
 " This is rustArrowCharacter rather than rustArrow for the sake of matchparen,
 " so it skips the ->; see http://stackoverflow.com/a/30309949 for details.
