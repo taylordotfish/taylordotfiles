@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     Rust
 " Maintainer:   taylor.fish <contact@taylor.fish>
-" Last Change:  2026-01-23
+" Last Change:  2026-01-25
 " Repository:   https://codeberg.org/taylordotfish/rust.vim
 " License:      MIT OR APACHE-2.0
 
@@ -214,12 +214,16 @@ syn match     rustFuncCall    "\<\%(r#\)\?\K\k*\ze\s*::\s*<\%([^<>{}]*\%(<[^<>{}
 "syn match     rustCapsIdent    display "[[:upper:]]\k\+"
 
 syn match     rustOperator     display "\%(+\|-\|/\|*\|=\|\^\|&\||\|!\|>\|<\|%\)=\?"
-" This one isn't *quite* right, as we could have binary-& with a reference
-syn match     rustSigil        display /&\s\+[&~@*][^)= \t\r\n]/he=e-1,me=e-1
-syn match     rustSigil        display /[&~@*][^)= \t\r\n]/he=e-1,me=e-1
-" This isn't actually correct; a closure with no arguments can be `|| { }`.
-" Last, because the & in && isn't a sigil
+" This pattern matches boolean-and and -or operators. Note that if there is no
+" whitespace after `&&`, the rule for rustSigil below will take precedence.
+" Also note that this matches the first part of closures with no arguments
+" (|| {}), but given that in closures with arguments (|x| {}), the rule above
+" matches the `|` characters as rustOperator, matching `||` as rustOperator
+" here should make no difference.
 syn match     rustOperator     display "&&\|||"
+" This one depends on consistent use of whitespace after binary-and and
+" boolean-and operators, and not after reference-of operators.
+syn match     rustSigil        display /[&*]\+[^&*)= \t]\@=/
 " This is rustArrowCharacter rather than rustArrow for the sake of matchparen,
 " so it skips the ->; see http://stackoverflow.com/a/30309949 for details.
 syn match     rustArrowCharacter display "->"
