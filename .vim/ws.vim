@@ -1,47 +1,20 @@
 " ws.vim: whitespace/indent configuration
-" Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
+" Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
-let s:default_indent = 4
-let s:default_width = 79
+" FileType autocommands can set these variables:
+" - g:ws_config.mode: 'space' or 'tab'
+" - g:ws_config.ft_indent: whether to use filetype-based indenting
+" By default, `mode` is 'space' and `ft_indent` is 1.
 
 function s:SetDefaults()
-    let s:mode = "space"  " 'space' or 'tab'
-    let s:ft_indent = 0  " Whether to use filetype-based indenting
+    let g:ws_config = #{mode: "space", ft_indent: 1}
 endfunction
 call s:SetDefaults()
 
-au FileType * let s:ft_indent = 1
-au FileType make,lua let s:mode = "tab"
-au FileType markdown,text,gitcommit let s:ft_indent = 0
-let g:python_indent = #{
-    \ open_paren: s:default_indent,
-    \ continue: s:default_indent,
-\ }
-
 function s:SetIndent(amount)
     let &l:shiftwidth = a:amount
-    let &l:softtabstop = a:amount
     let &l:tabstop = a:amount
-endfunction
-
-function s:SetTextWidth(width)
-    let &l:textwidth = a:width
-    let &l:colorcolumn = a:width + 1
-endfunction
-
-let &shiftwidth = s:default_indent
-let &softtabstop = s:default_indent
-let &tabstop = s:default_indent
-let &textwidth = s:default_width
-let &colorcolumn = s:default_width + 1
-
-function s:ApplyFtIndent()
-    if !s:ft_indent
-        ResetIndent
-    elseif &indentexpr == ""
-        UseCIndent
-    endif
 endfunction
 
 function s:GetCIndent()
@@ -61,7 +34,6 @@ function s:GetCIndent()
 endfunction
 
 command -nargs=1 SetIndent call s:SetIndent(<f-args>)
-command -nargs=1 SetTextWidth call s:SetTextWidth(<f-args>)
 command ResetIndent setlocal indentexpr=
 command UseCIndent setlocal indentexpr=s:GetCIndent()
 
@@ -112,8 +84,8 @@ command SpaceMode call s:SpaceMode()
 
 function s:ClearWsMode()
     setlocal listchars=extends:$,precedes:$
-    for id in b:ws_state.ws_ids
-        call matchdelete(id)
+    for l:id in b:ws_state.ws_ids
+        call matchdelete(l:id)
     endfor
     let b:ws_state.ws_ids = []
 endfunction
@@ -142,8 +114,17 @@ endfunction
 
 function s:Refresh()
     let b:ws_state.ft = &ft
-    call s:ApplyFtIndent()
-    if s:mode == "tab"
+    if &ft == "" || !g:ws_config.ft_indent
+        ResetIndent
+    elseif &indentexpr == ""
+        UseCIndent
+    endif
+    if &ft == "help"
+        setlocal nolist
+    else
+        setlocal list
+    endif
+    if g:ws_config.mode == "tab"
         TabMode
     else
         SpaceMode

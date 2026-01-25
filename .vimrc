@@ -1,4 +1,4 @@
-" Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
+" Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
 let g:fancyterm = $TERM !~ '^vt'
@@ -12,6 +12,11 @@ endif
 
 set autoindent
 set cinoptions=(1s
+set textwidth=79
+set colorcolumn=+1
+set shiftwidth=4
+let &tabstop=&shiftwidth
+set softtabstop=-1
 set expandtab
 set number
 set nowrap
@@ -23,12 +28,14 @@ set viminfo='100,<2000,s2000,h
 set nojoinspaces
 set laststatus=2
 set hlsearch
-set wrapmargin=0
 set comments-=://
 set comments-=mb:*
 set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
 set modeline
+set cinkeys-=0#
+set indentkeys-=0#
+
 if g:fancyterm
     set background=dark
     set t_Co=256
@@ -40,20 +47,23 @@ if g:term_encoding == "latin1"
     set termencoding=latin1
 endif
 
+let g:rust_edition = "latest"
+"let g:rust_highlight_doc_code = 0
 filetype indent on
 if g:fancyterm
     syntax on
     colorscheme bluegreen
-endif
-
-if g:fancyterm
     au FileType * syntax sync fromstart
 endif
-au FileType vim set comments+=:\"
+
+au FileType vim setlocal comments+=:\" indentkeys-=0\\
 au BufRead,BufNewFile *.h++ set filetype=cpp
+au FileType make,lua let g:ws_config.mode = "tab"
+au FileType markdown,text,gitcommit let g:ws_config.ft_indent = 0
+au FileType gitcommit setlocal textwidth=72
+let g:python_indent = #{open_paren: &shiftwidth, continue: &shiftwidth}
 
 nnoremap <Space> :noh\|echo<CR>
-inoremap # <Space><Backspace>#
 vnoremap YY :w! ~/.vimclip<CR>
 vnoremap Yd :w! ~/.vimclip<CR>gvd
 nnoremap Yp :read ~/.vimclip<CR>
@@ -63,9 +73,5 @@ nnoremap YP :execute (line(".") - 1) . "read ~/.vimclip"<CR>
 if g:fancyterm && $MONOCHROME != ""
     hi MatchParen ctermfg=none ctermbg=none cterm=underline
 endif
-
-" Whitespace/indent configuration
-so ~/.vim/ws.vim
-
-" Better % behavior
-packadd! matchit
+so ~/.vim/ws.vim  " Whitespace/indent configuration
+packadd! matchit  " Better % behavior
