@@ -3,7 +3,7 @@
 " Maintainer:   taylor.fish <contact@taylor.fish>
 " Last Change:  2026-01-25
 " Repository:   https://codeberg.org/taylordotfish/rust.vim
-" License:      MIT OR APACHE-2.0
+" License:      MIT OR Apache-2.0
 
 " Modified from https://github.com/rust-lang/rust.vim (file 'syntax/rust.vim')
 
