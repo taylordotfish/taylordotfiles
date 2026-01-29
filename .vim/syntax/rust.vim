@@ -1,8 +1,9 @@
 " Vim syntax file
 " Language:     Rust
 " Maintainer:   taylor.fish <contact@taylor.fish>
-" Last Change:  2026-01-25
+" Last Change:  2026-01-28
 " Repository:   https://codeberg.org/taylordotfish/rust.vim
+" Repository:   https://github.com/taylordotfish/rust.vim
 " License:      MIT OR Apache-2.0
 
 " Modified from https://github.com/rust-lang/rust.vim (file 'syntax/rust.vim')
@@ -15,21 +16,21 @@
 " Last Change:  2023-09-11
 " For bugs, patches and license go to https://github.com/rust-lang/rust.vim
 
-" If g:rust_edition is defined, syntax highlighting will be adjusted to be most
-" appropriate for the chosen edition. The variable should be set to the integer
-" edition year, as in `let g:rust_edition = 2021`. It can also be set to
-" 'latest' to use the latest edition supported by this file (2024).
+" Options: Behavior can be customized by setting these variables before the
+" syntax file is loaded:
 "
-" If g:rust_edition is not set, or is set to 0 or 'unknown', heuristics will be
-" used to try to guess how edition-dependent syntax should be highlighted, but
-" this is not perfect.
+" "g:rust_edition" adjusts syntax highlighting to be most appropriate for the
+" chosen edition. The variable can be:
 "
-" If g:rust_highlight_doc_code is set to a falsy value like 0, syntax
-" highlighting will not be applied to code blocks in doc comments.
+"   - a number (e.g., 2021), to use that edition's rules
+"   - the string 'latest' to use the latest supported edition (2024)
+"   - undefined, 0, or 'unknown' to use heuristics to guess how
+"     edition-dependent syntax should be highlighted (default)
 "
-" These variables should be set before the syntax file is loaded; i.e., before
-" `syntax on`. If modified, `syn off | syn on` is required for the changes to
-" take effect.
+" "g:rust_highlight_doc_code" controls whether code blocks in doc comments
+" should be highlighted as Rust code. If set to 0 or any other falsy value,
+" code blocks will not be highlighted. Otherwise, if truthy or undefined, they
+" will be.
 
 if version < 600
     syntax clear
@@ -45,6 +46,29 @@ else
     let s:edition = +g:rust_edition
 endif
 
+let s:highlight_doc_code = !!get(g:, "rust_highlight_doc_code", 1)
+let s:enable_multi = s:highlight_doc_code && v:version >= 802
+
+function s:AddMulti(args)
+    let l:cmd = join(a:args, ' ')
+    if len(a:args) > 3 && a:args[0] =~# '^sy\%[ntax]$'
+        call add(s:multi_groups, [l:cmd, a:args[1], a:args[2]])
+    else
+        echoerr 'invalid arguments to RustMulti: ' . l:cmd
+    endif
+endfunction
+
+" `RustMulti` is for use with syntax groups that can span multiple lines. It
+" generates alternative groups that ignore doc comment characters (/// and *)
+" at the start of each line, in order to highlight code blocks in doc comments
+" properly. Also see the `s:Embed` function later in this file.
+if s:enable_multi
+    let s:multi_groups = []
+    command! -nargs=* RustMulti <args> | call s:AddMulti([<f-args>])
+else
+    command! -nargs=* RustMulti <args>
+endif
+
 " Syntax definitions {{{1
 " Basic keywords {{{2
 syn keyword   rustConditional match if else
@@ -54,14 +78,14 @@ syn keyword   rustRepeat for
 " Highlight `for` keyword in `impl ... for ... {}` statement.
 syn match     rustImpl /\<impl\>/ nextgroup=rustImplGenerics,rustImplPath skipwhite skipempty
 syn match     rustImplPath /\%(::\)\?\s*\K\k*\%(\s*\%(::\)\s*\K\k*\)*/ contained contains=TOP nextgroup=rustImplGenerics,rustImplFor skipwhite skipempty
-syn match     rustImplGenerics /\%(::\)\?</ contained contains=rustModPathSep,rustGenerics nextgroup=rustImplFor skipwhite skipempty
-syn keyword   rustImplFor for contained
+syn match     rustImplGenerics /\%(::\)\?\s*</ contained contains=rustModPathSep,rustGenerics nextgroup=rustImplPath,rustImplFor skipwhite skipempty
+syn match     rustImplFor /\s*\<for\>/hs=e-2 contained
 
 syn keyword   rustRepeat in
 syn keyword   rustTypedef type nextgroup=rustIdentifier skipwhite skipempty
 syn keyword   rustStructure struct nextgroup=rustIdentifier skipwhite skipempty
 syn keyword   rustStructure enum nextgroup=rustIdentifier skipwhite skipempty contained
-syn region    rustEnumDecl start=/\<enum\>/ end=/\ze[;{]/ contains=@rustTop,rustStructure,rustGenerics nextgroup=rustEnumBody
+RustMulti syn region rustEnumDecl start=/\<enum\>/ end=/\ze[;{]/ contains=@rustTop,rustStructure,rustGenerics nextgroup=rustEnumBody
 syn keyword   rustUnion union nextgroup=rustIdentifier skipwhite skipempty contained
 syn match     rustUnionContextual /\<union\_s*\%(\_s\K\|\%$\)/ transparent contains=rustUnion
 syn keyword   rustKeyword     as
@@ -134,7 +158,7 @@ syn keyword   rustObsoleteExternMod mod contained nextgroup=rustIdentifier skipw
 syn match     rustIdentifier  "\K\k*" display contained contains=@rustKeyword
 syn match     rustFuncName    "\%(r#\)\=\K\k*" display contained contains=@rustKeyword
 
-syn region rustMacroRepeat matchgroup=rustMacroRepeatDelimiters start="$(" end="),\=[*+?]" contains=TOP
+RustMulti syn region rustMacroRepeat matchgroup=rustMacroRepeatDelimiters start="$(" end="),\=[*+?]" contains=TOP
 syn match rustMacroVariable "$\K\k*"
 syn match rustRawIdent "\<r#\K\k*"
 
@@ -187,7 +211,7 @@ endif
 syn cluster   rustTop         contains=TOP
 syn cluster   rustKeyword     contains=rustKeyword,rustImpl,rustAsync,rustAwait,rustReservedKeyword
 syn cluster   rustPrelude     contains=rustTrait,rustEnum,rustEnumVariant,rustStruct
-syn cluster   rustNoPrelude   contains=TOP,@rustPrelude
+RustMulti syn cluster rustNoPrelude contains=TOP,@rustPrelude
 
 syn keyword   rustSelf        self
 syn keyword   rustBoolean     true false
@@ -240,12 +264,12 @@ syn region    rustString      matchgroup=rustStringDelimiter start='b\?r\z(#*\)"
 
 " Match attributes with either arbitrary syntax or special highlighting for
 " derives. We still highlight strings and comments inside of the attribute.
-syn region    rustAttribute   matchgroup=rustAttribute start="#!\?\[" end="\]" contains=@rustAttributeContents,rustAttributeBalancedParens,rustAttributeBalancedCurly,rustAttributeBalancedBrackets,rustDerive
-syn region    rustAttributeBalancedParens matchgroup=rustAttribute start="("rs=e end=")"re=s transparent contained contains=rustAttributeBalancedParens,@rustAttributeContents
-syn region    rustAttributeBalancedCurly matchgroup=rustAttribute start="{"rs=e end="}"re=s transparent contained contains=rustAttributeBalancedCurly,@rustAttributeContents
-syn region    rustAttributeBalancedBrackets matchgroup=rustAttribute start="\["rs=e end="\]"re=s transparent contained contains=rustAttributeBalancedBrackets,@rustAttributeContents
-syn cluster   rustAttributeContents contains=rustString,rustCommentLine,rustCommentBlock,rustCommentLineDocError,rustCommentBlockDocError
-syn region    rustDerive      start="derive(" end=")" contained contains=rustDeriveTrait
+RustMulti syn region  rustAttribute matchgroup=rustAttribute start="#!\?\[" end="\]" contains=@rustAttributeContents,rustAttributeBalancedParens,rustAttributeBalancedCurly,rustAttributeBalancedBrackets,rustDerive
+RustMulti syn region  rustAttributeBalancedParens matchgroup=rustAttribute start="("rs=e end=")"re=s transparent contained contains=rustAttributeBalancedParens,@rustAttributeContents
+RustMulti syn region  rustAttributeBalancedCurly matchgroup=rustAttribute start="{"rs=e end="}"re=s transparent contained contains=rustAttributeBalancedCurly,@rustAttributeContents
+RustMulti syn region  rustAttributeBalancedBrackets matchgroup=rustAttribute start="\["rs=e end="\]"re=s transparent contained contains=rustAttributeBalancedBrackets,@rustAttributeContents
+RustMulti syn cluster rustAttributeContents contains=rustString,rustCommentLine,rustCommentBlock,rustCommentLineDocError,rustCommentBlockDocError
+RustMulti syn region  rustDerive start="derive(" end=")" contained contains=rustDeriveTrait
 " This list comes from compiler/rustc_builtin_macros/src/lib.rs
 syn keyword   rustDeriveTrait contained Clone Copy Debug Default Eq Hash Ord PartialEq PartialOrd ConstParamTy CoercePointee From
 
@@ -354,14 +378,13 @@ syn region rustFoldBraces start="{" end="}" transparent fold
 " These rules prevent enum variants from being highlighted as a prelude item,
 " as in `enum Shape { Box, Sphere }`. They need to be defined here to override
 " previous rules.
-syn region rustEnumBody matchgroup=rustEnumBody start=/{/ end=/}/ contained contains=@rustNoPrelude,rustEnumBody,rustGenerics,rustBraces,rustParens
-syn region rustGenerics matchgroup=rustOperator start=/</ end=/>/ contained contains=@rustTop,rustGenerics,rustBraces
+RustMulti syn region rustEnumBody matchgroup=rustEnumBody start=/{/ end=/}/ contained contains=@rustNoPrelude,rustEnumBody,rustGenerics,rustBraces,rustParens
+RustMulti syn region rustGenerics matchgroup=rustOperator start=/</ end=/>/ contained contains=@rustTop,rustGenerics,rustBraces
 " rustBraces doesn't need to contain itself due to rustFoldBraces
-syn region rustBraces matchgroup=rustBraces start=/{/ end=/}/ contained contains=TOP
-syn region rustParens matchgroup=rustParens start=/(/ end=/)/ contained contains=@rustTop,rustParens
+RustMulti syn region rustBraces matchgroup=rustBraces start=/{/ end=/}/ contained contains=TOP
+RustMulti syn region rustParens matchgroup=rustParens start=/(/ end=/)/ contained contains=@rustTop,rustParens
 
 " Fenced code blocks in doc comments {{{2
-let s:highlight_doc_code = !!get(g:, "rust_highlight_doc_code", 1)
 if s:highlight_doc_code
     " Currently regions marked as ```<some-other-syntax> will not get
     " highlighted at all. In the future, we can do as vim-markdown does and
@@ -407,57 +430,48 @@ if s:highlight_doc_code
     syn cluster rustEmbeddedTop contains=@rustContextFreeTop,@rustContextSensitiveTopEmbedded
 endif
 
-" Creates 'embedded' versions of various syntax groups. These are used for
-" highlighting code in doc comments. The difference is that these groups ignore
-" the leading `///` or `*` at the start of each line. `groups` should be a list
-" of strings, consisting of the groups for which an embedded version should be
-" created. The names of the embedded groups will be suffixed with 'Embedded'.
-function s:CreateEmbeddedRules(groups)
-    let l:state = #{counter: 1}
-    let l:any_group = join(a:groups, '\|')
-    let l:line_pattern = '^syn \(cluster\|match\|keyword\|region\)\s\+\('
-        \ . l:any_group . '\)\>.*'
+" Creates 'embedded' versions of the syntax groups for which `RustMulti` was
+" used. These ignore the leading '///' and '*' characters present in doc
+" comment code blocks.
+function s:Embed()
+    let l:any_group = copy(s:multi_groups)->map({ _, g -> g[2] })->join('\|')
     let l:top = []
-    for l:line in readfile(s:script_path)
-        let l:match = matchlist(l:line, l:line_pattern)
-        if empty(l:match)
-            continue
-        endif
-        let [l:kind, l:name] = l:match[1:2]
-        let l:text = l:match[0]->substitute(
+    for [l:cmd, l:subcmd, l:name] in s:multi_groups
+        let l:cmd = l:cmd->substitute(
             \ '\<\%(' . l:any_group . '\)\>',
             \ '\0Embedded',
             \ 'g',
         \ )->substitute(
-            \ '\<contain\%(s\|edin\)=\zs\S*',
-            \ { m -> s:EmbedContains(l:state, m[0]) },
+            \ '\<\(contain\%(s\|edin\)\)=\zs\(\S*\)',
+            \ { m -> s:EmbedList(l:name, m[1], m[2]) },
             \ 'g',
         \ )
-        if l:kind ==# "region" && l:text !~# '\<contains='
-            let l:text .= ' contains=@rustDocCodeLeader'
+        if l:subcmd ==# "region" && l:cmd !~# '\<contains='
+            let l:cmd .= ' contains=@rustDocCodeLeader'
         endif
-        if l:kind !=# "cluster" && l:text !~# '\<contained\>'
-            let l:text .= ' contained'
+        if l:subcmd !=# "cluster" && l:cmd !~# '\<contained\>'
+            let l:cmd .= ' contained'
             call add(l:top, l:name)
         endif
-        execute l:text
-        if l:kind !=# "cluster"
+        execute l:cmd
+        if l:subcmd !=# "cluster"
             execute 'hi def link ' . l:name . 'Embedded ' . l:name
         endif
     endfor
-    execute 'syn cluster rustContextSensitiveTop contains=' . join(l:top, ',')
-    call map(l:top, { _, x -> x . 'Embedded' })
-    execute 'syn cluster rustContextSensitiveTopEmbedded contains='
-        \ . join(l:top, ',')
+    if !empty(l:top)
+        execute 'syn cluster rustContextSensitiveTop contains='
+            \ . join(l:top, ',')
+        execute 'syn cluster rustContextSensitiveTopEmbedded contains='
+            \ . map(l:top, { _, x -> x . 'Embedded' })->join(',')
+    endif
 endfunction
 
-" Transforms a `contains` or `containedin` argument of a `syn` command into an
-" equivalent embedded one. Used by `s:CreateEmbeddedRules`.
-function s:EmbedContains(state, contains)
-    let l:list = split(a:contains, ',')
+" Transforms a `contains` or `containedin` argument of a `:syn` command into an
+" equivalent embedded one. Used by `s:Embed`.
+function s:EmbedList(group_name, list_name, list_contents)
+    let l:list = split(a:list_contents, ',')
     if l:list[0] ==# "TOP" && len(l:list) > 1
-        let l:cluster = 'rustEmbeddedCluster' . a:state.counter
-        let a:state.counter += 1
+        let l:cluster = a:group_name . 'Embedded_' . a:list_name . '_base'
         call add(l:list, "@rustContextSensitiveTop")
         execute 'syn cluster ' . l:cluster . ' contains=' . join(l:list, ',')
         let l:list = ['@' . l:cluster, "@rustContextSensitiveTopEmbedded"]
@@ -467,18 +481,13 @@ function s:EmbedContains(state, contains)
             let l:list[l:i] = "@rustEmbeddedTop"
         endif
     endif
-    return l:list->add("@rustDocCodeLeader")->join(',')
+    return add(l:list, "@rustDocCodeLeader")->join(',')
 endfunction
 
-if s:highlight_doc_code && v:version >= 802
-    let s:script_path = expand("<sfile>")
-    call s:CreateEmbeddedRules([
-        \ "rustEnumDecl", "rustMacroRepeat", "rustNoPrelude", "rustAttribute",
-        \ "rustAttributeBalancedParens", "rustAttributeBalancedCurly",
-        \ "rustAttributeBalancedBrackets", "rustAttributeContents",
-        \ "rustDerive", "rustEnumBody", "rustGenerics", "rustBraces",
-        \ "rustParens",
-    \ ])
+if s:enable_multi
+    call s:Embed()
+    unlet s:multi_groups
+    delcommand RustMulti
 endif
 
 " Default highlighting {{{1

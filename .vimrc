@@ -21,7 +21,6 @@ set expandtab
 set number
 set nowrap
 set linebreak
-set list
 set noshowmatch
 set formatoptions=ql
 set viminfo='100,<2000,s2000,h
@@ -56,7 +55,7 @@ if g:fancyterm
     au FileType * syntax sync fromstart
 endif
 
-au FileType vim setlocal comments+=:\" indentkeys-=0\\
+au FileType vim setlocal comments+=:\" indentkeys-=0\\ indentkeys-==}
 au BufRead,BufNewFile *.h++ set filetype=cpp
 au FileType make,lua let g:ws_config.mode = "tab"
 au FileType markdown,text,gitcommit let g:ws_config.ft_indent = 0
