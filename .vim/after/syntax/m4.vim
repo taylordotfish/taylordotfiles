@@ -1,4 +1,4 @@
-" Copyright (C) 2023, 2025 taylor.fish <contact@taylor.fish>
+" Copyright (C) 2023, 2025-2026 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
 setlocal matchpairs+=`:'
@@ -11,11 +11,32 @@ endfunction
 function s:ChangeQuote(startquote, endquote)
     let l:startquote = s:Escape(a:startquote)
     let l:endquote = s:Escape(a:endquote)
-    syn clear m4String
-    if l:startquote != "" && l:endquote != ""
-        execute 'syn region m4String start="' . l:startquote . '" end="'
-            \ . l:endquote . '" contains=m4Constants,m4Special,m4Variable,'
-            \ . 'm4Command,m4Statement,m4Function,m4String'
+    let l:has_quotes = l:startquote != "" && l:endquote != ""
+    if hlexists("m4Quoted")
+        syn clear m4Quoted
+        syn cluster m4QuotedTop contains=m4Quoted,m4ParamZero,m4ParamPos,
+            \ m4ParamCount,m4ParamAll,m4ParamBad,m4Constants,m4Command,
+            \ m4Statement,m4Function
+        if l:has_quotes
+            execute 'syn region m4Quoted matchgroup=m4QuoteDelim start="'
+                \ . l:startquote . '" end="' . l:endquote
+                \ . '" contains=@m4QuotedTop'
+        endif
+        syn region m4Function matchgroup=m4Type start="\<[[:upper:]_]\+("
+            \ end=")" contains=@m4Top containedin=@m4Top
+        hi def link m4Quoted Constant
+        hi def link m4Type Type
+        hi def link m4Disabled Comment
+    elseif hlexists("m4String")
+        syn clear m4String
+        syn cluster m4StringTop contains=m4Constants,m4Special,m4Variable,
+            \ m4String,m4Command,m4Statement,m4Function
+        if l:has_quotes
+            execute 'syn region m4String start="' . l:startquote . '" end="'
+                \ . l:endquote . '" contains=@m4StringTop'
+        endif
+    else
+        echoerr "could not patch m4 syntax"
     endif
 endfunction
 
