@@ -149,8 +149,9 @@ elseif s:edition >= 2018
 endif
 
 syn keyword rustPubScopeCrate crate contained
+syn keyword rustPubScopeIn in contained
 syn match rustPubScopeDelim /[()]/ contained
-syn match rustPubScope /([^()]*)/ contained contains=rustPubScopeDelim,rustPubScopeCrate,rustSuper,rustModPath,rustModPathSep,rustSelf transparent
+syn match rustPubScope /([^()]*)/ contained contains=rustPubScopeDelim,rustPubScopeCrate,rustSuper,rustPubScopeIn,rustModPath,rustModPathSep,rustSelf transparent
 
 syn keyword   rustExternCrate crate contained nextgroup=rustIdentifier skipwhite skipempty
 syn keyword   rustObsoleteExternMod mod contained nextgroup=rustIdentifier skipwhite skipempty
@@ -530,6 +531,7 @@ hi def link rustUnion         rustStructure
 hi def link rustExistential   rustKeyword
 hi def link rustPubScopeDelim Delimiter
 hi def link rustPubScopeCrate rustKeyword
+hi def link rustPubScopeIn    rustKeyword
 hi def link rustSuper         rustKeyword
 hi def link rustUnsafeKeyword Exception
 hi def link rustReservedKeyword Error
