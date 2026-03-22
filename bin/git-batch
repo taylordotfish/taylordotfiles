@@ -125,7 +125,7 @@ sync() {
 branch() {
     local maxlen
     maxlen=$(printf '%s\n' "$@" | awk '
-        length > n { n = length }
+        length() > n { n = length() }
         END { print n }
     ')
     local d
