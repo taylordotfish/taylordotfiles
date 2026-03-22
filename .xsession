@@ -67,6 +67,7 @@ start_lock() {
 }
 
 target=${XSESSION_TARGET:-$default_target}
+unset XSESSION_TARGET
 case "$target" in
     i3|xfce|gnome|windowmaker|lock) ;;
     *)
