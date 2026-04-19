@@ -1,14 +1,14 @@
 #!/bin/sh
 set -euf
 dir=$(dirname "$0")
-{
-    cat << 'EOF'
+
+exec > ~/.i3status.conf
+cat << 'EOF'
 # AUTOMATICALLY GENERATED!
 # CHANGES WILL BE LOST!
 
 EOF
-    (cd ~; m4 .i3status.conf.m4)
-} > ~/.i3status.conf
+m4 ~/.i3status.conf.m4
 
 exec > "$dir"/config
 cat << 'EOF'
@@ -16,5 +16,4 @@ cat << 'EOF'
 # CHANGES WILL BE LOST!
 
 EOF
-cd "$dir"
-m4 config.m4
+m4 "$dir"/config.m4

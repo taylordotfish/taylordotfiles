@@ -1,6 +1,6 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 merge_env(`HIDPI')dnl
-sinclude(`bar.pre.m4')dnl
+sinclude_rel(`bar.pre.m4')dnl
 dnl
 define_default(`I3BAR_HIDPI_FONT', `pango:DejaVu Sans Mono 22px')dnl
 dnl
@@ -29,4 +29,4 @@ ifdefn(`MONITOR_MONO', `dnl
 ')dnl
     }
 }
-sinclude(`bar.post.m4')dnl
+sinclude_rel(`bar.post.m4')dnl

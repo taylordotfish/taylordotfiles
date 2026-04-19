@@ -9,7 +9,7 @@
 
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 merge_env(`HIDPI', `MONOCHROME')dnl
-sinclude(`config.pre.m4')dnl
+sinclude_rel(`config.pre.m4')dnl
 dnl
 set $mod Mod4
 set $alt Mod1
@@ -238,5 +238,4 @@ syscmd(`./bar.sh')dnl
 bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
     prompt -f "defn(`I3_FONT')"
 
-sinclude(`config.post.m4')dnl
-`#' `vim:ft=conf'
+sinclude_rel(`config.post.m4')dnl
