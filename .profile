@@ -8,17 +8,20 @@ PATH=$ORIG_PATH
 if [ -f ~/.profile.pre.sh ]; then
     . ~/.profile.pre.sh
 fi
+
 export GOPATH=~/go
-PATH=$GOPATH/bin:$PATH
-PATH=~/.virtualenv/bin:$PATH
+export NODE_PATH=~/.local/lib/node_modules
 export PYENV_ROOT=~/.pyenv
 export PYENV_DIR=~
+
+PATH=$GOPATH/bin:$PATH
+PATH=~/.virtualenv/bin:$PATH
 PATH=$PYENV_ROOT/bin:$PATH
 PATH=~/.cargo/bin:$PATH
 PATH=~/.local/bin:$PATH
 PATH=~/bin:$PATH
 
-delayed_exec() {
+_delayed_exec() {
     local timeout=5
     while [ "$#" -gt 0 ]; do
         case "$1" in
@@ -64,7 +67,7 @@ EOF
     start_time=$(awk '{ print $1 }' /proc/uptime)
     "$@" && true
     local status=$?
-    if awk -- '
+    if awk '
         BEGIN { ARGC = 2 }
         { exit $1 - ARGV[2] < ARGV[3] ? 0 : 1 }
     ' /proc/uptime "$start_time" "$timeout"; then
@@ -73,7 +76,7 @@ EOF
     exit "$status"
 }
 
-alias delayed-exec=delayed_exec
+alias delayed-exec=_delayed_exec
 
 if [ -f ~/.profile.post.sh ]; then
     . ~/.profile.post.sh
@@ -91,7 +94,7 @@ source_bashrc() {
     unset _profile_sourced
 }
 
-# If this file is used as a shared script that other .profile files source, it
-# may be desired to defer the sourcing of .bashrc so those other files can run
-# their own commands first.
+# If this file is used as a shared script to be sourced by other .profile
+# files, it may be desired to defer the sourcing of .bashrc so those other
+# files can run their own commands first.
 [ -n "$DEFER_BASHRC" ] || source_bashrc
