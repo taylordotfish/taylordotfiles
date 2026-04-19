@@ -53,7 +53,7 @@ stty_settings=$(stty -g)
 unset pid
 
 on_exit() {
-    local status=$?
+    local status="$?"
     trap - HUP INT QUIT TERM EXIT
     stty "$stty_settings"
     if [ -n "${pid-}" ]; then
