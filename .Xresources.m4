@@ -1,6 +1,6 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 merge_env(`HIDPI')dnl
-sinclude(`.Xresources.pre.m4')dnl
+sinclude_rel(`.Xresources.pre.m4')dnl
 dnl
 Xft.dpi: ifdefn(`HIDPI', `192', `96')
 
@@ -40,4 +40,4 @@ Rxvt*mono*2x*font: xft:DejaVu Sans Mono:pixelsize=22
 Rxvt*mono*2x*boldFont: xft:DejaVu Sans Mono:pixelsize=22:bold
 Rxvt*mono*2x*italicFont: xft:DejaVu Sans Mono:pixelsize=22:italic
 Rxvt*mono*2x*boldItalicFont: xft:DejaVu Sans Mono:pixelsize=22:bold:italic
-sinclude(`.Xresources.post.m4')dnl
+sinclude_rel(`.Xresources.post.m4')dnl
