@@ -44,12 +44,6 @@ start_xfce() {
     exec xfce4-session
 }
 
-start_gnome() {
-    ensure_installed gnome-session
-    prepare_desktop
-    exec gnome-session
-}
-
 start_windowmaker() {
     ensure_installed wmaker
     prepare_desktop
@@ -69,7 +63,7 @@ start_lock() {
 target=${XSESSION_TARGET:-$default_target}
 unset XSESSION_TARGET
 case "$target" in
-    i3|xfce|gnome|windowmaker|lock) ;;
+    i3|xfce|windowmaker|lock) ;;
     *)
         printf >&2 '%s\n' "unknown target: $target"
         exit 1
