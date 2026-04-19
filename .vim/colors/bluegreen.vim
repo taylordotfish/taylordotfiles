@@ -1,9 +1,9 @@
-" Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+" Copyright (C) 2023, 2024, 2026 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
-" Terminal background must be dark.
 set background=dark
-let g:colors_name="bluegreen"
+hi clear
+let g:colors_name = "bluegreen"
 
 hi MoreMsg      ctermfg=84   ctermbg=none cterm=none
 hi Question     ctermfg=84   ctermbg=none cterm=none
@@ -33,3 +33,15 @@ hi StatusLine   ctermfg=none ctermbg=235  cterm=none
 hi Search       ctermfg=15   ctermbg=30   cterm=none
 hi NonText      ctermfg=74   ctermbg=none cterm=none
 hi Folded       ctermfg=43   ctermbg=none cterm=none
+" Defined by ws.vim.
+hi Ws           ctermfg=243  ctermbg=none cterm=none
+hi TrailingWs   ctermfg=0    ctermbg=40   cterm=none
+
+hi csvCol1 ctermfg=210
+hi csvCol2 ctermfg=214
+hi csvCol3 ctermfg=226
+hi csvCol4 ctermfg=154
+hi csvCol5 ctermfg=85
+hi csvCol6 ctermfg=81
+hi csvCol7 ctermfg=183
+hi csvCol8 ctermfg=212

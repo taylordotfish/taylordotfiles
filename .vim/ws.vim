@@ -52,9 +52,9 @@ function s:TabMode()
     let b:ws_state.lc_normal = l:lc_normal
     if g:fancyterm
         let l:ws_ids = b:ws_state.ws_ids
-        call add(l:ws_ids, matchadd("Ws", '\(^\s*\)\@<= ', -2))
+        call add(l:ws_ids, matchadd("Ws", '\%(^\s*\)\@<= ', -2))
         call add(l:ws_ids, matchadd("Ws", ' \ze\s*$', -2))
-        call add(l:ws_ids, matchadd("TrailingWs", '\(\S.*\)\@<=\t', -1))
+        call add(l:ws_ids, matchadd("InternalTab", '\%(\S.*\)\@<=\t', -1))
     endif
 endfunction
 command TabMode call s:TabMode()
@@ -93,22 +93,31 @@ endfunction
 au InsertEnter * execute "setlocal listchars-=" . b:ws_state.lc_normal
 au InsertLeave * execute "setlocal listchars+=" . b:ws_state.lc_normal
 
+function s:EnableTrailing()
+    if g:fancyterm && b:ws_state.trailing_id is v:null
+        let b:ws_state.trailing_id = matchadd("TrailingWs", '\s\+$', -1)
+    endif
+endfunction
+
+function s:DisableTrailing()
+    if b:ws_state.trailing_id isnot v:null
+        call matchdelete(b:ws_state.trailing_id)
+        let b:ws_state.trailing_id = v:null
+    endif
+endfunction
+
 if g:fancyterm
     " Highlight trailing space
-    hi Ws ctermfg=243 cterm=none
-    function s:HiTrailingWs()
-        hi TrailingWs ctermfg=40 ctermbg=none cterm=reverse
-    endfunction
-    au InsertEnter * hi clear TrailingWs
-    au InsertLeave * call s:HiTrailingWs()
-    call s:HiTrailingWs()
+    hi def link Ws NonText
+    hi def link TrailingWs Todo
+    hi def link InternalTab TrailingWs
+    au InsertEnter * call s:DisableTrailing()
+    au InsertLeave * call s:EnableTrailing()
 endif
 
 function s:Init()
-    let b:ws_state = #{ws_ids: []}
-    if g:fancyterm
-        call matchadd("TrailingWs", '\s\+$', -1)
-    endif
+    let b:ws_state = #{ws_ids: [], trailing_id: v:null}
+    call s:EnableTrailing()
     call s:Refresh()
 endfunction
 
