@@ -1,2 +1,6 @@
+CC ?= gcc
+CFLAGS := -std=c11 -O2 -Wall -Wextra -pedantic $(CFLAGS)
+LDLIBS = -lpulse
+
 pulse-max-volume: main.c
-	gcc -Wall -Wextra -pedantic -std=c11 -O2 -o $@ $< -lpulse
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
