@@ -1,6 +1,6 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 merge_env(`HIDPI', `MONOCHROME')dnl
-sinclude(`dunstrc.pre.m4')dnl
+sinclude_rel(`dunstrc.pre.m4')dnl
 dnl
 [global]
     follow = mouse
@@ -36,5 +36,5 @@ ifelse(defn(`MONOCHROME'), `2',, `dnl
 ')dnl
     timeout = 0
 
-sinclude(`dunstrc.post.m4')dnl
+sinclude_rel(`dunstrc.post.m4')dnl
 `#' `vim:ft=cfg'
