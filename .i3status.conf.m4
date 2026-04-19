@@ -7,7 +7,7 @@
 # If the above line is not correctly displayed, fix your editor first!
 
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
-sinclude(`.i3status.conf.pre.m4')dnl
+sinclude_rel(`.i3status.conf.pre.m4')dnl
 dnl
 general {
     output_format="i3bar"
@@ -84,4 +84,4 @@ volume master {
     mixer = "Master"
 }
 dnl
-sinclude(`.i3status.conf.post.m4')dnl
+sinclude_rel(`.i3status.conf.post.m4')dnl
