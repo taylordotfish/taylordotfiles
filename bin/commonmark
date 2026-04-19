@@ -1,35 +1,138 @@
 #!/bin/sh
+# Copyright (C) 2025-2026 taylor.fish <contact@taylor.fish>
+# License: GNU GPL version 3 or later
 set -euf
+
+usage() {
+    cat << EOF
+Usage: $(basename "$0") [options] <file>...
+
+Options:
+  --full   Add extra HTML to make a standalone page
+  --ext    Enable tables, footnotes, and strikethrough
+  --smart  Enable smart punctuation
+EOF
+}
+
+full=
+ext=
+smart=
+
+while [ "$#" -gt 0 ]; do
+    case "${1-}" in
+        -h|--help)
+            usage
+            exit
+            ;;
+        --full)
+            full=1
+            ;;
+        --ext)
+            ext=1
+            ;;
+        --smart)
+            smart=1
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
 
 run_cmark() {
     case "${1-}" in
         -*) set -- ./"$1" ;;
     esac
-    cmark --unsafe "$@"
+    cmark --unsafe ${smart:+--smart} "$@"
 }
 
 pulldown_cmark() {
-    pulldown-cmark -- "$@"
+    pulldown-cmark ${ext:+-TFS} ${smart:+-P} -- "$@"
 }
 
-case "${1-}" in
-    -h|--help)
-        printf '%s\n' "usage: $(basename "$0") <file>..."
-        exit
-        ;;
-    --)
-        shift
-        ;;
-esac
-
 unset target
-if command -v cmark > /dev/null; then
-    target=run_cmark
-elif command -v pulldown-cmark > /dev/null; then
+if [ -n "$ext" ] || command -v pulldown-cmark > /dev/null; then
     target=pulldown_cmark
+elif command -v cmark > /dev/null; then
+    target=run_cmark
 else
     printf >&2 '%s\n' 'error: missing (pulldown-)cmark'
     exit 1
+fi
+
+if [ -n "$full" ]; then cat << 'EOF'
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>CommonMark document</title>
+<style>
+    html {
+        font-size: 16px;
+        font-family: sans-serif;
+        padding: 2em 1em;
+    }
+    body {
+        max-width: 55em;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.5;
+    }
+    @media print {
+        html, body {
+            padding: 0;
+            margin: 0;
+            max-width: none;
+        }
+        body > :first-child {
+            margin-top: 0;
+        }
+        body > :last-child {
+            margin-bottom: 0;
+        }
+    }
+</style>
+EOF
+fi
+
+if [ -n "$full" ] && [ -n "$ext" ]; then cat << 'EOF'
+<style>
+    .footnote-definition {
+        display: flex;
+        font-size: 75%;
+        margin-top: 0.75em;
+        margin-bottom: 0.75em;
+        padding-top: 1rem;
+        border-top: 1px solid #bbb;
+    }
+    .footnote-definition + .footnote-definition {
+        padding-top: 0;
+        border-top: 0;
+    }
+    .footnote-definition > sup {
+        margin-right: 1em;
+    }
+    .footnote-definition > p {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    .footnote-reference {
+        line-height: 1;
+        font-size: 75%;
+        position: relative;
+        top: -0.05em
+    }
+    .footnote-reference a::before, .footnote-definition > sup::before {
+        content: "[";
+    }
+    .footnote-reference a::after, .footnote-definition > sup::after {
+        content: "]";
+    }
+</style>
+EOF
 fi
 
 if [ "$#" -eq 0 ]; then
