@@ -35,27 +35,32 @@ EOF
 unpushed() {
     if ! git -C "$1" branch | grep -q .; then
         printf '%s: ' "$1"
-        printf ',%s' $(git -C "$1" remote) | tail -c+2
+        printf ',%s' "$(git -C "$1" remote)" | tail -c+2
         printf '\n'
         return 0
     fi
+
     local upstream
     upstream=$(git -C "$1" rev-parse --abbrev-ref '@{u}' 2> /dev/null) ||
         upstream=
+    local uncommitted=
     if ! git -C "$1" diff --name-only --exit-code > /dev/null; then
-        local uncommitted=1
+        uncommitted=1
     fi
     local branch
     branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
+
+    local stdout
+    stdout=$(git -C "$1" remote)
     local pushed=
     local unpushed=
     local remote
-    for remote in $(git -C "$1" remote); do
-        local rbranch=$remote/$branch
+    for remote in $stdout; do
+        local rbranch="$remote/$branch"
         case "$upstream" in
             "$remote"/*) rbranch=$upstream ;;
         esac
-        if [ -n "${uncommitted-}" ] ||
+        if [ -n "$uncommitted" ] ||
             ! git -C "$1" rev-parse --abbrev-ref "$rbranch" \
                 > /dev/null 2>&1 ||
             ! git -C "$1" diff "$rbranch..." --name-only --exit-code \
@@ -80,10 +85,13 @@ unpulled() {
         upstream=
     local branch
     branch=$(git -C "$1" rev-parse --abbrev-ref HEAD)
+
+    local stdout
+    stdout=$(git -C "$1" remote)
     local remotes=
     local remote
-    for remote in $(git -C "$1" remote); do
-        local rbranch=$remote/$branch
+    for remote in $stdout; do
+        local rbranch="$remote/$branch"
         case "$upstream" in
             "$remote"/*) rbranch=$upstream ;;
         esac
@@ -136,7 +144,7 @@ branch() {
 }
 
 cmd_foreach() {
-    local cmd=$1
+    local cmd="$1"
     shift
     local d
     for d do
