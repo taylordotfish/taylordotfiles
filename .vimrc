@@ -1,6 +1,10 @@
 " Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 " License: GNU GPL version 3 or later
 
+if filereadable(expand("~/.vimrc.pre"))
+    so ~/.vimrc.pre
+endif
+
 let g:fancyterm = $TERM !~ '^vt'
 if $LANG =~? 'UTF-\?8$'
     let g:term_encoding = "utf8"
@@ -74,3 +78,7 @@ if g:fancyterm && $MONOCHROME != ""
 endif
 so ~/.vim/ws.vim  " Whitespace/indent configuration
 packadd! matchit  " Better % behavior
+
+if filereadable(expand("~/.vimrc.post"))
+    so ~/.vimrc.post
+endif
