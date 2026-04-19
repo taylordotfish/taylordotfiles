@@ -228,11 +228,10 @@ def main() -> None:
             fifo_closed = False
             if fd == fifo.fileno() and events & select.POLLIN:
                 data = fifo.read()
-                fifo_closed |= not data
+                fifo_closed = not data
                 fifo_buffer += data
-            fifo_closed |= (
-                fd == fifo.fileno() and bool(events & select.POLLHUP)
-            )
+            if not fifo_closed and fd == fifo.fileno():
+                fifo_closed = bool(events & select.POLLHUP)
             if fifo_closed:
                 timer = []
                 pending_update = True
