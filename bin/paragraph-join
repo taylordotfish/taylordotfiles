@@ -4,6 +4,9 @@ if [ "$#" -gt 1 ]; then
     printf >&2 '%s\n' "error: unexpected argument"
     exit 1
 fi
+if [ "$#" -gt 0 ]; then
+    exec < "$1"
+fi
 exec awk '
     function end() {
         if (any) print ""
@@ -22,4 +25,4 @@ exec awk '
     END {
         end()
     }
-' "$@"
+'
