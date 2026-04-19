@@ -1,11 +1,14 @@
 #!/bin/sh
-# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 dir=$(dirname "$0")
 
-[ -f "$dir"/layout.conf ] || echo us > "$dir"/layout.conf
-layout=$(awk '/./ { print $1; exit }' "$dir"/layout.conf)
+if [ -f "$dir"/setmap.pre.sh ]; then
+    . "$dir"/setmap.pre.sh
+fi
+# Comma-separated list of XKB layouts; Ctrl+Alt+Space switches between them.
+: ${LAYOUTS:=us}
 
 xcape_map=
 set --
@@ -13,21 +16,19 @@ if [ -n "${NOSRVRKEYS-}" ]; then
     set -- "$@" -option srvrkeys:none
 fi
 
-if [ -f "$dir"/rules/source/Makefile ]; then
-    make --quiet -C "$dir"/rules/source
-fi
-setxkbmap "-I$HOME/.xkb" \
-    -rules 'local' \
+setxkbmap "-I$dir" \
+    -rules evdev \
+    -option ctrl:nocaps \
     -option compose:menu \
     -option compose:rwin \
     -option compose:ralt \
-    -option 'local' \
+    -option custom \
     "$@" \
-    -layout "$layout" \
+    -layout "$LAYOUTS" \
     -print > "$dir"/.keymap.xkb
 
 run_verbose() {
-    xkbcomp "-I$HOME/.xkb" "$dir"/.keymap.xkb "$DISPLAY"
+    xkbcomp "-I$dir" "$dir"/.keymap.xkb "$DISPLAY"
     if [ -z "${NOXCAPE-}" ]; then
         pkill -x xcape || true
     fi

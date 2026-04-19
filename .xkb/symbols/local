@@ -1,9 +1,9 @@
-partial
-xkb_symbols {
-    // Caps Lock is Left Control
-    key <CAPS> { [ Control_L ] };
-    modifier_map Control { <CAPS> };
-
+default partial xkb_symbols {
+    // Ctrl+Alt+Space switches layout
+    key <SPCE> {
+        [ space, space, space, space, nobreakspace, ISO_Next_Group ],
+        type[Group1] = "CTRL+ALT"
+    };
     // Unused Caps Lock key for xcape
     key <I248> { [ Caps_Lock ] };
 };

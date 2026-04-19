@@ -1,24 +1,25 @@
+NAME = local
+UPSTREAM = /usr/share/X11/xkb/rules/evdev
 BUILD_DIR = ..
-TARGET = local
-SOURCE := $(TARGET).add
-SYSTEM_SRC = /usr/share/X11/xkb/rules/evdev
 
-add_build = $(addprefix $(BUILD_DIR)/,$(1))
-TARGET := $(call add_build,$(TARGET))
-TARGETS = $(TARGET) $(TARGET).lst
+SOURCES = $(NAME) $(NAME).lst
+OUTPUTS = $(addprefix $(BUILD_DIR)/,$(SOURCES))
 
 .PHONY: all
-all: $(TARGETS)
+all: $(OUTPUTS)
 
-$(TARGET): $(SYSTEM_SRC) $(SOURCE)
-$(TARGET).lst: $(SYSTEM_SRC).lst $(SOURCE).lst
+$(OUTPUTS): | $(BUILD_DIR)
+	for f in $^; do echo; cat "$$f"; done | tail -n+2 > $@
 
-$(TARGETS): | $(BUILD_DIR)
-	(for f in $^; do cat "$$f"; echo; echo; done) | head -n-2 > $@
+define make_rule
+$(BUILD_DIR)/$1: $$(UPSTREAM)$$(suffix $1) $1
+endef
+
+$(foreach source,$(SOURCES),$(eval $(call make_rule,$(source))))
 
 $(BUILD_DIR):
 	mkdir -p $@
 
 .PHONY: clean
 clean:
-	rm -f $(TARGETS)
+	rm -f $(OUTPUTS)
