@@ -1,30 +1,23 @@
 [ -z "$_bashrc_sourced" ] || return 1
 _bashrc_sourced=1
 
-source ~/.profile || true
+. ~/.profile || true
 if [ -f ~/.bashrc.pre.sh ]; then
-    source ~/.bashrc.pre.sh
-fi
-
-# Source default .bashrc
-if [ -f /etc/skel/.bashrc ]; then
-    skel_term=$TERM
-    # Non-color prompt
-    case "$skel_term" in
-        *-color|*-256color) skel_term=${skel_term%-*} ;;
-    esac
-    # Don't set window title
-    case "$skel_term" in
-        xterm*|rxvt*) skel_term=screen ;;
-    esac
-    TERM=$skel_term source /etc/skel/.bashrc
-    unset skel_term
+    . ~/.bashrc.pre.sh
 fi
 unset _bashrc_sourced
 
+PS1='\u@\h:\w\$ '
+HISTCONTROL=ignoreboth
+HISTSIZE=1000
+HISTFILESIZE=2000
+shopt -s histappend
+if command -v dircolors > /dev/null; then
+    eval "$(dircolors -b)"
+fi
+
 export PYTHONDONTWRITEBYTECODE=1
 export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
-export NODE_PATH=~/.local/lib/node_modules
 export LC_COLLATE=C
 
 alias grep="grep --color=auto"
@@ -51,7 +44,7 @@ fi
 # Replaces `-h` with `--si`.
 si() {
     [ "$#" -gt 0 ] || return 1
-    local cmd=$1
+    local cmd="$1"
     shift
     local done=
     local arg
@@ -96,7 +89,7 @@ lsp() {
 }
 
 _run_gcc_like() {
-    local bin=$1
+    local bin="$1"
     shift
     if [ -t 1 ]; then
         command "$bin" -fdiagnostics-color=always "$@" |& less -R
@@ -106,15 +99,15 @@ _run_gcc_like() {
 }
 
 gccs() {
-    _run_gcc_like gcc -std=c11 -Wall -Wextra -Werror -pedantic -Og "$@"
+    _run_gcc_like gcc -std=c23 -Wall -Wextra -Werror -pedantic -Og "$@"
 }
 
 g++s() {
-    _run_gcc_like g++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
+    _run_gcc_like g++ -std=c++23 -Wall -Wextra -pedantic -Og "$@"
 }
 
 clang++s() {
-    _run_gcc_like clang++ -std=c++17 -Wall -Wextra -pedantic -Og "$@"
+    _run_gcc_like clang++ -std=c++23 -Wall -Wextra -pedantic -Og "$@"
 }
 
 clear-history() {
@@ -163,6 +156,10 @@ if [ -x ~/scripts/displays.sh ]; then displays() {
     ~/scripts/displays.sh
 } fi
 
+xres() {
+    xrdb -cpp m4 ~/.Xresources.m4
+}
+
 git-gc-all() {
     if [ "$1" != "--confirm" ]; then
         echo >&2 "error: pass --confirm to confirm"
@@ -201,7 +198,7 @@ fi
 
 unset -f jq
 if command -v jq > /dev/null; then jq() {
-    if [ -t 1 ]; then
+    if [ -t 1 ] && ! { [ -t 0 ] && [ "$#" -lt 2 ]; }; then
         command jq -C "$@" | less -R
     else
         command jq "$@"
@@ -227,22 +224,16 @@ if command -v cargo > /dev/null; then cargo() {
         return
     fi
 
-    local rf=$RUSTFLAGS
-    local rdf=$RUSTDOCFLAGS
-    local mf=$MIRIFLAGS
+    local rf="$RUSTFLAGS"
+    local rdf="$RUSTDOCFLAGS"
+    local mf="$MIRIFLAGS"
     rf="$rf -Z macro-backtrace -Z proc-macro-backtrace"
-    rdf="$rdf -Z unstable-options"
+    rdf="$rdf -Z unstable-options --extern-html-root-takes-precedence"
     mf="$mf -Zmiri-symbolic-alignment-check -Zmiri-strict-provenance"
 
-    case "$1" in
-        test)
-            # Necessary to use local std docs
-            rdf="$rdf --extern-html-root-takes-precedence"
-            ;;
-        doc)
-            set -- "$@" -Zrustdoc-map -Zrustdoc-scrape-examples
-            ;;
-    esac
+    if [ "$1" = doc ]; then
+        set -- "$@" -Zrustdoc-map -Zrustdoc-scrape-examples
+    fi
     RUSTFLAGS=$rf RUSTDOCFLAGS=$rdf MIRIFLAGS=$mf command cargo "$@"
 } fi
 
@@ -251,5 +242,5 @@ if command -v ds > /dev/null; then
 fi
 
 if [ -f ~/.bashrc.post.sh ]; then
-    source ~/.bashrc.post.sh
+    . ~/.bashrc.post.sh
 fi
