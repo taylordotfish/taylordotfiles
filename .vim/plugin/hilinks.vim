@@ -10,8 +10,16 @@
 "                (see |copyright|) except use "hilinks" instead of "Vim"
 "                NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 "
-" All modifications in this file compared to the original are released under
-" the same license as the original.
+" All modifications in this file are released under the same license as the
+" original. The license of Vim as it appeared throughout the period during
+" which the original hilinks.vim was created and/or published (Jan 10, 2008 to
+" Feb 18, 2016) is included in the file 'licenses/Vim-7.0' at the root of the
+" repository (https://codeberg.org/taylordotfish/taylordotfiles).
+
+" Original header:
+" Author:      Charles E Campbell <NcampObell@SdrPchip.AorgM-NOSPAM>
+" Date:        Jan 10, 2008 - Feb 18, 2016
+" Version:     4
 
 if exists("g:loaded_hilinks")
     finish

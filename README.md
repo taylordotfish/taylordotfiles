@@ -7,5 +7,6 @@ License
 -------
 
 taylordotfiles is licensed under version 3 of the GNU General Public License,
-or (at your option) any later version. See [COPYRIGHT](COPYRIGHT) and
-[LICENSE](LICENSE).
+or (at your option) any later version; see [COPYRIGHT](COPYRIGHT) and
+[LICENSE](LICENSE). Certain files may have other licenses; see each file for
+details.
