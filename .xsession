@@ -1,11 +1,12 @@
 #!/bin/sh
-# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
 default_target=i3
 
 prepare_session() {
+    xprop -root -format XSESSION_TARGET 8s -set XSESSION_TARGET "$target"
     if [ -f ~/.xprofile ]; then
         . ~/.xprofile
     fi
@@ -51,6 +52,7 @@ start_windowmaker() {
 }
 
 start_lock() {
+    ensure_installed i3lock
     NOXCAPE=1 NOSRVRKEYS=1 ~/.xkb/setmap.sh
     if [ -n "${MONOCHROME-}" ]; then
         local color=ffffff
