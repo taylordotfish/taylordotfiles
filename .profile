@@ -1,12 +1,12 @@
-[ -z "$_profile_sourced" ] || return 1
+[ -z "$_profile_sourced" ] || return 0
 _profile_sourced=1
 unalias -a
 
 [ -n "${ORIG_PATH+x}" ] || export ORIG_PATH=$PATH
 PATH=$ORIG_PATH
 
-if [ -f ~/.profile.pre.sh ]; then
-    . ~/.profile.pre.sh
+if [ -f ~/.profile.pre ]; then
+    . ~/.profile.pre
 fi
 
 export GOPATH=~/go
@@ -78,23 +78,15 @@ EOF
 
 alias delayed-exec=_delayed_exec
 
-if [ -f ~/.profile.post.sh ]; then
-    . ~/.profile.post.sh
+if [ -f ~/.profile.post ]; then
+    . ~/.profile.post
 fi
 
-source_bashrc() {
-    unset -f source_bashrc
-    # if running bash
-    if [ -n "$BASH_VERSION" ]; then
-        # include .bashrc if it exists
-        if [ -f "$HOME/.bashrc" ]; then
-            . "$HOME/.bashrc" || true
-        fi
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+        . "$HOME/.bashrc"
     fi
-    unset _profile_sourced
-}
-
-# If this file is used as a shared script to be sourced by other .profile
-# files, it may be desired to defer the sourcing of .bashrc so those other
-# files can run their own commands first.
-[ -n "$DEFER_BASHRC" ] || source_bashrc
+fi
+unset _profile_sourced

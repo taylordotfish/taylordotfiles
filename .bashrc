@@ -1,9 +1,9 @@
-[ -z "$_bashrc_sourced" ] || return 1
+[ -z "$_bashrc_sourced" ] || return 0
 _bashrc_sourced=1
 
-. ~/.profile || true
-if [ -f ~/.bashrc.pre.sh ]; then
-    . ~/.bashrc.pre.sh
+. ~/.profile
+if [ -f ~/.bashrc.pre ]; then
+    . ~/.bashrc.pre
 fi
 unset _bashrc_sourced
 
@@ -249,6 +249,6 @@ if command -v ds > /dev/null; then
     complete -F _command ds
 fi
 
-if [ -f ~/.bashrc.post.sh ]; then
-    . ~/.bashrc.post.sh
+if [ -f ~/.bashrc.post ]; then
+    . ~/.bashrc.post
 fi
