@@ -7,7 +7,6 @@ if [ "$#" -ne 0 ]; then
 fi
 
 dispwin-quiet -c
-if xprop -notype -root 8c ':YES\n' _ICC_PROFILE | grep -qFx _ICC_PROFILE:YES
-then
+if [ "$(xprop -root 8c '\nYES\n' _ICC_PROFILE | tail -n+2)" = YES ]; then
     dispwin-quiet -U
 fi
