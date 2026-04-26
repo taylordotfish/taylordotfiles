@@ -1,0 +1,113 @@
+#!/bin/sh
+set -euf
+
+usage() {
+    cat << EOF
+Usage: $(basename "$0") [options] [file]
+
+Truncates each line to a specified length. Reads from [file], or standard
+input if not provided.
+
+Options:
+  -h, --help      Show this help message
+  -n <length>     Limit each line to <length> bytes (default: 100)
+  --color[=auto]  Use colored output when writing to a terminal (default)
+  --color=always  Always use colored output
+  --color=never   Never use colored output
+EOF
+}
+
+alias get-short-value='
+    optval=${opts#?}
+    if [ -z "$optval" ]; then
+        shift
+        if [ "$#" -eq 0 ]; then
+            printf "%s\n" "error: missing argument to -$arg"
+            exit 1
+        fi
+        optval=$1
+    fi
+    opts=
+'
+
+unset file
+length=100
+color=auto
+options_done=
+while [ "$#" -gt 0 ]; do
+    is_positional=$options_done
+    [ -n "$is_positional" ] || case "$1" in
+        --help)
+            usage
+            exit
+            ;;
+        --color)
+            color=auto
+            ;;
+        --color=*)
+            color=${1#*=}
+            ;;
+        --)
+            options_done=1
+            ;;
+        -*)
+            opts=$1
+            while true; do
+                opts=${opts#?}
+                case "$opts" in
+                    "")
+                        break
+                        ;;
+                    h*)
+                        usage
+                        exit
+                        ;;
+                    n*)
+                        get-short-value
+                        length=$optval
+                        ;;
+                    *)
+                        printf '%s\n' "error: unknown option: -$opts"
+                        exit 1
+                        ;;
+                esac
+            done
+            ;;
+        *)
+            is_positional=1
+            ;;
+    esac
+    if [ -n "$is_positional" ]; then
+        if [ -n "${file+x}" ]; then
+            printf '%s\n' "error: unexpected positional argument: $1"
+            exit 1
+        fi
+        file=$1
+    fi
+    shift
+done
+case "$length" in
+    *[!0-9]*|"")
+        printf >&2 '%s\n' "error: invalid value for -n: $length"
+        exit 1
+        ;;
+esac
+
+set --
+if [ -n "${file+x}" ]; then
+    set -- "$file"
+fi
+if [ "$length" -lt 1 ]; then
+    length=1
+fi
+
+if case "$color" in
+    always) true ;;
+    auto) [ -z "${NO_COLOR-}" ] && [ -t 1 ] ;;
+    *) false ;;
+esac; then
+    end=$(printf '\033[31;1m$\033[m')
+else
+    end="$"
+fi
+exec sed -E "s/^(.{$((length-1))}).{2,}/\\1$end/" -- "$@"

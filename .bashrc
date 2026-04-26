@@ -237,6 +237,14 @@ if command -v cargo > /dev/null; then cargo() {
     RUSTFLAGS=$rf RUSTDOCFLAGS=$rdf MIRIFLAGS=$mf command cargo "$@"
 } fi
 
+if command -v truncline > /dev/null; then truncline() {
+    if [ -t 0 ]; then
+        command truncline --color=always "$@" | less -R
+    else
+        command truncline "$@"
+    fi
+} fi
+
 if command -v ds > /dev/null; then
     complete -F _command ds
 fi
