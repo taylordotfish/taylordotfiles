@@ -9,5 +9,5 @@ define(`merge_env', `ifelse(`$#', `0',, `ifelse(
 )')')dnl
 define(`dquote', ```$1''')dnl
 define(`include_rel', `include(ifelse(regexp(`$1', `^/'), `-1',
-    `patsubst(dquote(__file__), `[^/]*\(.\)$', `\1')')`$1')')dnl
+    `patsubst(__file__, `^\(\([^/]*/\)*\)[^/]*$', ``\1'')')`$1')')dnl
 define(`sinclude_rel', `s'defn(`include_rel'))dnl
