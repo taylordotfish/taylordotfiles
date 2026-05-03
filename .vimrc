@@ -15,7 +15,7 @@ else
 endif
 
 set autoindent
-set cinoptions=(1s
+set cinoptions=(s,U1,m1,Ls,g0
 set textwidth=79
 set colorcolumn=+1
 set shiftwidth=4
@@ -35,7 +35,7 @@ set comments-=://
 set comments-=mb:*
 set comments+=mb:\ *,:///,://!,://,:;
 set matchpairs+=<:>
-set modeline
+set nomodeline
 set cinkeys-=0#
 set indentkeys-=0#
 

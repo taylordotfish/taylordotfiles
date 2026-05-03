@@ -32,8 +32,7 @@ if v:version < 700
     finish
 endif
 
-let s:HLTmode = 0
-command HiLinkTrace call HiLinkTrace()
+command HiLinkTrace echo HiLinkTrace()
 
 " this function traces the highlighting group names from transparent/top level
 " through to the bottom
@@ -104,9 +103,8 @@ function HiLinkTrace()
     if exists("syntaxstack")
         let retval = syntaxstack." ".retval
     endif
-    echo retval
 
     " restore register a
     let @a = keep_rega
     return retval
-endfun
+endfunction
