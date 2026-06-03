@@ -1,19 +1,12 @@
-include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
-merge_env(`HIDPI')dnl
-sinclude_rel(`bar.pre.m4')dnl
-dnl
-define_default(`I3BAR_HIDPI_FONT', `pango:DejaVu Sans Mono 22px')dnl
-dnl
 bar {
-    output MONITOR_NAME
-    tray_output primary
-    status_command i3status | `MONITOR_PRIORITY'=MONITOR_PRIORITY ifdefn(
-        `MONITOR_MONO', ``MONOCHROME=2 '')~/.config/i3/status-wrapper.py
-ifdefn(`HIDPI',, ifdefn(`MONITOR_HIDPI', ``dnl
-    font I3BAR_HIDPI_FONT
-''))dnl
+    output defn(`MONITOR_OUTPUT')
+    tray_output ifelse(MONITOR_PRIORITY, 0, `defn(`MONITOR_OUTPUT')', none)
+    status_command i3status | `MONITOR_PRIORITY'=MONITOR_PRIORITY \
+        `MONITOR_TECH'=defn(`MONITOR_TECH') ~/.config/i3/status-wrapper.py
+    font ifdefn(`USE_BITMAP_FONT', `I3_BITMAP_FONT',
+        `pango:VECTOR_FONT_FAMILY frac(MONITOR_DPI * VECTOR_FONT_SIZE, DPI)')
     colors {
-ifdefn(`MONITOR_MONO', `dnl
+ifelse(defn(`MONITOR_TECH'), epaper, `dnl
         background #ffffff
         statusline #000000
         separator #000000
@@ -29,4 +22,3 @@ ifdefn(`MONITOR_MONO', `dnl
 ')dnl
     }
 }
-sinclude_rel(`bar.post.m4')dnl

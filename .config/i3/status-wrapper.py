@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -u
-# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2024, 2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 
 from dataclasses import dataclass
@@ -18,7 +18,7 @@ color_good = "#60ff80"
 color_degraded = "#ffd060"
 color_bad = "#ff5050"
 
-if os.getenv("MONOCHROME") == "2":
+if os.getenv("MONITOR_TECH") == "epaper":
     color_normal = "#000000"
     color_good = color_normal
     color_degraded = color_normal
@@ -29,6 +29,9 @@ color_map = {
     "#000002": color_degraded,
     "#000003": color_bad,
 }
+
+timer_enabled = os.getenv("MONITOR_PRIORITY") == "0"
+timer_fifo_path = os.path.join(os.path.dirname(__file__), ".timer_fifo")
 
 Block = dict[str, Any]
 
@@ -139,19 +142,15 @@ def add_timer(blocks: list[Block], timer_blocks: list[Block]) -> None:
         blocks[:0] = timer_blocks
 
 
-TIMER_FIFO_PATH = os.path.join(os.path.dirname(__file__), ".timer_fifo")
-TIMER_ENABLED = os.getenv("MONITOR_PRIORITY") == "1"
-
-
 def open_fifo_as_fd() -> int:
-    return os.open(TIMER_FIFO_PATH, os.O_RDONLY | os.O_NONBLOCK)
+    return os.open(timer_fifo_path, os.O_RDONLY | os.O_NONBLOCK)
 
 
 def open_fifo(poll: select.poll) -> BinaryIO:
     try:
         fd = open_fifo_as_fd()
     except FileNotFoundError:
-        os.mkfifo(TIMER_FIFO_PATH)
+        os.mkfifo(timer_fifo_path)
         fd = open_fifo_as_fd()
     fifo = os.fdopen(fd, "rb", buffering=0)
     poll.register(fifo, select.POLLIN)
@@ -166,7 +165,7 @@ def reopen_fifo(fifo: BinaryIO, poll: select.poll) -> BinaryIO:
 def main() -> None:
     poll = select.poll()
     fifo = None
-    if TIMER_ENABLED:
+    if timer_enabled:
         fifo = open_fifo(poll)
     stdin = sys.stdin.buffer
     assert isinstance(stdin, io.BufferedIOBase)

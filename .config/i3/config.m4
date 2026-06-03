@@ -8,8 +8,9 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
-merge_env(`HIDPI', `MONOCHROME')dnl
 sinclude_rel(`config.pre.m4')dnl
+esyscmd(`~/scripts/monitor-utils/m4/globals.sh')dnl
+define(`DPI', defn(`GLOBAL_MONITOR_DPI'))dnl
 dnl
 set $mod Mod4
 set $alt Mod1
@@ -70,8 +71,12 @@ bindsym $mod+a focus parent
 # focus the child container
 bindsym $mod+q focus child
 
-# switch keyboard layout
-bindsym $mod+$alt+space exec --no-startup-id ~/.xkb/next-layout.sh
+# move the currently focused window to the scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+bindsym $mod+minus scratchpad show
 
 define_default(`WS1', `one')dnl
 define_default(`WS2', `two')dnl
@@ -151,20 +156,28 @@ bindsym $mod+Shift+e exit
 mode "resize" {
     # These bindings trigger as soon as you enter the resize mode
 
-    # Pressing left will shrink the window’s width.
-    # Pressing right will grow the window’s width.
-    # Pressing up will shrink the window’s height.
-    # Pressing down will grow the window’s height.
-    bindsym h resize shrink width 10 px or 10 ppt
-    bindsym j resize grow height 10 px or 10 ppt
-    bindsym k resize shrink height 10 px or 10 ppt
-    bindsym l resize grow width 10 px or 10 ppt
+    # Pressing h will shrink the window’s width.
+    # Pressing j will grow the window’s width.
+    # Pressing k will shrink the window’s height.
+    # Pressing l will grow the window’s height.
+    bindsym h resize shrink width 10 px
+    bindsym j resize grow height 10 px
+    bindsym k resize shrink height 10 px
+    bindsym l resize grow width 10 px
+    bindsym Shift+h resize shrink width 50 px
+    bindsym Shift+j resize grow height 50 px
+    bindsym Shift+k resize shrink height 50 px
+    bindsym Shift+l resize grow width 50 px
 
     # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 10 px or 10 ppt
-    bindsym Down resize grow height 10 px or 10 ppt
-    bindsym Up resize shrink height 10 px or 10 ppt
-    bindsym Right resize grow width 10 px or 10 ppt
+    bindsym Left resize shrink width 10 px
+    bindsym Down resize grow height 10 px
+    bindsym Up resize shrink height 10 px
+    bindsym Right resize grow width 10 px
+    bindsym Shift+Left resize shrink width 50 px
+    bindsym Shift+Down resize grow height 50 px
+    bindsym Shift+Up resize shrink height 50 px
+    bindsym Shift+Right resize grow width 50 px
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -178,15 +191,16 @@ bindsym $mod+r mode "resize"
 for_window [class=".*"] border normal 0
 
 # floating
+for_window [title="^Event Tester$"] floating enable
+for_window [title="^Picture-in-Picture$"] border none
+for_window [instance="^display([^A-Za-z0-9]|$)"] floating enable
+for_window [instance="^display([^A-Za-z0-9]|$)"] move position ifelse(
+    )eval(DPI * 400 / 96) eval(DPI * 225 / 96)
+for_window [instance="^kmag$"] floating enable
+for_window [instance="^kmag$"] resize set ifelse(
+    )eval(DPI * 800 / 96) eval(DPI * 600 / 96)
 for_window [instance="^jack-keyboard([^A-Za-z]|$)"] floating enable
 for_window [instance="^notes-ui$"] floating enable  # carla
-for_window [title="^Event Tester$"] floating enable
-for_window [instance="^display([^A-Za-z0-9]|$)"] floating enable
-for_window [instance="^display([^A-Za-z0-9]|$)"] move position ifdefn(
-    `HIDPI', `800 450', `400 225')
-for_window [instance="^kmag$"] floating enable
-for_window [instance="^kmag$"] resize set ifdefn(
-    `HIDPI', `1600 1200', `800 600')
 
 # dunst
 bindsym Control+space exec --no-startup-id dunstctl close
@@ -195,34 +209,28 @@ bindsym Control+grave exec --no-startup-id dunstctl history-pop
 bindsym Control+Shift+period exec --no-startup-id dunstctl context
 
 # fonts
-define_default(`I3_FONT', ifdefn(
-    `HIDPI',
-    ``pango:DejaVu Sans Mono 10'',
-    ``-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso10646-1''))dnl
-define_default(`DMENU_FONT', ifelse(
-    defn(`HIDPI')vsyscmd(
-        `[ "$(fc-match "Misc Fixed" family)" = "Misc Fixed" ]'),
-    `0', ``Misc Fixed:pixelsize=13'', ``DejaVu Sans Mono:size=10''))dnl
-define_default(`DMENU_COLORS',
-    ifdefn(`MONOCHROME', ``-nf white -sb white -sf black -nb black''))dnl
-dnl
-font defn(`I3_FONT')
-bindsym $mod+d exec --no-startup-id dmenu_run \
-    -fn "defn(`DMENU_FONT')"dnl
-ifdefn(`DMENU_COLORS', ` DMENU_COLORS')
+define_default(`VECTOR_FONT_FAMILY', `DejaVu Sans Mono')dnl
+define_default(`VECTOR_FONT_SIZE', `10')dnl
+define_default(`I3_BITMAP_FONT', ifelse(eval(DPI < 144), 1, 9x15, 9x15-2x))dnl
+define_default(`DMENU_BITMAP_FONT', ifelse(eval(DPI < 144), 1,
+    ``Misc Fixed:pixelsize=13'', ``Misc 2xFixed:pixelsize=26''))dnl
+define_default(`I3_FONT', ifdefn(`USE_BITMAP_FONT', ``I3_BITMAP_FONT'',
+    ``pango:VECTOR_FONT_FAMILY VECTOR_FONT_SIZE''))dnl
+define_default(`DMENU_FONT', ifdefn(`USE_BITMAP_FONT', ``DMENU_BITMAP_FONT'',
+    ``VECTOR_FONT_FAMILY:size=VECTOR_FONT_SIZE''))dnl
+define_default(`DMENU_COLORS', ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper,
+    ``-nf white -sb white -sf black -nb black''))dnl
+font I3_FONT
+bindsym $mod+d exec --no-startup-id dmenu_run -fn 'DMENU_FONT'ifdefn(
+    `DMENU_COLORS', ` DMENU_COLORS')
 
 # terminal shortcuts
 bindsym $mod+Return exec --no-startup-id \
-    URXVT_MONITOR=7:1 urxvt -title urxvt -e tmux -2
+    urxvt -per-monitor -title urxvt -e tmux
 bindsym $mod+Shift+Return exec --no-startup-id \
-    URXVT_MONITOR=7:1 urxvt -title urxvt -e bash
+    urxvt -per-monitor -title urxvt -e bash
 
-bindsym $mod+$alt+Return exec --no-startup-id \
-    URXVT_MONITOR=7:2 urxvt -title urxvt -e tmux -2
-bindsym $mod+$alt+Shift+Return exec --no-startup-id \
-    URXVT_MONITOR=7:2 urxvt -title urxvt -e bash
-
-ifelse(defn(`MONOCHROME'), `2', `dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper, `dnl
 client.focused          #000000 #ffffff #000000 #ffffff #000000
 client.unfocused        #ffffff #ffffff #dddddd #ffffff #000000
 client.focused_inactive #000000 #ffffff #dddddd #ffffff #000000
@@ -232,10 +240,11 @@ client.unfocused        #444444 #000000 #909090 #000000 #000000
 client.focused_inactive #444444 #202020 #909090 #000000 #000000
 ')dnl
 
-syscmd(`./bar.sh')dnl
-
+define(`HANDLE_MONITOR', `include_rel(`bar.m4')
+')dnl
+esyscmd(`~/scripts/monitor-utils/m4/foreach.sh HANDLE_MONITOR')dnl
+dnl
 # rename workspace
 bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
-    prompt -f "defn(`I3_FONT')"
-
+    prompt -f 'I3_FONT'
 sinclude_rel(`config.post.m4')dnl
