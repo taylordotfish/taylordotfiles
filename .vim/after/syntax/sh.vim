@@ -34,7 +34,7 @@ syn cluster shCommandSubList add=shNotKeyword
 
 " Don't highlight `set-foo` as a `set` invocation. The root cause is a
 " misplaced `\>` in the upstream syntax file; this is a workaround.
-syn match shNotKeyword "\<set\>\@!"
+syn match shNotKeyword "\<set\>\@!\w\@!"
 
 " Treat `$(` as the start of a command substitution even when followed by a
 " newline.
@@ -45,3 +45,7 @@ syn region shCommandSub matchgroup=shCmdSubRegion
 
 " Highlight `local` the same way as `export`.
 syn keyword shStatement local
+
+" Don't highlight `abc` in `[ $x = abc ]`. The highlighting is inconsistent
+" anyway; in `[ $x = .abc ]`, `.abc` is not highlighted.
+syn clear shTestPattern
