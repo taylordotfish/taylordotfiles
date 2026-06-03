@@ -3,7 +3,7 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-dir="$(dirname "$0")"
+dir=$(dirname "$0")
 image=/etc/alternatives/desktop-theme/wallpaper/contents/images/1920x1080.svg
 if [ -f "$dir"/.fehbg.pre.sh ]; then
     . "$dir"/.fehbg.pre.sh
