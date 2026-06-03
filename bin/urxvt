@@ -1,12 +1,12 @@
 #!/bin/sh
-# Copyright (C) 2023-2025 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
 dir=$(dirname "$0")
 path=:$PATH:
 case "$path" in
-    *:$dir:*) path=${path%%:$dir:*}:${path#*:$dir:} ;;
+    *:$dir:*) path=${path%%:"$dir":*}:${path#*:"$dir":} ;;
 esac
 path=${path#:}
 path=${path%:}
@@ -15,45 +15,10 @@ if ! urxvt=$(PATH=$path command -v urxvt); then
     exit 1
 fi
 
-case "${URXVT_MONITOR-}" in
-    "")
-        monitor_field=1
-        monitor_value=0
-        ;;
-    *:*)
-        monitor_field=$(printf '%s\n' "$URXVT_MONITOR" | cut -d: -f1)
-        monitor_value=$(printf '%s\n' "$URXVT_MONITOR" | cut -d: -f2-)
-        ;;
-    *)
-        monitor_field=1
-        monitor_value=$URXVT_MONITOR
-        ;;
-esac
-unset URXVT_MONITOR
-
-IFS='
-'
-properties=
-for line in $(~/scripts/monitor-utils.sh monitors); do
-    value=$(printf '%s\n' "$line" | cut -f"$monitor_field")
-    [ "$value" = "$monitor_value" ] || continue
-    properties=$(printf '%s\n' "$line" | cut -f8)
-    break
-done
-
-prop_mono=
-prop_hidpi=
-case ",$properties," in
-    *,mono,*) prop_mono=1 ;;
-esac
-case ",$properties," in
-    *,hidpi,*) prop_hidpi=1 ;;
-esac
-
 args=
 cmd=
-unset name
-unset title
+unset -v name title
+per_monitor=
 state=
 i=0
 
@@ -71,7 +36,10 @@ for arg do
             continue
             ;;
         -e)
-            cmd="$cmd \"\$$i\""
+            cmd="$cmd \"\${$i}\""
+            if [ -z "${title+x}" ]; then
+                title=$(basename "$arg")
+            fi
             continue
             ;;
     esac
@@ -79,11 +47,21 @@ for arg do
         -name|-title|-e)
             state=$arg
             ;;
+        -per-monitor)
+            per_monitor=1
+            ;;
         *)
-            args="$args \"\$$i\""
+            args="$args \"\${$i}\""
             ;;
     esac
 done
+
+eval "$(~/scripts/monitor-utils/sh/globals.sh)"
+monitor_dpi=$global_monitor_dpi
+monitor_tech=$global_monitor_tech
+if [ -n "$per_monitor" ]; then
+    eval "$(~/scripts/monitor-utils/sh/focused.sh)"
+fi
 
 [ -n "$cmd" ] || cmd=$(awk -vFS=: '
     BEGIN {
@@ -97,39 +75,39 @@ done
 ' /etc/passwd "$(id -u)")
 : ${cmd:=bash}
 
-colors_sh=~/scripts/"set-urxvt-colors.sh"
-if [ -n "$prop_mono" ]; then
+colors_sh=~/scripts/set-urxvt-colors.sh
+if [ "$monitor_tech" = epaper ]; then
     if command -v monoterm > /dev/null; then
         cmd="monoterm -b $cmd"
     fi
-elif [ -z "${KEEPCOLORS-}" ] && [ -x "$colors_sh" ]; then
+elif [ -z "${URXVT_NO_SET_COLORS-}" ] && [ -x "$colors_sh" ]; then
     cmd="\"\$colors_sh\" $cmd"
 fi
-unset KEEPCOLORS
 
-hidpi_sh=~/scripts/hidpi.sh
-if [ -n "$prop_hidpi" ] && [ -x "$hidpi_sh" ]; then
-    cmd="\"\$hidpi_sh\" $cmd"
+fix_sh=~/scripts/fix-urxvt-position.sh
+if [ -z "${URXVT_NO_FIX_POSITION-}" ] && [ -x "$fix_sh" ]; then
+    cmd="\"\$fix_sh\" $cmd"
 fi
 
 if [ -z "${name+x}" ]; then
     name=Rxvt
-    if [ -n "$prop_mono" ]; then
-        name=$name.mono
+    if [ "$monitor_tech" = epaper ]; then
+        name=$name.epaper
     fi
-    if [ -n "$prop_hidpi" ]; then
-        name=$name.2x
+    if [ "$monitor_dpi" -ne "$global_monitor_dpi" ]; then
+        name=$name.${monitor_dpi}dpi
     fi
 fi
 
-if [ -n "$prop_mono" ]; then
-    export MONOCHROME=${MONOCHROME-1}
+if [ "$monitor_tech" = epaper ]; then
+    export MONOCHROME=1
 else
-    unset MONOCHROME
+    unset -v MONOCHROME
 fi
-
-if [ -z "$prop_mono" ] && [ -n "$prop_hidpi" ]; then
-    export HEAVY_BLOCKS=${HEAVY_BLOCKS-1}
+if [ "$monitor_dpi" -ge 144 ]; then
+    export HEAVY_BLOCKS=1
+else
+    unset -v HEAVY_BLOCKS
 fi
 
 : ${title=urxvt}
