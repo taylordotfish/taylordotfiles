@@ -7,13 +7,10 @@ default_target=i3
 
 prepare_session() {
     xprop -root -format XSESSION_TARGET 8s -set XSESSION_TARGET "$target"
+    rm -rf ~/.cache/monitor-utils
     if [ -f ~/.xprofile ]; then
         . ~/.xprofile
     fi
-    dbus-update-activation-environment \
-        GDK_SCALE \
-        GDK_DPI_SCALE \
-        QT_SCALE_FACTOR
 }
 
 prepare_desktop() {
