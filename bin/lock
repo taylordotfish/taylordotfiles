@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2023-2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2023-2024, 2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
@@ -12,9 +12,7 @@ run_i3lock_blocking() {
     fi
     i3lock -n "$@"
     if [ -n "$picom" ]; then
-        local picom_bin=~/scripts/picom.sh
-        [ -x "$picom_bin" ] || picom_bin=picom
-        exec "$picom_bin"
+        exec picom
     fi
 }
 
@@ -22,77 +20,63 @@ run_i3lock() {
     run_i3lock_blocking "$@" > /dev/null 2>&1 < /dev/null &
 }
 
-unset any_scr_parts
+any_screenshots=
 
-rm_scr_parts() {
-    (
-        set +f
-        rm -f "$screenshot_dir"/screen_*.png
-    )
-    unset any_scr_parts
+rm_screenshots() {
+    [ -n "$any_screenshots" ] || return
+    set +f
+    set -f -- "$screenshot_dir"/screen_*.png
+    rm -f -- "$@"
+    any_screenshots=
 }
 
 on_exit() {
-    local status=$?
+    local status="$?"
     trap - HUP INT QUIT TERM EXIT
-    if [ -n "${any_scr_parts-}" ]; then
-        rm_scr_parts
-    fi
+    rm_screenshots
     exit "$status"
 }
 
 trap on_exit HUP INT QUIT TERM EXIT
 
+handle_monitor() {
+    if [ "$monitor_tech" = epaper ]; then
+        return
+    fi
+    local screen="$((monitor_screen))"
+    local x="$((monitor_x))"
+    local y="$((monitor_y))"
+    local endx="$((x + monitor_width))"
+    local endy="$((y + monitor_height))"
+    [ "$endx" -le "$maxx" ] || maxx=$endx
+    [ "$endy" -le "$maxy" ] || maxy=$endy
+
+    any_screenshots=1
+    local path="$screenshot_dir/screen_$screen.png"
+    local blur_sigma="$((monitor_dpi * 8 / 96))"
+    {
+        scrot -M "$screen" "$path"
+        mogrify -colorspace RGB -blur 0x"$blur_sigma" -colorspace sRGB "$path"
+    } &
+    eval "path_$screen=\$path"
+    im_args="$im_args \$path_$screen -geometry '+$x+$y' -composite"
+}
+
 if [ -d "$screenshot_dir" ]; then
-    rm_scr_parts
-    oldifs=$IFS
-    IFS='
-'
     maxx=0
     maxy=0
-    for line in $(~/scripts/monitor-utils.sh monitors); do
-        index=$(printf '%s\n' "$line" | cut -f1)
-        width=$(printf '%s\n' "$line" | cut -f2)
-        height=$(printf '%s\n' "$line" | cut -f3)
-        posx=$(printf '%s\n' "$line" | cut -f4)
-        posy=$(printf '%s\n' "$line" | cut -f5)
-        properties=$(printf '%s\n' "$line" | cut -f8)
-        endx=$((posx+width))
-        endy=$((posy+height))
-        [ "$endx" -le "$maxx" ] || maxx=$endx
-        [ "$endy" -le "$maxy" ] || maxy=$endy
-        case ",$properties," in
-            *,hidpi,*) blur_sigma=16 ;;
-            *) blur_sigma=8 ;;
-        esac
-        case ",$properties," in
-            *,mono,*) ;;
-            *)
-                any_scr_parts=1
-                scrot -M "$index" "$screenshot_dir"/screen_"$index".png
-                mogrify -colorspace RGB -blur 0x"$blur_sigma" \
-                    -colorspace sRGB "$screenshot_dir"/screen_"$index".png
-                ;;
-        esac
-    done
-    set --
-    for line in $(~/scripts/monitor-utils.sh monitors); do
-        index=$(printf '%s\n' "$line" | cut -f1)
-        posx=$(printf '%s\n' "$line" | cut -f4)
-        posy=$(printf '%s\n' "$line" | cut -f5)
-        if [ -f "$screenshot_dir/screen_$index.png" ]; then
-            set -- "$@" "$screenshot_dir/screen_$index.png" \
-                -geometry "+$posx+$posy" -composite
-        fi
-    done
-    IFS=$oldifs
+    im_args=
+    eval "$(~/scripts/monitor-utils/sh/foreach.sh handle_monitor)"
+    eval "set -- $im_args"
+    wait
     convert -size "$maxx"x"$maxy" xc:white "$@" "$screenshot_dir"/full.png
-    rm_scr_parts
+    rm_screenshots
     run_i3lock -i "$screenshot_dir"/full.png
     exit
 fi
 
-if [ -n "${MONOCHROME-}" ]; then
+eval "$(~/scripts/monitor-utils/sh/globals.sh)"
+if [ "$global_monitor_tech" = epaper ]; then
     run_i3lock -c ffffff
 else
     run_i3lock -c 000000
