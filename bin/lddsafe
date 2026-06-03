@@ -1,0 +1,22 @@
+#!/bin/sh
+set -euf
+
+run_one() {
+    objdump -p "$1" | awk '$1 == "NEEDED" { print "\t" $2 }'
+}
+
+case "$#" in
+    0)
+        printf >&2 '%s\n' "lddsafe: missing file arguments"
+        exit 1
+        ;;
+    1)
+        run_one "$1"
+        ;;
+    *)
+        for arg do
+            printf '%s\n' "$arg:"
+            run_one "$arg"
+        done
+        ;;
+esac
