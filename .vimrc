@@ -45,7 +45,7 @@ if g:fancyterm
     set cursorline
     set ttimeoutlen=0
 endif
-if g:term_encoding == "latin1"
+if g:term_encoding is# "latin1"
     set encoding=utf-8
     set termencoding=latin1
 endif
@@ -73,7 +73,7 @@ nnoremap Yp :read ~/.vimclip<CR>
 nnoremap YP :execute (line(".") - 1) . "read ~/.vimclip"<CR>
 
 " For monochrome displays
-if g:fancyterm && $MONOCHROME != ""
+if g:fancyterm && $MONOCHROME isnot# ""
     hi MatchParen ctermfg=none ctermbg=none cterm=underline
 endif
 so ~/.vim/ws.vim  " Whitespace/indent configuration

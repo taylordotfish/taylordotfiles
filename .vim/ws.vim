@@ -41,7 +41,7 @@ command UseCIndent setlocal indentexpr=s:GetCIndent()
 function s:TabMode()
     call s:ClearWsMode()
     setlocal noexpandtab softtabstop=0
-    if g:term_encoding == "utf8"
+    if g:term_encoding is# "utf8"
         let l:spacechar="·"
     else
         let l:spacechar="`"
@@ -67,9 +67,9 @@ function s:SpaceMode()
         let &l:softtabstop = &shiftwidth
     endif
     let b:ws_state.lc_normal = ""
-    if !g:term_encoding == "utf8"
+    if !g:term_encoding is# "utf8"
         let l:tabchars='\|-\|'
-    elseif $HEAVY_BLOCKS != ""
+    elseif $HEAVY_BLOCKS isnot# ""
         let l:tabchars="┣━┫"
     else
         let l:tabchars="├─┤"
@@ -123,17 +123,17 @@ endfunction
 
 function s:Refresh()
     let b:ws_state.ft = &ft
-    if &ft == "" || !g:ws_config.ft_indent
+    if &ft is# "" || !g:ws_config.ft_indent
         ResetIndent
-    elseif &indentexpr == ""
+    elseif &indentexpr is# ""
         UseCIndent
     endif
-    if &ft == "help"
+    if &ft is# "help"
         setlocal nolist
     else
         setlocal list
     endif
-    if g:ws_config.mode == "tab"
+    if g:ws_config.mode is# "tab"
         TabMode
     else
         SpaceMode
@@ -152,13 +152,13 @@ function s:OnBufEnter()
 endfunction
 
 function s:OnFileType()
-    if s:IsInitialized() && b:ws_state.ft != &ft
+    if s:IsInitialized() && b:ws_state.ft isnot# &ft
         call s:Refresh()
     endif
 endfunction
 
 function s:OnBufUnload()
-    if bufnr() == expand("<abuf>")
+    if bufnr() is# expand("<abuf>")
         let b:ws_state = v:null
     endif
 endfunction
