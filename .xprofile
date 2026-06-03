@@ -1,13 +1,5 @@
-#!/usr/bin/env -S NOTSOURCED=1 /bin/sh
-if [ -z "${NOTSOURCED-}" ]; then
-    eval "$(NOTSOURCED=1 sh ~/.xprofile eval)"
-    return 0
-fi
-set -euf
-unset NOTSOURCED
-
-initialize() {
-    xrdb ~/.Xresources.m4 -cpp m4
+#!/bin/sh -euf
+xprofile_main() {
     xset s off
     xset s noblank
     xset dpms 65535 65535 65535
@@ -25,31 +17,18 @@ initialize() {
             xset fp+ "$dir"
         fi
     done
-    set -- ~/scripts/displays.sh \
-        ~/scripts/controls.sh \
-        ~/.config/gtk-4.0/generate.sh
     local script
-    for script do
+    for script in displays.sh controls.sh; do
+        script=~/scripts/$script
         if [ -x "$script" ]; then
             "$script"
         fi
     done
+    xrdb ~/.Xresources.m4 -cpp m4
+    export QT_AUTO_SCREEN_SCALE_FACTOR=1
+    export QT_ENABLE_HIGHDPI_SCALING=1
+    dbus-update-activation-environment \
+        QT_AUTO_SCREEN_SCALE_FACTOR \
+        QT_ENABLE_HIGHDPI_SCALING
 }
-
-print_env() {
-    local dpi
-    dpi=$(xrdb -query | grep '^Xft\.dpi:' | cut -f2)
-    if [ "${dpi:-96}" != 96 ]; then
-        cat << EOF
-export GDK_DPI_SCALE=$(awk 'BEGIN { printf "%.2g\n", 96/ARGV[1] }' "$dpi")
-export QT_FONT_DPI=96
-EOF
-    fi
-}
-
-if [ "${1-}" = eval ]; then
-    initialize >&2
-    print_env
-else
-    initialize
-fi
+xprofile_main
