@@ -1,35 +1,40 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
-merge_env(`HIDPI', `MONOCHROME')dnl
 sinclude_rel(`dunstrc.pre.m4')dnl
+esyscmd(`~/scripts/monitor-utils/m4/globals.sh')dnl
+define_default(`FONT', `DejaVu Sans Mono 10')dnl
 dnl
 [global]
     follow = mouse
-    width = ifdefn(`HIDPI', `450', `300')
+    width = 300
     offset = 35x35
-    frame_color = ifelse(defn(`MONOCHROME'), `2', `"#000000"', `"#9090907f"')
-    font = DejaVu Sans Mono 10
+    frame_color = ifelse(
+        defn(`GLOBAL_MONITOR_TECH'),
+        epaper,
+        `"#000000"',
+        `"#9090907f"')
+    font = FONT
     icon_position = off
-ifelse(defn(`MONOCHROME'), `2', `dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper, `dnl
     background = "#ffffff"
     foreground = "#000000"
 ')dnl
 
 [urgency_low]
-ifelse(defn(`MONOCHROME'), `2',, `dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper,, `dnl
     background = "#0000007f"
     foreground = "#909090"
 ')dnl
     timeout = 0
 
 [urgency_normal]
-ifelse(defn(`MONOCHROME'), `2',, `dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper,, `dnl
     background = "#0000007f"
     foreground = "#ffffff"
 ')dnl
     timeout = 0
 
 [urgency_critical]
-ifelse(defn(`MONOCHROME'), `2',, `dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper,, `dnl
     background = "#0000007f"
     foreground = "#ffffff"
     frame_color = "#ff5050"
