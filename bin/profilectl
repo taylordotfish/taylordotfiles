@@ -1,0 +1,181 @@
+#!/bin/sh
+set -euf
+
+usage_exit() {
+    exec cat << EOF
+Usage: $(basename "$0") [options] <command>
+
+Commands:
+  install <profile>
+    Install and load an ICC profile
+  remove
+    Uninstall and clear the current ICC profile
+  load
+    Load the installed ICC profile
+  clear
+    Clear the loaded ICC profile
+
+Options:
+  -s <screen>  Use screen number <screen> (default: all)
+  -h, --help   Show this help message
+EOF
+}
+
+expected_warnings="Warning.*Expected VideoLUT depth 8 doesn't match actual
+10\$"
+expected_errors=
+
+run_dispwin() {
+    local screen="$1"
+    shift
+    set -- -d "$((screen + 1))" "$@"
+
+    local expected="$expected_warnings"
+    if [ -n "$expected_errors" ]; then
+        expected=${expected:+$expected|}$expected_errors
+    fi
+    if [ -z "$expected" ]; then
+        dispwin "$@"
+        return
+    fi
+
+    local output
+    output=$(dispwin "$@" 2>&1) && false
+    local status="$?"
+
+    if printf '%s\n' "$output" | grep -Ev -- "$expected" | grep -q .; then
+        printf '%s\n' "$output"
+        if [ "$status" -ne 0 ]; then
+            exit "$status"
+        fi
+        return
+    fi
+
+    if [ "$status" -ne 0 ] && [ -n "$expected_errors" ] &&
+        ! printf '%s\n' "$output" | grep -E -- "$expected_errors"
+    then
+        printf '%s\n' "$output"
+        exit "$status"
+    fi
+}
+
+dispwin_all() {
+    local screen
+    for screen in $screens; do
+        run_dispwin "$screen" "$@"
+    done
+}
+
+args_done() {
+    if [ "$#" -gt 0 ]; then
+        printf >&2 '%s\n' "error: unexpected argument: $1"
+        exit 1
+    fi
+}
+
+cmd_install() {
+    if [ "$#" -lt 1 ]; then
+        printf >&2 '%s\n' "error: missing <profile>"
+        exit 1
+    fi
+    local profile="$1"
+    shift
+    args_done "$@"
+    dispwin_all -I "$profile"
+}
+
+cmd_remove() {
+    args_done "$@"
+    local screen
+    for screen in $screens; do
+        local atom=_ICC_PROFILE
+        if [ "$screen" -ne 0 ]; then
+            atom=${atom}_$screen
+        fi
+        set --
+        if [ "$(xprop -root 8c '\nYES\n' "$atom" | tail -n+2)" = YES ]; then
+            set -- -U
+        fi
+        run_dispwin "$screen" -c "$@"
+    done
+}
+
+cmd_load() {
+    args_done "$@"
+    local msg='Error.*Failed to get the displays current ICC profile$'
+    expected_errors=${expected_errors:+$expected_errors|}$msg
+    dispwin_all -L
+}
+
+cmd_clear() {
+    args_done "$@"
+    local xmonutil
+    xmonutil=~/scripts/monitor-utils/xmonutil.sh
+    if ! [ -x "$xmonutil" ]; then
+        xmonutil=
+        printf >&2 '%s\n' \
+            "warning: missing xmonutil; cannot remove RandR output properties"
+    fi
+    local screen
+    for screen in $screens; do
+        run_dispwin "$screen" -c
+        local atom=_ICC_PROFILE
+        if [ "$screen" -ne 0 ]; then
+            atom=${atom}_$screen
+        fi
+        xprop -root -remove "$atom" 2>&1 | grep -v 'no such property'
+        if [ -n "$xmonutil" ]; then
+            "$xmonutil" delprop "$screen" _ICC_PROFILE
+        fi
+    done
+}
+
+for arg do
+    case "$arg" in
+        --help) usage_exit ;;
+        -*) ;;
+        *) break ;;
+    esac
+done
+
+screens=
+while getopts 's:h' name; do
+    case "$name" in
+        s) case "$OPTARG" in
+            *[!0-9]*|"")
+                printf >&2 '%s\n' "error: invalid screen: $OPTARG"
+                exit 1
+                ;;
+            *) screens="$screens $OPTARG" ;;
+        esac ;;
+        h) usage_exit ;;
+        \?) exit 1 ;;
+    esac
+done
+
+shift "$((OPTIND - 1))"
+if [ "$#" -lt 1 ]; then
+    printf >&2 '%s\n' "error: missing <command>"
+    exit 1
+fi
+cmd=$1
+shift
+
+case "$cmd" in
+    install|remove|load|clear) ;;
+    *)
+        printf >&2 '%s\n' "error: unknown command: $cmd"
+        exit 1
+        ;;
+esac
+if [ -z "$screens" ]; then
+    screens=$(~/scripts/monitor-utils/monitors.sh | jq -r '
+        map(.screen | floor | select(. >= 0)) | @sh
+    ')
+    if [ -z "$screens" ]; then
+        printf >&2 '%s\n' "error: failed to get list of screens"
+        exit 1
+    fi
+fi
+pkill -x redshift || true
+"cmd_$cmd" "$@"

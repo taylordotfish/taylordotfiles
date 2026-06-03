@@ -249,6 +249,24 @@ if command -v truncline > /dev/null; then truncline() {
     fi
 } fi
 
+if command -v profilectl > /dev/null; then
+    install-profile() {
+        profilectl install "$@"
+    }
+
+    remove-profile() {
+        profilectl remove "$@"
+    }
+
+    load-profile() {
+        profilectl load "$@"
+    }
+
+    clear-profile() {
+        profilectl clear "$@"
+    }
+fi
+
 if command -v ds > /dev/null; then
     complete -F _command ds
 fi
