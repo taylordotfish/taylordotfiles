@@ -30,7 +30,7 @@ alias get-short-value='
     opts=
 '
 
-unset file
+unset -v file
 length=100
 color=auto
 options_done=

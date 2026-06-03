@@ -50,7 +50,7 @@ if ! { [ -r "$device" ] && [ -w "$device" ]; }; then
 fi
 
 stty_settings=$(stty -g)
-unset pid
+unset -v pid
 
 on_exit() {
     local status="$?"

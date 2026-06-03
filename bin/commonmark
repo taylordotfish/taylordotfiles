@@ -55,7 +55,7 @@ pulldown_cmark() {
     pulldown-cmark ${ext:+-TFS} ${smart:+-P} -- "$@"
 }
 
-unset target
+unset -v target
 if [ -n "$ext" ] || command -v pulldown-cmark > /dev/null; then
     target=pulldown_cmark
 elif command -v cmark > /dev/null; then

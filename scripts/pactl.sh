@@ -15,7 +15,7 @@ fi
 
 if [ "$(command -v amixer_sset)" = amixer_sset ]; then
     if [ "$1" = "set-sink-volume" ]; then
-        unset volume
+        unset -v volume
         case "$2" in
             *[!0-9%+-]*) ;;
             +*%) volume=${2#+}+ ;;
@@ -27,7 +27,7 @@ if [ "$(command -v amixer_sset)" = amixer_sset ]; then
             exit
         fi
     elif [ "$1" = "set-sink-mute" ]; then
-        unset param
+        unset -v param
         case "$2" in
             0) param=unmute ;;
             1) param=mute ;;

@@ -89,4 +89,4 @@ if [ -n "$BASH_VERSION" ]; then
         . "$HOME/.bashrc"
     fi
 fi
-unset _profile_sourced
+unset -v _profile_sourced

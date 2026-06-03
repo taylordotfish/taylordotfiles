@@ -5,7 +5,7 @@ _bashrc_sourced=1
 if [ -f ~/.bashrc.pre ]; then
     . ~/.bashrc.pre
 fi
-unset _bashrc_sourced
+unset -v _bashrc_sourced
 
 PS1='\u@\h:\w\$ '
 HISTCONTROL=ignoreboth

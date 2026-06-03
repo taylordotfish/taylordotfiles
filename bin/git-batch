@@ -163,7 +163,7 @@ case "$1" in
         ;;
 esac
 
-unset target
+unset -v target
 case "$1" in
     unpushed|unpulled|fetch|ff|submodule|sync)
         target="cmd_foreach $1"
