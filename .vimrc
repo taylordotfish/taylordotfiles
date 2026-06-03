@@ -5,7 +5,13 @@ if filereadable(expand("~/.vimrc.pre"))
     so ~/.vimrc.pre
 endif
 
-let g:fancyterm = $TERM !~ '^vt'
+if $TERM =~# '^tmux\%(-\|$\)'
+    let g:term = trim(system("tmux display-message -p '#{client_termname}'"))
+else
+    let g:term = $TERM
+endif
+
+let g:fancyterm = g:term !~# '^vt'
 if $LANG =~? 'UTF-\?8$'
     let g:term_encoding = "utf8"
 elseif $LANG =~? 'ISO-\?8859-\?1$'
@@ -55,6 +61,10 @@ let g:rust_edition = "latest"
 filetype indent on
 if g:fancyterm
     syntax on
+    if exists("g:bluegreen_transparency")
+    elseif g:term =~# '^rxvt-unicode-256color$'
+        let g:bluegreen_transparency = "full"
+    endif
     colorscheme bluegreen
     au FileType * syntax sync fromstart
 endif
