@@ -23,7 +23,7 @@ run_i3lock() {
 any_screenshots=
 
 rm_screenshots() {
-    [ -n "$any_screenshots" ] || return
+    [ -n "$any_screenshots" ] || return 0
     set +f
     set -f -- "$screenshot_dir"/screen_*.png
     rm -f -- "$@"
