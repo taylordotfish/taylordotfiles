@@ -1,22 +1,38 @@
 #!/bin/sh
-# Copyright (C) 2024 taylor.fish <contact@taylor.fish>
+# Copyright (C) 2024, 2026 taylor.fish <contact@taylor.fish>
 # License: GNU GPL version 3 or later
 set -euf
 
+dir="$(dirname "$0")"
 image=/etc/alternatives/desktop-theme/wallpaper/contents/images/1920x1080.svg
+if [ -f "$dir"/.fehbg.pre.sh ]; then
+    . "$dir"/.fehbg.pre.sh
+fi
 
-IFS='
-'
-for line in $(~/scripts/monitor-utils.sh monitors); do
-    index=$(printf '%s\n' "$line" | cut -f1)
-    priority=$(printf '%s\n' "$line" | cut -f7)
-    properties=$(printf '%s\n' "$line" | cut -f8)
-    eval "image=\${image_$priority-\$image}"
-    case ",$properties," in
-        *,mono,*) image=${image_mono:-$image} ;;
+handle_monitor() {
+    local clean_name
+    case "$monitor_name" in
+        *[!A-Za-z0-9_]*) clean_name=$(printf '%s' "$monitor_name" |
+            tr - _ | tr -dC A-Za-z0-9_) ;;
+        *) clean_name=$monitor_name ;;
     esac
-    eval "mimage_$index=\$image"
-done
+    local monitor_image
+    eval "monitor_image=\${image_name_$clean_name-}"
+
+    if [ -z "$monitor_image" ]; then
+        case "$monitor_tech" in
+            *[!A-Za-z0-9_]*) ;;
+            *) eval "monitor_image=\${image_tech_$monitor_tech-}" ;;
+        esac
+    fi
+    if [ -z "$monitor_image" ]; then
+        monitor_image=$image
+    fi
+    local screen="$((monitor_screen))"
+    eval "mimage_$screen=\$monitor_image"
+}
+
+eval "$(~/scripts/monitor-utils/sh/foreach.sh handle_monitor)"
 
 i=0
 set --
