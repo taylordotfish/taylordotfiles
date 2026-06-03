@@ -194,6 +194,10 @@ if command -v rg > /dev/null; then
     rgg() {
         rg -. '-g!.git' "$@"
     }
+
+    if [ -f ~/scripts/rgc.sh ]; then rgc() (
+        . ~/scripts/rgc.sh
+    ) fi
 fi
 
 unset -f jq
