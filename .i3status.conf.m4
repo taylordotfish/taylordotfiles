@@ -26,7 +26,7 @@ order += "disk /"
 order += "wireless _first_"
 order += "ethernet _first_"
 define(`BATTERY', esyscmd(`printf \\140
-printf "%s\n" /sys/class/power_supply/BAT* | head -1 | tr -dc "[0-9]"
+printf "%s\n" /sys/class/power_supply/BAT* | head -1 | tr -dC 0-9
 printf \\47
 '))dnl
 ifelse(defn(`BATTERY'),,, `dnl
