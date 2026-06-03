@@ -1,0 +1,13 @@
+// Example configuration -- remove this line before using
+[
+    {
+        "name": "internal",
+        "dpi": 96,
+        "tech": "standard"
+    },
+    {
+        "name": "paperlike",
+        "dpi": 150,
+        "tech": "epaper"
+    }
+]

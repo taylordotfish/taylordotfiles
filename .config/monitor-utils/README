@@ -1,0 +1,46 @@
+monitors.json
+-------------
+
+Array of monitor objects, each containing of the following keys:
+
+* name (required): arbitrary unique name for this monitor (string)
+
+* priority (optional): arbitrary number by which monitors should be ordered.
+  Lower numbers mean higher priority; RandR index is used as a tiebreaker
+  (number, default 0)
+
+* dpi (optional): per-monitor DPI (number, default 96)
+
+* tech (optional): display technology used by this monitor
+  - "standard": emissive LCD or LED
+  - "epaper": grayscale e-paper
+  - default: "standard"
+
+outputs.json
+------------
+
+Object where:
+
+* Each key is a RandR output name like "HDMI-1".
+* Each value is the name of a monitor in monitors.json.
+
+settings.json
+-------------
+
+Object containing the following keys:
+
+* global_dpi (optional):
+  - "priority": use DPI of highest priority monitor
+  - "average": use average DPI of all monitors
+  - "minimum": use lowest DPI of any monitor
+  - "maximum": use highest DPI of any monitor
+  - <number>: use specified DPI
+  - default: "priority"
+
+* global_tech (optional):
+  - "priority": use tech of highest priority monitor
+  - array of strings: each string must be a valid monitor "tech". Use the first
+    tech used by at least one monitor; if none, use the last element of the
+    array. Array must be non-empty.
+  - <string>: always use the specified tech; same as [<string>]
+  - default: "priority"

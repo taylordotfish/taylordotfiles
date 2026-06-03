@@ -1,0 +1,5 @@
+// Example configuration -- remove this line before using
+{
+    "eDP-1": "internal",
+    "HDMI-1": "paperlike"
+}
