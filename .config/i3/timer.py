@@ -76,12 +76,11 @@ class SystemInfo:
 
     @classmethod
     def _make(cls) -> Self:
-        dpi_str = subprocess.run(
-            r"xrdb -query | grep '^Xft\.dpi:' | cut -f2",
-            shell=True,
-            stdout=subprocess.PIPE,
-            check=True,
-        ).stdout
+        dpi_str = subprocess.run([
+            os.path.expanduser("~/scripts/monitor-utils/monitors.sh"),
+            "-j",
+            ".[0].dpi",
+        ], stdout=subprocess.PIPE, check=True).stdout
         try:
             dpi = int(dpi_str)
         except ValueError:
