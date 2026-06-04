@@ -4,32 +4,72 @@
 set -euf
 
 dir=$(dirname "$0")
-image=/etc/alternatives/desktop-theme/wallpaper/contents/images/1920x1080.svg
+
+default_get_image() {
+    local dir=/etc/alternatives/desktop-theme/wallpaper/contents/images
+    set +f
+    set -f -- "$dir"/*.svg
+    local widest_image=
+    local max_width=
+    local best_image=
+    local best_area=
+    local f
+    for f do
+        if ! [ -f "$f" ]; then
+            continue
+        fi
+        local name="${f##*/}"
+        name=${name%%.*}
+        local width="${name%%x*}"
+        local height="${name##*x}"
+        case "$width" in
+            *[!0-9]*|"") continue ;;
+        esac
+        case "$height" in
+            *[!0-9]*|"") continue ;;
+        esac
+        if [ -z "$max_width" ] || [ "$width" -gt "$max_width" ]; then
+            widest_image=$f
+            max_width=$width
+        fi
+        if [ "$width" -lt "$monitor_width" ]; then
+            continue
+        fi
+        if [ "$height" -lt "$monitor_height" ]; then
+            continue
+        fi
+        local area="$((width * height))"
+        if [ -z "$best_area" ] || [ "$area" -lt "$best_area" ]; then
+            best_image=$f
+            best_area=$area
+        fi
+    done
+    if [ -n "$best_image" ]; then
+        image=$best_image
+    elif [ -n "$widest_image" ]; then
+        image=$widest_image
+    fi
+}
+
+get_image() {
+    default_get_image
+}
+
 if [ -f "$dir"/.fehbg.pre.sh ]; then
+    # `get_image` can be overridden here.
     . "$dir"/.fehbg.pre.sh
 fi
 
 handle_monitor() {
-    local clean_name
-    case "$monitor_name" in
-        *[!A-Za-z0-9_]*) clean_name=$(printf '%s' "$monitor_name" |
-            tr - _ | tr -dC A-Za-z0-9_) ;;
-        *) clean_name=$monitor_name ;;
-    esac
-    local monitor_image
-    eval "monitor_image=\${image_name_$clean_name-}"
-
-    if [ -z "$monitor_image" ]; then
-        case "$monitor_tech" in
-            *[!A-Za-z0-9_]*) ;;
-            *) eval "monitor_image=\${image_tech_$monitor_tech-}" ;;
-        esac
-    fi
-    if [ -z "$monitor_image" ]; then
-        monitor_image=$image
+    local image=
+    get_image
+    if [ -z "$image" ]; then
+        local msg=".fehbg: could not find image for screen $monitor_screen"
+        msg="$msg (${monitor_width}x${monitor_height})"
+        printf >&2 '%s\n' "$msg"
     fi
     local screen="$((monitor_screen))"
-    eval "mimage_$screen=\$monitor_image"
+    eval "image$screen=\$image"
 }
 
 eval "$(~/scripts/monitor-utils/sh/foreach.sh handle_monitor)"
@@ -37,10 +77,10 @@ eval "$(~/scripts/monitor-utils/sh/foreach.sh handle_monitor)"
 i=0
 set --
 while true; do
-    eval "mimage=\${mimage_$i-}"
-    [ -n "$mimage" ] || break
-    set -- "$@" "$mimage"
-    i=$((i+1))
+    eval "image=\${image$i-}"
+    [ -n "$image" ] || break
+    set -- "$@" "$image"
+    : $((i += 1))
 done
 
 if [ "$#" -gt 0 ]; then
