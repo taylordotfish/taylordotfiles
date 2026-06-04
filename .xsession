@@ -13,10 +13,8 @@ prepare_session() {
     fi
 }
 
-prepare_desktop() {
+prepare_wm() {
     prepare_session
-    ~/.config/dunst/generate.sh
-    systemctl --user start dunst || true
     if { command -v lxpolkit && ! pgrep -x lxpolkit; } > /dev/null; then
         lxpolkit &
     fi
@@ -31,20 +29,19 @@ ensure_installed() {
 
 start_i3() {
     ensure_installed i3
-    prepare_desktop
-    ~/.config/i3/generate.sh
+    prepare_wm
     exec i3
 }
 
 start_xfce() {
     ensure_installed xfce4-session
-    prepare_desktop
+    prepare_session
     exec xfce4-session
 }
 
 start_windowmaker() {
     ensure_installed wmaker
-    prepare_desktop
+    prepare_session
     exec wmaker
 }
 
