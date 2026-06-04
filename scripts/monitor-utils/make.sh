@@ -4,7 +4,8 @@
 set -euf
 stale=${MONITORS_STALE-}
 verbose=${MONITORS_VERBOSE-}
-unset -v MONITORS_STALE MONITORS_VERBOSE
+unset -v MONITORS_STALE
+unset -v MONITORS_VERBOSE
 
 case "$0" in
     */*) dir=${0%/*} ;;
