@@ -26,7 +26,46 @@
 #include <X11/extensions/Xinerama.h>
 #include <stdbool.h>
 
-int xmonutil_focused_screen(Display *const display) {
+static int max_intersecting_screen(
+    const XineramaScreenInfo * const info,
+    const int num_screens,
+    int x,
+    int y,
+    int width,
+    int height
+) {
+    DEBUG_PRINT("finding screen for %dx%d+%d+%d\n", width, height, x, y);
+    long max_area = 0;
+    int screen = -1;
+    if (width < 0) {
+        x += width;
+        width *= -1;
+    }
+    if (height < 0) {
+        y += height;
+        height *= -1;
+    }
+    for (int i = 0; i < num_screens; ++i) {
+        const long area = intersect(
+            x,
+            y,
+            width,
+            height,
+            info[i].x_org,
+            info[i].y_org,
+            info[i].width,
+            info[i].height
+        );
+        DEBUG_PRINT("area %d is %ld\n", i, area);
+        if (area > max_area) {
+            screen = info[i].screen_number;
+            max_area = area;
+        }
+    }
+    return screen;
+}
+
+int xmonutil_focused_screen(Display * const display) {
     const Window root = DefaultRootWindow(display);
     Window window = None;
     int revert = 0;
@@ -37,26 +76,13 @@ int xmonutil_focused_screen(Display *const display) {
     int y = 0;
     int width = 0;
     int height = 0;
+    int screen = 0;
 
-    if (window == None || window == PointerRoot || window == root) {
-        DEBUG_PRINT("using pointer coordinates\n");
-        Window root_;
-        Window child;
-        int win_x;
-        int win_y;
-        unsigned int mask;
-        success = XQueryPointer(
-            display,
-            root,
-            &root_,
-            &child,
-            &x,
-            &y,
-            &win_x,
-            &win_y,
-            &mask
-        );
-    } else {
+    int num_screens = 0;
+    XineramaScreenInfo * const info =
+        XineramaQueryScreens(display, &num_screens);
+
+    if (window != None && window != PointerRoot && window != root) {
         while (true) {
             Window root_;
             Window parent = None;
@@ -87,41 +113,59 @@ int xmonutil_focused_screen(Display *const display) {
             height = attrs.height;
             success = true;
         }
-    }
-
-    if (!success) {
-        return 0;
-    }
-
-    DEBUG_PRINT("(%d, %d) %dx%d\n", x, y, width, height);
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (width < 1) width = 1;
-    if (height < 1) height = 1;
-
-    int num_screens = 0;
-    XineramaScreenInfo * const info =
-        XineramaQueryScreens(display, &num_screens);
-
-    long max_area = 0;
-    int screen = 0;
-    for (int i = 0; i < num_screens; ++i) {
-        const long area = intersect(
+        screen = max_intersecting_screen(
+            info,
+            num_screens,
             x,
             y,
             width,
-            height,
-            info[i].x_org,
-            info[i].y_org,
-            info[i].width,
-            info[i].height
+            height
         );
-        DEBUG_PRINT("area %d is %ld\n", i, area);
-        if (area > max_area) {
-            screen = info[i].screen_number;
-            max_area = area;
+        if (screen >= 0) {
+            goto free_screens;
         }
     }
+
+    DEBUG_PRINT("using pointer coordinates\n");
+    Window root_;
+    Window child;
+    int win_x;
+    int win_y;
+    unsigned int mask;
+    x = 0;
+    y = 0;
+    success = XQueryPointer(
+        display,
+        root,
+        &root_,
+        &child,
+        &x,
+        &y,
+        &win_x,
+        &win_y,
+        &mask
+    );
+
+    if (!success) {
+        DEBUG_PRINT("XQueryPointer failed\n");
+        return 0;
+    }
+
+    width = 1;
+    height = 1;
+    screen = max_intersecting_screen(
+        info,
+        num_screens,
+        x,
+        y,
+        width,
+        height
+    );
+    if (screen < 0) {
+        screen = 0;
+    }
+
+free_screens:
     XFree(info);
     return screen;
 }
