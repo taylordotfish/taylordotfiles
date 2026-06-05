@@ -6,7 +6,14 @@ set -euf
 dir=$(dirname "$0")
 wm=$(xprop -root 8s '\n$0\n' XSESSION_TARGET | tail -n+2 | tr -dc A-Za-z0-9_-)
 
-if [ -f "$dir"/init-monitors.sh ]; then
+init_monitors=
+for arg do
+    case "$arg" in
+        --init-monitors|--init) init_monitors=1 ;;
+    esac
+done
+
+if [ -n "$init_monitors" ] && [ -f "$dir"/init-monitors.sh ]; then
     # Calls to xrandr go in this file
     . "$dir"/init-monitors.sh
 fi
@@ -26,6 +33,20 @@ setroot() {
         hsetroot "$@"
     else
         xsetroot "$@"
+    fi
+}
+
+set_background() {
+    if [ -x ~/.fehbg ]; then
+        if ~/.fehbg; then
+            return
+        fi
+        printf >&2 '%s\n' "warning: failed to run .fehbg"
+    fi
+    if [ "$global_monitor_tech" = epaper ]; then
+        setroot -solid '#ffffff'
+    else
+        setroot -solid '#000000'
     fi
 }
 
@@ -52,15 +73,7 @@ if [ "$wm" = i3 ]; then
         i3-msg -q reload
     fi
 
-    if [ "$global_monitor_tech" = epaper ]; then
-        setroot -solid '#ffffff'
-    else
-        setroot -solid '#000000'
-    fi
-    if ! run_if_exists ~/.fehbg; then
-        printf >&2 '%s\n' "warning: failed to run .fehbg"
-    fi
-
+    set_background
     if ! pgrep -x xsettingsd > /dev/null; then
         make_xsettingsd
         xsettingsd &

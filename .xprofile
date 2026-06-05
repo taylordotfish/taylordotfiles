@@ -17,14 +17,12 @@ xprofile_main() {
             xset fp+ "$dir"
         fi
     done
-    local script
-    for script in displays.sh controls.sh; do
-        script=~/scripts/$script
-        if [ -x "$script" ]; then
-            "$script"
-        fi
-    done
-    xrdb ~/.Xresources.m4 -cpp m4
+    if [ -x ~/scripts/displays.sh ]; then
+        ~/scripts/displays.sh --init-monitors
+    fi
+    if [ -x ~/scripts/controls.sh ]; then
+        ~/scripts/controls.sh
+    fi
     export QT_AUTO_SCREEN_SCALE_FACTOR=1
     export QT_ENABLE_HIGHDPI_SCALING=1
     dbus-update-activation-environment \
