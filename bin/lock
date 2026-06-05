@@ -12,12 +12,12 @@ run_i3lock_blocking() {
     fi
     i3lock -n "$@"
     if [ -n "$picom" ]; then
-        exec picom
+        exec picom > /dev/null 2>&1
     fi
 }
 
 run_i3lock() {
-    run_i3lock_blocking "$@" > /dev/null 2>&1 < /dev/null &
+    run_i3lock_blocking "$@" &
 }
 
 any_screenshots=
@@ -40,26 +40,31 @@ on_exit() {
 trap on_exit HUP INT QUIT TERM EXIT
 
 handle_monitor() {
-    if [ "$monitor_tech" = epaper ]; then
-        return
-    fi
     local screen="$((monitor_screen))"
     local x="$((monitor_x))"
     local y="$((monitor_y))"
-    local endx="$((x + monitor_width))"
-    local endy="$((y + monitor_height))"
+    local width="$((monitor_width))"
+    local height="$((monitor_height))"
+    local endx="$((x + width))"
+    local endy="$((y + height))"
     [ "$endx" -le "$maxx" ] || maxx=$endx
     [ "$endy" -le "$maxy" ] || maxy=$endy
 
-    any_screenshots=1
-    local path="$screenshot_dir/screen_$screen.png"
-    local blur_sigma="$((monitor_dpi * 8 / 96))"
-    {
-        scrot -M "$screen" "$path"
-        mogrify -colorspace RGB -blur 0x"$blur_sigma" -colorspace sRGB "$path"
-    } &
-    eval "path_$screen=\$path"
-    im_args="$im_args \$path_$screen -geometry '+$x+$y' -composite"
+    if [ "$monitor_tech" = epaper ]; then
+        im_args="$im_args -size '${width}x${height}' xc:white"
+    else
+        any_screenshots=1
+        local path="$screenshot_dir/screen_$screen.png"
+        local blur_sigma="$((monitor_dpi * 8 / 96))"
+        {
+            scrot -oM "$screen" "$path"
+            mogrify -colorspace RGB -blur 0x"$blur_sigma" -colorspace sRGB \
+                "$path"
+        } &
+        eval "path_$screen=\$path"
+        im_args="$im_args \$path_$screen"
+    fi
+    im_args="$im_args -geometry '+$x+$y' -composite"
 }
 
 if [ -d "$screenshot_dir" ]; then
