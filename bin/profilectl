@@ -21,8 +21,8 @@ Options:
 EOF
 }
 
-expected_warnings="Warning.*Expected VideoLUT depth 8 doesn't match actual
-10\$"
+expected_warnings="Warning.*Expected VideoLUT depth 8 doesn't match actual\
+ 10\$"
 expected_errors=
 
 run_dispwin() {
@@ -40,7 +40,7 @@ run_dispwin() {
     fi
 
     local output
-    output=$(dispwin "$@" 2>&1) && false
+    output=$(dispwin "$@" 2>&1) && true
     local status="$?"
 
     if printf '%s\n' "$output" | grep -Ev -- "$expected" | grep -q .; then
@@ -52,7 +52,7 @@ run_dispwin() {
     fi
 
     if [ "$status" -ne 0 ] && [ -n "$expected_errors" ] &&
-        ! printf '%s\n' "$output" | grep -E -- "$expected_errors"
+        ! printf '%s\n' "$output" | grep -qE -- "$expected_errors"
     then
         printf '%s\n' "$output"
         exit "$status"
