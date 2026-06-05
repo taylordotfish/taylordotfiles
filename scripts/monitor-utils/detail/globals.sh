@@ -40,7 +40,7 @@ exec jq -c "$@" -- '({
         }) | from_entries as $used
             | $s.global_tech
             | map(select(type == "string"))
-            | first(.[] | select(. | in($used))) // last
+            | first(.[] | select(in($used))) // last
     else
         null
     end // "standard"),
