@@ -10,7 +10,7 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 sinclude_rel(`config.pre.m4')dnl
 esyscmd(`~/scripts/monitor-utils/m4/globals.sh')dnl
-define(`DPI', defn(`GLOBAL_MONITOR_DPI'))dnl
+define(`DPI', `GLOBAL_MONITOR_DPI')dnl
 dnl
 set $mod Mod4
 set $alt Mod1
@@ -78,26 +78,16 @@ bindsym $mod+Shift+minus move scratchpad
 # If there are multiple scratchpad windows, this command cycles through them.
 bindsym $mod+minus scratchpad show
 
-define_default(`WS1', `one')dnl
-define_default(`WS2', `two')dnl
-define_default(`WS3', `three')dnl
-define_default(`WS4', `four')dnl
-define_default(`WS5', `five')dnl
-define_default(`WS6', `six')dnl
-define_default(`WS7', `seven')dnl
-define_default(`WS8', `eight')dnl
-define_default(`WS9', `nine')dnl
-define_default(`WS10', `ten')dnl
-set $ws1 1: defn(`WS1')
-set $ws2 2: defn(`WS2')
-set $ws3 3: defn(`WS3')
-set $ws4 4: defn(`WS4')
-set $ws5 5: defn(`WS5')
-set $ws6 6: defn(`WS6')
-set $ws7 7: defn(`WS7')
-set $ws8 8: defn(`WS8')
-set $ws9 9: defn(`WS9')
-set $ws10 10: defn(`WS10')
+set $ws1 1`'ifdefn(`WS1', `: WS1')
+set $ws2 2`'ifdefn(`WS2', `: WS2')
+set $ws3 3`'ifdefn(`WS3', `: WS3')
+set $ws4 4`'ifdefn(`WS4', `: WS4')
+set $ws5 5`'ifdefn(`WS5', `: WS5')
+set $ws6 6`'ifdefn(`WS6', `: WS6')
+set $ws7 7`'ifdefn(`WS7', `: WS7')
+set $ws8 8`'ifdefn(`WS8', `: WS8')
+set $ws9 9`'ifdefn(`WS9', `: WS9')
+set $ws10 10`'ifdefn(`WS10', `: WS10')
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -212,17 +202,17 @@ bindsym Control+Shift+period exec --no-startup-id dunstctl context
 define_default(`VECTOR_FONT_FAMILY', `DejaVu Sans Mono')dnl
 define_default(`VECTOR_FONT_SIZE', `10')dnl
 define_default(`I3_BITMAP_FONT', ifelse(eval(DPI < 144), 1, 9x15, 9x15-2x))dnl
-define_default(`DMENU_BITMAP_FONT', ifelse(eval(DPI < 144), 1,
-    ``Misc Fixed:pixelsize=13'', ``Misc 2xFixed:pixelsize=26''))dnl
 define_default(`I3_FONT', ifdefn(`USE_BITMAP_FONT', ``I3_BITMAP_FONT'',
     ``pango:VECTOR_FONT_FAMILY VECTOR_FONT_SIZE''))dnl
+font I3_FONT
+define_default(`DMENU_BITMAP_FONT', ifelse(eval(DPI < 144), 1,
+    ``Misc Fixed:pixelsize=13'', ``Misc 2xFixed:pixelsize=26''))dnl
 define_default(`DMENU_FONT', ifdefn(`USE_BITMAP_FONT', ``DMENU_BITMAP_FONT'',
     ``VECTOR_FONT_FAMILY:size=VECTOR_FONT_SIZE''))dnl
-define_default(`DMENU_COLORS', ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper,
-    ``-nf white -sb white -sf black -nb black''))dnl
-font I3_FONT
-bindsym $mod+d exec --no-startup-id dmenu_run -fn 'DMENU_FONT'ifdefn(
-    `DMENU_COLORS', ` DMENU_COLORS')
+define_default(`DMENU_ARGS', `-fn "DMENU_FONT"')dnl
+ifelse(defn(`GLOBAL_MONITOR_TECH'), epaper, `define(`DMENU_ARGS',
+    defn(`DMENU_ARGS')` -nf white -sb white -sf black -nb black')')dnl
+bindsym $mod+d exec --no-startup-id dmenu_run DMENU_ARGS
 
 # terminal shortcuts
 bindsym $mod+Return exec --no-startup-id \
@@ -246,5 +236,5 @@ esyscmd(`~/scripts/monitor-utils/m4/foreach.sh HANDLE_MONITOR')dnl
 dnl
 # rename workspace
 bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
-    prompt -f 'I3_FONT'
+    prompt -f "I3_FONT"
 sinclude_rel(`config.post.m4')dnl

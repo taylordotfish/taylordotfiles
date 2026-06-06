@@ -25,11 +25,9 @@ order += "disk /"
 #order += "run_watch VPN"
 order += "wireless _first_"
 order += "ethernet _first_"
-define(`BATTERY', esyscmd(`printf \\140
-printf "%s\n" /sys/class/power_supply/BAT* | head -1 | tr -dC 0-9
-printf \\47
-'))dnl
-ifelse(defn(`BATTERY'),,, `dnl
+define(`BATTERY', esyscmd(`printf "%s\n" /sys/class/power_supply/BAT* |
+    head -1 | tr -dC 0-9'))dnl
+ifdefn(`BATTERY', `dnl
 order += "battery BATTERY"
 ')dnl
 order += "load"
@@ -48,11 +46,11 @@ ethernet _first_ {
     format_up = "E: %ip"
     format_down = "E: down"
 }
-ifelse(defn(`BATTERY'),,, `dnl
+dnl
+ifdefn(`BATTERY', `
 define_default(`BATTERY_FORMAT', `%status %percentage %remaining')dnl
-
 battery BATTERY {
-    format = "defn(`BATTERY_FORMAT')"
+    format = "BATTERY_FORMAT"
 }
 ')dnl
 

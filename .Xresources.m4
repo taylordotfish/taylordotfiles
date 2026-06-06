@@ -1,15 +1,15 @@
 include(esyscmd(`printf "\`%s'" "$HOME"')`/.conf.m4')dnl
 sinclude_rel(`.Xresources.pre.m4')dnl
 esyscmd(`~/scripts/monitor-utils/m4/globals.sh')dnl
-define(`DPI', defn(`GLOBAL_MONITOR_DPI'))dnl
+define(`DPI', `GLOBAL_MONITOR_DPI')dnl
 Xft.dpi: DPI
 
 define_default(`TERM_FONT_FAMILY', `DejaVu Sans Mono')dnl
 define_default(`TERM_FONT_SIZE', `10')dnl
 ifdef(`BITMAP_FONT',, `ifelse(
     define(`BITMAP_SUFFIX', ifelse(eval(DPI >= 144), 1, -2x))
-    define(`BITMAP_FONT', `9x15'defn(`BITMAP_SUFFIX'))
-    define_default(`BITMAP_FONT_BOLD', `9x15'defn(`BITMAP_SUFFIX')`bold')
+    define(`BITMAP_FONT', `9x15`'BITMAP_SUFFIX')
+    define_default(`BITMAP_FONT_BOLD', `9x15`'BITMAP_SUFFIX`'bold')
     define_default(`BITMAP_FONT_ITALIC', `BITMAP_FONT')
     define_default(`BITMAP_FONT_BOLD_ITALIC', `BITMAP_FONT_BOLD')
 )')dnl
