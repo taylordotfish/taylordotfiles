@@ -17,6 +17,7 @@ if [ -f "$config"/outputs.json ]; then
 else
     set -- "$@" --argjson output_map '[{}]'
 fi
+
 exec jq -cn "$@" '
 def validate(prop; filt):
     .[prop] | if filt | not then
