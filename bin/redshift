@@ -1,0 +1,28 @@
+#!/bin/sh
+set -euf
+
+dir=$(dirname "$0")
+path=:$PATH:
+case "$path" in
+    *:$dir:*) path=${path%%:"$dir":*}:${path#*:"$dir":} ;;
+esac
+path=${path#:}
+path=${path%:}
+if ! redshift=$(PATH=$path command -v redshift); then
+    printf >&2 '%s\n' 'error: missing redshift'
+    exit 1
+fi
+
+screens=
+
+handle_monitor() {
+    if [ "$monitor_tech" != epaper ]; then
+        screens=${screens:+$screens,}$monitor_screen
+    fi
+}
+
+eval "$(~/scripts/monitor-utils/sh/foreach.sh handle_monitor)"
+
+if [ -n "$screens" ]; then
+    exec "$redshift" -m "randr:crtc=$screens"
+fi
