@@ -22,7 +22,7 @@ set -- "$dir"/settings.default.json
 if [ -f "$dir"/settings.override.json ]; then
     set -- "$@" "$dir"/settings.override.json
 fi
-jq -cs add -- "$@" > "$tmp"/settings.json
+jq -cs '{"@AUTO_GENERATED": true} + add' -- "$@" > "$tmp"/settings.json
 mv -- "$tmp"/settings.json "$dir"/
 
 if [ -f "$dir"/generate.post.sh ]; then
