@@ -14,7 +14,7 @@ for arg do
 done
 
 if [ -n "$init_monitors" ] && [ -f "$dir"/init-monitors.sh ]; then
-    # Calls to xrandr go in this file
+    # Calls to xrandr go in this file.
     . "$dir"/init-monitors.sh
 fi
 
@@ -22,10 +22,6 @@ run_if_exists() {
     if [ -x "$1" ]; then
         "$@"
     fi
-}
-
-monitors_newer() {
-    [ ~/.cache/monitor-utils/monitors.json -nt "$1" ]
 }
 
 setroot() {
@@ -51,6 +47,7 @@ set_background() {
 }
 
 make_xsettingsd() {
+    [ -f ~/.xsettingsd.m4 ] || return 0
     {
         printf '%s\n' "# AUTOMATICALLY GENERATED!"
         printf '%s\n\n' "# CHANGES WILL BE LOST!"
@@ -69,17 +66,18 @@ fi
 
 if [ "$wm" = i3 ]; then
     run_if_exists ~/.config/i3/generate.sh
-    if pgrep -x i3 > /dev/null && monitors_newer ~/.config/i3/config.m4; then
-        i3-msg -q reload
+    if pgrep -x i3 > /dev/null; then
+        i3-msg -q restart
     fi
 
     set_background
-    if ! pgrep -x xsettingsd > /dev/null; then
-        make_xsettingsd
-        xsettingsd &
-    elif monitors_newer ~/.xsettingsd.m4; then
-        make_xsettingsd
+    make_xsettingsd
+    if ! [ -f ~/.xsettingsd ]; then
+        :
+    elif pgrep -x xsettingsd > /dev/null; then
         pkill -x xsettingsd -HUP
+    else
+        xsettingsd &
     fi
 
     if { command -v picom && ! pgrep -x picom; } > /dev/null; then
