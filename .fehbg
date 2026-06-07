@@ -6,6 +6,17 @@ set -euf
 dir=$(dirname "$0")
 
 default_get_image() {
+    if [ "$monitor_tech" = epaper ]; then
+        local dir
+        dir=~/.cache/fehbg
+        if ! [ -e "$dir"/white.png ]; then
+            mkdir -p -- "$dir"
+            convert -size 16x16 xc:white "$dir"/white.png
+        fi
+        image=$dir/white.png
+        return
+    fi
+
     local dir=/etc/alternatives/desktop-theme/wallpaper/contents/images
     set +f
     set -f -- "$dir"/*.svg
