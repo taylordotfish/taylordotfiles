@@ -63,7 +63,7 @@ default_get_image() {
 }
 
 get_image() {
-    default_get_image
+    :
 }
 
 if [ -f "$dir"/.fehbg.pre.sh ]; then
@@ -72,9 +72,11 @@ if [ -f "$dir"/.fehbg.pre.sh ]; then
 fi
 
 handle_monitor() {
-    local image=
+    local image
+    unset image
     get_image
-    if [ -z "$image" ]; then
+    [ -n "${image+x}" ] || default_get_image
+    if [ -z "${image+x}" ]; then
         local msg=".fehbg: could not find image for screen $monitor_screen"
         msg="$msg (${monitor_width}x${monitor_height})"
         printf >&2 '%s\n' "$msg"
