@@ -44,6 +44,7 @@ set matchpairs+=<:>
 set nomodeline
 set cinkeys-=0#
 set indentkeys-=0#
+set scrolloff=0
 
 if g:fancyterm
     set background=dark
