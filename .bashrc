@@ -140,14 +140,6 @@ ansireset() {
     printf '\033[0m'
 }
 
-if [ -x ~/scripts/keyboard.sh ]; then keyboard() {
-    ~/scripts/keyboard.sh "$@"
-} fi
-
-if [ -x ~/scripts/mouse.sh ]; then mouse() {
-    ~/scripts/mouse.sh
-} fi
-
 if [ -x ~/scripts/controls.sh ]; then controls() {
     ~/scripts/controls.sh
 } fi
