@@ -1,6 +1,6 @@
 #!/bin/sh
 set -euf
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 
 exec > "$dir"/dunstrc
 cat << 'EOF'

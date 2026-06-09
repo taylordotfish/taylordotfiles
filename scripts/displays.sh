@@ -3,7 +3,7 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 wm=$(xprop -root 8s '\n$0\n' XSESSION_TARGET | tail -n+2 | tr -dc A-Za-z0-9_-)
 
 init_monitors=

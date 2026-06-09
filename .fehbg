@@ -3,7 +3,7 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 
 default_get_image() {
     if [ "$monitor_tech" = epaper ]; then

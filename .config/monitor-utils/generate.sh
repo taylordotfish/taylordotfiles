@@ -1,6 +1,6 @@
 #!/bin/sh
 set -euf
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 cache=~/.cache/monitor-utils
 mkdir -p -- "$cache"
 

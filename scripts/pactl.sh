@@ -1,6 +1,6 @@
 #!/bin/sh
 set -euf
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 if [ -f "$dir"/pactl.pre.sh ]; then
     . "$dir"/pactl.pre.sh
 fi

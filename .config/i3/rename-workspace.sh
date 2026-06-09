@@ -16,7 +16,7 @@ rename \"%s\"" -P "rename workspace: " "$@"
 }
 
 rename() {
-    #exec >> "$(dirname "$0")"/rename-workspace.log 2>&1
+    #exec >> "$(dirname -- "$0")"/rename-workspace.log 2>&1
     local new_name="$1"
     [ -n "$new_name" ] || return 0
     local new_number="${new_name%%:*}"

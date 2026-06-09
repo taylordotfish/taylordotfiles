@@ -3,7 +3,7 @@
 # License: GNU GPL version 3 or later
 set -euf
 
-dir=$(dirname "$0")
+dir=$(dirname -- "$0")
 path=:$PATH:
 case "$path" in
     *:$dir:*) path=${path%%:"$dir":*}:${path#*:"$dir":} ;;
