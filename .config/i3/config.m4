@@ -237,4 +237,7 @@ dnl
 # rename workspace
 bindsym $mod+m exec --no-startup-id sh ~/.config/i3/rename-workspace.sh \
     prompt -f "I3_FONT"
+
+# default to tabbed layout
+workspace_layout tabbed
 sinclude_rel(`config.post.m4')dnl
