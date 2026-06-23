@@ -26,6 +26,7 @@ Graphical environment:
 * libxrandr-dev
 * logrotate
 * lxpolkit
+* picom
 * xsettingsd
 
 Optional:
