@@ -120,17 +120,11 @@ clear-history() {
     rm -f ~/.wget-hsts
 }
 
-clear-clipboard() {
-    local c
-    for c in p s b; do
-        xsel "-$c" < /dev/null
-    done
-}
-
-clear-all() {
+unset -f clear-all
+if command -v clear-clipboard > /dev/null; then clear-all() {
     clear-history
     clear-clipboard
-}
+} fi
 
 cd-parent() {
     cd "$(realpath ..)"

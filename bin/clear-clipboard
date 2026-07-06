@@ -1,0 +1,5 @@
+#!/bin/sh
+set -euf
+for c in p s b; do
+    xsel "-$c" < /dev/null
+done
