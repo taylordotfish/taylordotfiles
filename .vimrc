@@ -72,8 +72,8 @@ endif
 
 au FileType vim setlocal comments+=:\" indentkeys-=0\\ indentkeys-==}
 au BufRead,BufNewFile *.h++ set filetype=cpp
-au FileType make,lua let g:ws_config.mode = "tab"
-au FileType markdown,text,gitcommit let g:ws_config.ft_indent = 0
+au FileType make,lua call WsSetFileOptions(#{mode: "tab"})
+au FileType markdown,text,gitcommit call WsSetFileOptions(#{ft_indent: 0})
 au FileType gitcommit setlocal textwidth=72
 " Workaround for bugs in upstream indent/javascript.vim
 au FileType javascript setlocal cinoptions=
