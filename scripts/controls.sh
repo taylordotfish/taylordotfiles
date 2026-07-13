@@ -14,7 +14,7 @@ pointer_map="1 2 3"
 if [ -n "${left_mouse-}" ]; then
     pointer_map="3 2 1"
 fi
-output=$(xmodmap -e "pointer = $pointer_map" 2>&1) && true
+output=$(xmodmap -e "pointer = $pointer_map" 2>&1) || true
 status=$?
 printf '%s\n' "$output" | grep -Ev '^Warning: Only changing the first 3 |^$'
 if [ "$status" -ne 0 ]; then
