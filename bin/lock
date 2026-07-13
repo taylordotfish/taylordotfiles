@@ -67,7 +67,11 @@ handle_monitor() {
     im_args="$im_args -geometry '+$x+$y' -composite"
 }
 
-if [ -d "$screenshot_dir" ]; then
+if [ -d "$screenshot_dir" ] &&
+    command -v mogrify > /dev/null &&
+    # `scrot` might be a wrapper script; actually invoke it to check existence
+    scrot --version > /dev/null 2>&1
+then
     maxx=0
     maxy=0
     im_args=
