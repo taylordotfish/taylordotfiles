@@ -2,6 +2,10 @@
 _profile_sourced=1
 unalias -a
 
+if [ -f /etc/profile ]; then
+    . /etc/profile
+fi
+
 [ -n "${ORIG_PATH+x}" ] || export ORIG_PATH=$PATH
 PATH=$ORIG_PATH
 
