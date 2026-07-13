@@ -56,7 +56,7 @@ make_xsettingsd() {
 }
 
 run_if_exists ~/.config/monitor-utils/generate.sh
-eval "$(~/scripts/monitor-utils/sh/globals.sh)"
+MONITORS_STALE=1 ~/scripts/monitor-utils/make.sh
 xrdb ~/.Xresources.m4 -cpp m4
 
 if command -v dunst > /dev/null; then
