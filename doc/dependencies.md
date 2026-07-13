@@ -16,8 +16,9 @@ Base:
 
 Graphical environment:
 
+* argyll
 * brightnessctl (if laptop)
-* dispwin
+* feh
 * gnome-icon-theme
 * hsetroot
 * i3
@@ -26,7 +27,11 @@ Graphical environment:
 * libxrandr-dev
 * logrotate
 * lxpolkit
+* pactl
 * picom
+* rxvt-unicode
+* xcape
+* xsel
 * xsettingsd
 
 Optional:
