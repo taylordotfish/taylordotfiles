@@ -16,13 +16,15 @@ if [ -n "${NOSRVRKEYS-}" ]; then
     set -- "$@" -option srvrkeys:none
 fi
 
+make -sC "$dir"/rules/source
+
 setxkbmap "-I$dir" \
-    -rules evdev \
+    -rules local \
     -option ctrl:nocaps \
     -option compose:menu \
     -option compose:rwin \
     -option compose:ralt \
-    -option custom \
+    -option local \
     "$@" \
     -layout "$LAYOUTS" \
     -print > "$dir"/.keymap.xkb
@@ -40,6 +42,6 @@ else
     run_verbose > /dev/null 2>&1
 fi
 
-if [ -z "${NOXCAPE-}" ]; then
+if [ -z "${NOXCAPE-}" ] && command -v xcape > /dev/null; then
     xcape -e "#66=Escape;#37=Caps_Lock${xcape_map:+;$xcape_map}"
 fi
