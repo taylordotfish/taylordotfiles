@@ -120,8 +120,12 @@ bindsym $mod+$alt+l workspace next
 bindsym $mod+$alt+h workspace prev
 bindsym $mod+$alt+Shift+Right move workspace to output right
 bindsym $mod+$alt+Shift+Left move workspace to output left
+bindsym $mod+$alt+Shift+Up move workspace to output up
+bindsym $mod+$alt+Shift+Down move workspace to output down
 bindsym $mod+$alt+Shift+l move workspace to output right
 bindsym $mod+$alt+Shift+h move workspace to output left
+bindsym $mod+$alt+Shift+k move workspace to output up
+bindsym $mod+$alt+Shift+j move workspace to output down
 
 # brightness keys
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
