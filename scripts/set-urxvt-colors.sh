@@ -2,7 +2,7 @@
 set -euf
 printf '\033]4'
 printf ';0;[75]#000000'
-printf ';8;[75]#4d4d4d'
+#printf ';8;[75]#4d4d4d'
 printf ';232;[75]#080808'
 printf ';233;[75]#121212'
 printf ';234;[75]#1c1c1c'
