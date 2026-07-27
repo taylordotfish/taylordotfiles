@@ -7,6 +7,7 @@ are used.
 Base:
 
 * awk
+* bc
 * gcc
 * jq
 * m4

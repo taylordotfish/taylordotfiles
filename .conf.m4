@@ -17,5 +17,5 @@ define_nonbare(`getcwd', `ifelse(regexp(__file__, `/'), `-1', `.',
     `regexp(__file__, `^\(.*\)/.*$', ``\1'')')')dnl
 define_nonbare(`include_rel', `include(getcwd()`/$1')')dnl
 define_nonbare(`sinclude_rel', `sinclude(getcwd()`/$1')')dnl
-define_nonbare(`frac', `ifelse(`$3',, `frac(`$1', `$2', `3')',
-    `eval(`($1)/($2)').eval(`($1) * 10**($3) / $2 % 10**($3)')')')dnl
+define_nonbare(`evalf', `esyscmd(`printf "scale=3;%s\n" "'patsubst(
+    ``$1'', `[^`' 0-9.()+*/-]', `')`" | bc | tr -d "\n"')')dnl

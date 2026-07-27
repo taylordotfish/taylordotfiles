@@ -4,7 +4,7 @@ bar {
     status_command i3status | `MONITOR_PRIORITY'=MONITOR_PRIORITY \
         `MONITOR_TECH'=defn(`MONITOR_TECH') ~/.config/i3/status-wrapper.py
     font ifdefn(`USE_BITMAP_FONT', `I3_BITMAP_FONT',
-        `pango:VECTOR_FONT_FAMILY frac(MONITOR_DPI * VECTOR_FONT_SIZE, DPI)')
+        `pango:VECTOR_FONT_FAMILY evalf(MONITOR_DPI * VECTOR_FONT_SIZE / DPI)')
     colors {
 ifelse(defn(`MONITOR_TECH'), epaper, `dnl
         background #ffffff

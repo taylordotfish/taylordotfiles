@@ -45,7 +45,7 @@ ifdefn(`BITMAP_FONT_BOLD_ITALIC', `Rxvt*boldItalicFont: BITMAP_FONT_BOLD_ITALIC
 ')dnl', `dnl
 Rxvt*font: xft:TERM_FONT_FAMILY:size=TERM_FONT_SIZE
 define(`RXVT_DPI_FONTS', `ifelse(`$#$1', 1,, `dnl
-Rxvt*$1dpi*font: xft:TERM_FONT_FAMILY:size=frac($1 * TERM_FONT_SIZE, DPI)
+Rxvt*$1dpi*font: xft:TERM_FONT_FAMILY:size=evalf($1 * TERM_FONT_SIZE / DPI)
 RXVT_DPI_FONTS(shift($@))')')dnl
 RXVT_DPI_FONTS(esyscmd(`~/scripts/monitor-utils/monitors.sh -j \
     "map(.dpi | select(. != 'DPI`)) | unique | join(\",\")"'))')dnl
