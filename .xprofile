@@ -18,10 +18,16 @@ xprofile_main() {
         fi
     done
     if [ -x ~/scripts/displays.sh ]; then
-        ~/scripts/displays.sh --init-monitors
+        if ! ~/scripts/displays.sh --init-monitors; then
+            echo "displays.sh failed"
+            exit 1
+        fi
     fi
     if [ -x ~/scripts/controls.sh ]; then
-        ~/scripts/controls.sh
+        if ! ~/scripts/controls.sh; then
+            echo "controls.sh failed"
+            exit 1
+        fi
     fi
     export QT_AUTO_SCREEN_SCALE_FACTOR=1
     export QT_ENABLE_HIGHDPI_SCALING=1
