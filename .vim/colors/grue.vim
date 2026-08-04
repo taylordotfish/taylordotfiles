@@ -3,7 +3,7 @@
 
 set background=dark
 hi clear
-let g:colors_name = "bluegreen"
+let g:colors_name = "grue"
 
 " Describes the transparency of black and dark gray colors in the terminal.
 " Possible values:
@@ -12,7 +12,7 @@ let g:colors_name = "bluegreen"
 " - "background": Black and dark gray colors have approximately 75% opacity
 "   when used as a background color only. When used as a foreground color, they
 "   have full opacity.
-let s:transparency = get(g:, "bluegreen_transparency", "none")
+let s:transparency = get(g:, "grue_transparency", "none")
 
 hi MoreMsg      ctermfg=84   ctermbg=none cterm=none
 hi Question     ctermfg=84   ctermbg=none cterm=none

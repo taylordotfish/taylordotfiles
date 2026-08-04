@@ -62,11 +62,11 @@ let g:rust_edition = "latest"
 filetype indent on
 if g:fancyterm
     syntax on
-    if exists("g:bluegreen_transparency")
+    if exists("g:grue_transparency")
     elseif g:term =~# '^rxvt-unicode-256color$'
-        let g:bluegreen_transparency = "full"
+        let g:grue_transparency = "full"
     endif
-    colorscheme bluegreen
+    colorscheme grue
     au FileType * syntax sync fromstart
 endif
 
