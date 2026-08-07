@@ -99,12 +99,17 @@ static void print_outputs(Display * const display) {
 
     putchar('[');
     bool any = false;
+    int screen_num = 0;
     for (int i = 0; i < ncrtc; ++i) {
         const RRCrtc crtc = resources->crtcs[i];
         XRRCrtcInfo * const crtc_info =
             XRRGetCrtcInfo(display, resources, crtc);
+        if (!crtc_info) {
+            continue;
+        }
 
-        XRROutputInfo * const output_info = crtc_info && crtc_info->noutput > 0
+        const bool is_active = crtc_info->width != 0 && crtc_info->height != 0;
+        XRROutputInfo * const output_info = is_active && crtc_info->noutput > 0
             ? XRRGetOutputInfo(display, resources, crtc_info->outputs[0])
             : NULL;
         XRRFreeCrtcInfo(crtc_info);
@@ -112,10 +117,11 @@ static void print_outputs(Display * const display) {
         if (output_info && output_info->name) {
             printf("%s{\"output\":", any ? "," : "");
             write_json_string(stdout, output_info->name);
-            printf(",\"screen\":%d}", i);
+            printf(",\"screen\":%d}", screen_num);
             any = true;
         }
         XRRFreeOutputInfo(output_info);
+        screen_num += is_active;
     }
     puts("]");
     XRRFreeScreenResources(resources);
