@@ -50,6 +50,9 @@ for arg do
         -per-monitor)
             per_monitor=1
             ;;
+        -invalid)  # used by fastfetch
+            exec "$urxvt" "$@"
+            ;;
         *)
             args="$args \"\${$i}\""
             ;;
