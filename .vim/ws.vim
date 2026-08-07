@@ -110,15 +110,17 @@ function s:Init()
         elseif &indentexpr is# ""
             UseCIndent
         endif
+        " `list` and `listchars` are documented as being window-local rather
+        " than buffer-local, but this doesn't seem to be the case.
         if &ft is# "help"
             setlocal nolist
         else
             setlocal list
         endif
+        setlocal listchars=extends:$,precedes:$
     endif
 
     if w:ws_state.mode isnot# b:ws_state.mode
-        setlocal listchars=extends:$,precedes:$
         for l:id in w:ws_state.ws_ids
             call matchdelete(l:id)
         endfor
