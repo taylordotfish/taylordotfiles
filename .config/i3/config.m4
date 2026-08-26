@@ -146,6 +146,8 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exit
 
+define_default(`RESIZE_STEP', eval(DPI * 10 / 96))dnl
+define_default(`RESIZE_STEP_LARGE', eval(DPI * 50 / 96))dnl
 # resize window (you can also use the mouse for that)
 mode "resize" {
     # These bindings trigger as soon as you enter the resize mode
@@ -154,24 +156,24 @@ mode "resize" {
     # Pressing j will grow the window’s width.
     # Pressing k will shrink the window’s height.
     # Pressing l will grow the window’s height.
-    bindsym h resize shrink width 10 px
-    bindsym j resize grow height 10 px
-    bindsym k resize shrink height 10 px
-    bindsym l resize grow width 10 px
-    bindsym Shift+h resize shrink width 50 px
-    bindsym Shift+j resize grow height 50 px
-    bindsym Shift+k resize shrink height 50 px
-    bindsym Shift+l resize grow width 50 px
+    bindsym h resize shrink width RESIZE_STEP px
+    bindsym j resize grow height RESIZE_STEP px
+    bindsym k resize shrink height RESIZE_STEP px
+    bindsym l resize grow width RESIZE_STEP px
+    bindsym Shift+h resize shrink width RESIZE_STEP_LARGE px
+    bindsym Shift+j resize grow height RESIZE_STEP_LARGE px
+    bindsym Shift+k resize shrink height RESIZE_STEP_LARGE px
+    bindsym Shift+l resize grow width RESIZE_STEP_LARGE px
 
     # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 10 px
-    bindsym Down resize grow height 10 px
-    bindsym Up resize shrink height 10 px
-    bindsym Right resize grow width 10 px
-    bindsym Shift+Left resize shrink width 50 px
-    bindsym Shift+Down resize grow height 50 px
-    bindsym Shift+Up resize shrink height 50 px
-    bindsym Shift+Right resize grow width 50 px
+    bindsym Left resize shrink width RESIZE_STEP px
+    bindsym Down resize grow height RESIZE_STEP px
+    bindsym Up resize shrink height RESIZE_STEP px
+    bindsym Right resize grow width RESIZE_STEP px
+    bindsym Shift+Left resize shrink width RESIZE_STEP_LARGE px
+    bindsym Shift+Down resize grow height RESIZE_STEP_LARGE px
+    bindsym Shift+Up resize shrink height RESIZE_STEP_LARGE px
+    bindsym Shift+Right resize grow width RESIZE_STEP_LARGE px
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
