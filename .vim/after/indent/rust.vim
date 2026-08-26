@@ -17,11 +17,16 @@ function s:GetRustIndent()
     endif
 
     let l:prev_indent = indent(l:prev)
-    if l:line =~# '}\s*$' && getline(l:prev) !~# '{\s*$'
-        let l:expected_indent = l:prev_indent - 4
+    if getline(l:prev) =~# '[[{(]\s*$'
+        let l:expected_indent = l:prev_indent + &shiftwidth
     else
         let l:expected_indent = l:prev_indent
     endif
+
+    if l:line =~# '}\s*$'
+        let l:expected_indent -= &shiftwidth
+    endif
+
     let l:expected_indent = max([l:expected_indent, 0])
     return min([l:expected_indent, l:indent])
 endfunction
