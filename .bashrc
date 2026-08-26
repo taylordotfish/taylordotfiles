@@ -134,10 +134,6 @@ ansireset() {
     printf '\033[0m'
 }
 
-if [ -x ~/scripts/controls.sh ]; then controls() {
-    ~/scripts/controls.sh
-} fi
-
 if [ -x ~/scripts/displays.sh ]; then displays() {
     ~/scripts/displays.sh
 } fi
