@@ -135,7 +135,7 @@ ansireset() {
 }
 
 if [ -x ~/scripts/displays.sh ]; then displays() {
-    ~/scripts/displays.sh
+    ~/scripts/displays.sh "$@"
 } fi
 
 xres() {
