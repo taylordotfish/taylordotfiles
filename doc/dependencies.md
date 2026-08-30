@@ -28,7 +28,7 @@ Graphical environment:
 * libxrandr-dev
 * logrotate
 * lxpolkit
-* pactl
+* pulseaudio-utils
 * picom
 * rxvt-unicode
 * xcape
