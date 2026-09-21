@@ -195,6 +195,7 @@ for_window [instance="^display([^A-Za-z0-9]|$)"] move position ifelse(
 for_window [instance="^kmag$"] floating enable
 for_window [instance="^kmag$"] resize set ifelse(
     )eval(DPI * 800 / 96) eval(DPI * 600 / 96)
+for_window [instance="^qjackctl$"] floating enable
 for_window [instance="^jack-keyboard([^A-Za-z]|$)"] floating enable
 for_window [instance="^notes-ui$"] floating enable  # carla
 
