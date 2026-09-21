@@ -24,6 +24,14 @@ run_if_exists() {
     fi
 }
 
+unset -v globals_loaded
+
+load_globals() {
+    [ -z "${globals_loaded-}" ] || return 0
+    eval "$(~/scripts/monitor-utils/sh/globals.sh)"
+    globals_loaded=1
+}
+
 setroot() {
     if command -v hsetroot > /dev/null; then
         hsetroot "$@"
@@ -39,6 +47,7 @@ set_background() {
         fi
         printf >&2 '%s\n' "warning: failed to run .fehbg"
     fi
+    load_globals
     if [ "$global_monitor_tech" = epaper ]; then
         setroot -solid '#ffffff'
     else
@@ -77,7 +86,7 @@ if [ "$wm" = i3 ]; then
     elif pgrep -x xsettingsd > /dev/null; then
         pkill -x xsettingsd -HUP
     else
-        xsettingsd &
+        xsettingsd > /dev/null 2>&1 &
     fi
 
     if { command -v picom && ! pgrep -x picom; } > /dev/null; then
