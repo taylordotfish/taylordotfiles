@@ -49,4 +49,4 @@ Rxvt*$1dpi*font: xft:TERM_FONT_FAMILY:size=evalf($1 * TERM_FONT_SIZE / DPI)
 RXVT_DPI_FONTS(shift($@))')')dnl
 RXVT_DPI_FONTS(esyscmd(`~/scripts/monitor-utils/monitors.sh -j \
     "map(.dpi | select(. != 'DPI`)) | unique | join(\",\")"'))')dnl
-sinclude(`.Xresources.post.m4')dnl
+sinclude_rel(`.Xresources.post.m4')dnl
