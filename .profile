@@ -13,12 +13,13 @@ if [ -f ~/.profile.pre ]; then
     . ~/.profile.pre
 fi
 
-export GOPATH=~/go
-export NODE_PATH=~/.local/lib/node_modules
+export GOPATH=~/.go
+export NODE_PATH=~/.npm-packages/lib/node_modules
 export PYENV_ROOT=~/.pyenv
 export PYENV_DIR=~
 
 PATH=$GOPATH/bin:$PATH
+PATH=~/.npm-packages/bin:$PATH
 PATH=~/.virtualenv/bin:$PATH
 PATH=$PYENV_ROOT/bin:$PATH
 PATH=~/.cargo/bin:$PATH
